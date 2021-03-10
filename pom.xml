@@ -103,6 +103,9 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<profiles>
+						<profile>develop</profile>
+					</profiles>
 				</configuration>
 			</plugin>
 		</plugins>
