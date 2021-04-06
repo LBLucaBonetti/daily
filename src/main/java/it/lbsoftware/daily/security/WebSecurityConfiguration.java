@@ -1,7 +1,7 @@
 package it.lbsoftware.daily.security;
 
 import com.okta.spring.boot.oauth.Okta;
-import it.lbsoftware.daily.users.UserRegistrationFilter;
+import it.lbsoftware.daily.appusers.AppUserRegistrationFilter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -22,7 +22,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .cors();
         http
-                .addFilterAfter(new UserRegistrationFilter(), BearerTokenAuthenticationFilter.class);
+                .addFilterAfter(new AppUserRegistrationFilter(), BearerTokenAuthenticationFilter.class);
 
         Okta.configureResourceServer401ResponseBody(http);
     }
