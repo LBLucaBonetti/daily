@@ -20,10 +20,6 @@ public class NoteController {
 //    @GetMapping("/api/messages")
 //    @PreAuthorize("hasAuthority('SCOPE_email')")
 //    public Map<String, Object> messages(JwtAuthenticationToken jwtAuthenticationToken) {
-//        System.out.println("--- CONTROLLER ---");
-//        System.out.println("Sub: " + jwtAuthenticationToken.getName());
-//        System.out.println("Uid: " + jwtAuthenticationToken.getTokenAttributes().get("uid"));
-//
 //        Map<String, Object> result = new HashMap<>();
 //        result.put("messages", Arrays.asList(
 //                new Message("I am a robot."),
