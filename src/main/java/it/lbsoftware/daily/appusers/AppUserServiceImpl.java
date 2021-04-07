@@ -15,7 +15,7 @@ import java.util.Optional;
 public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository appUserRepository;
-    //private final EmailService emailService;
+//    private final EmailService emailService;
 
     @Override
     public void checkAppUserPresence(@NotNull JwtAuthenticationToken jwtAuthenticationToken) {
@@ -34,7 +34,7 @@ public class AppUserServiceImpl implements AppUserService {
                     .lastAccessDateTime(now)
                     .build();
             appUserRepository.save(newUser);
-            //emailService.send(newUser.getEmail(), "Welcome!", "Welcome to Daily :)");
+//            emailService.send(newUser.getEmail(), "Welcome!", "Welcome to Daily :)");
         } else {
             System.out.println("user already exists, updating last access...");
             AppUser appUser = appUserOptional.get();
