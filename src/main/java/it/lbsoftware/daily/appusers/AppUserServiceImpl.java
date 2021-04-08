@@ -23,10 +23,10 @@ public class AppUserServiceImpl implements AppUserService {
         String uid = (String) jwtAuthenticationToken.getTokenAttributes().get("uid");
         Optional<AppUser> appUserOptional = appUserRepository.findByUid(uid);
         LocalDateTime now = LocalDateTime.now();
+        // By default, the name maps to the sub claim according to Spring Security docs
+        String email = jwtAuthenticationToken.getName();
         if (appUserOptional.isEmpty()) {
 //            System.out.println("user does not exist, creating...");
-            // By default, the name maps to the sub claim according to Spring Security docs
-            String email = jwtAuthenticationToken.getName();
             AppUser newUser = AppUser.builder()
                     .uid(uid)
                     .email(email)
@@ -38,6 +38,10 @@ public class AppUserServiceImpl implements AppUserService {
         } else {
 //            System.out.println("user already exists, updating last access...");
             AppUser appUser = appUserOptional.get();
+            if (!appUser.getEmail().equals(email)) {
+                // User changed email address, update accordingly
+                appUser.setEmail(email);
+            }
             appUser.setLastAccessDateTime(now);
             appUserRepository.save(appUser);
         }
