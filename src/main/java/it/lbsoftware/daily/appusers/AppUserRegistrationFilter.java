@@ -21,7 +21,7 @@ public class AppUserRegistrationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        appUserService.checkAppUserPresence(jwtAuthenticationToken);
+        appUserService.checkAppUserRegistration(jwtAuthenticationToken);
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
