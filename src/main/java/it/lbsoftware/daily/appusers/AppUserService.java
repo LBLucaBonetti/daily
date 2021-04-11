@@ -2,8 +2,6 @@ package it.lbsoftware.daily.appusers;
 
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import javax.validation.constraints.NotNull;
-
 public interface AppUserService {
 
     /**
@@ -11,6 +9,6 @@ public interface AppUserService {
      *
      * @param jwtAuthenticationToken Token that contains user details
      */
-    void checkAppUserRegistration(@NotNull JwtAuthenticationToken jwtAuthenticationToken);
+    void checkAppUserRegistration(JwtAuthenticationToken jwtAuthenticationToken);
 
 }

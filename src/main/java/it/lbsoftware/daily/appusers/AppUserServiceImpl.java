@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -18,7 +17,7 @@ public class AppUserServiceImpl implements AppUserService {
 //    private final EmailService emailService;
 
     @Override
-    public void checkAppUserRegistration(@NotNull JwtAuthenticationToken jwtAuthenticationToken) {
+    public void checkAppUserRegistration(JwtAuthenticationToken jwtAuthenticationToken) {
         String uid = (String) jwtAuthenticationToken.getTokenAttributes().get("uid");
         Optional<AppUser> appUserOptional = appUserRepository.findByUid(uid);
         LocalDateTime now = LocalDateTime.now();
