@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.emails;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -8,12 +8,9 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
     private final static String EMAIL_FAILURE_MSG = "Failed to send email";
@@ -22,7 +19,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void send(@Email @NotNull String to, @NotBlank String subject, @NotBlank String content) {
+    public void send(String to, String subject, String content) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");

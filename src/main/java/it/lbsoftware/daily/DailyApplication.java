@@ -10,8 +10,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableAsync
 public class DailyApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DailyApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(DailyApplication.class, args);
+    }
 
 }
