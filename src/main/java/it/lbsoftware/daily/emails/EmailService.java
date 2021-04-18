@@ -8,7 +8,7 @@ public interface EmailService {
      * Sends an email
      *
      * @param to      Valid email address of the single recipient
-     * @param subject The subject for the email, automatically prepended with the app name
+     * @param subject The subject for the email, automatically prepended with the name of the app
      * @param content The content for the email
      */
     @Async
