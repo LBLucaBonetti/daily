@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 
 @Configuration
@@ -28,6 +29,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Cross-origin resource sharing
         http
                 .cors();
+        // Stateless session policy
+        http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         // Custom filters
         http
                 .addFilterAfter(new AppUserRegistrationFilter(appUserService), BearerTokenAuthenticationFilter.class);
