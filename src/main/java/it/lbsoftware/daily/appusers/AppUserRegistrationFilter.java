@@ -1,9 +1,11 @@
 package it.lbsoftware.daily.appusers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -19,7 +21,9 @@ public class AppUserRegistrationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        appUserService.checkAppUserRegistration(jwtAuthenticationToken);
+        if (jwtAuthenticationToken != null) {
+            appUserService.checkAppUserRegistration(jwtAuthenticationToken);
+        }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
