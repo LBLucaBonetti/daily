@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.tags;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.notes.Note;
 import lombok.*;
@@ -39,6 +40,7 @@ public class Tag {
     private Set<Note> noteSet = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appUserId")
-    AppUser appUser;
+    @JsonBackReference
+    private AppUser appUser;
 
 }
