@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 // TODO Change @CrossOrigin to match the deployed frontend URL
 @CrossOrigin(origins = "http://localhost:8080")
-public class NoteController {
+class NoteController {
 
 //    @GetMapping("/api/messages")
 //    @PreAuthorize("hasAuthority('SCOPE_email')")
