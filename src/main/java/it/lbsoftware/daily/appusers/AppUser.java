@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import it.lbsoftware.daily.notes.Note;
 import it.lbsoftware.daily.tags.Tag;
 import lombok.*;
@@ -44,14 +45,35 @@ public class AppUser {
      */
     private LocalDateTime lastAccessDateTime;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
+    @JsonManagedReference
     /**
      * Private tags for this user
      */
     private List<Tag> tagList;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
+    @JsonManagedReference
     /**
      * Private notes for this user
      */
     private List<Note> noteList;
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null) {
+            return false;
+        }
+
+        if (object instanceof AppUser) {
+            AppUser other = (AppUser) object;
+            if (this.getUid().equals(other.getUid())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }
