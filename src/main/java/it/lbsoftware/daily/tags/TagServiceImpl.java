@@ -4,7 +4,6 @@ import it.lbsoftware.daily.appusers.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -16,51 +15,39 @@ public class TagServiceImpl implements TagService {
     @Override
     public Tag createTag(Tag tag, AppUser appUser) {
         tag.setAppUser(appUser);
+
         return tagRepository.save(tag);
     }
 
     @Override
-    public Tag readTag(Long id, AppUser appUser) {
-        Optional<Tag> tagOptional = tagRepository.findById(id);
-        if (tagOptional.isPresent()) {
-            Tag prevTag = tagOptional.get();
-            if (!prevTag.getAppUser().equals(appUser)) {
-                throw new IllegalStateException();
-            }
-            return prevTag;
-        }
+    public Optional<Tag> readTag(Long id, AppUser appUser) {
+        Optional<Tag> tagOptional = tagRepository.findByIdAndAppUser(id, appUser);
 
-        throw new EntityNotFoundException();
+        return tagOptional;
     }
 
     @Override
-    public void updateTag(Long id, Tag tag, AppUser appUser) throws IllegalStateException, EntityNotFoundException {
-        Optional<Tag> tagOptional = tagRepository.findById(id);
-        if (tagOptional.isPresent()) {
-            Tag prevTag = tagOptional.get();
-            if (!prevTag.getAppUser().equals(appUser)) {
-                throw new IllegalStateException();
-            }
-            prevTag.setName(tag.getName());
-            prevTag.setColorHex(tag.getColorHex());
-            tagRepository.save(prevTag);
-        } else {
-            throw new EntityNotFoundException();
+    public Optional<Tag> updateTag(Long id, Tag tag, AppUser appUser) {
+        Optional<Tag> tagOptional = tagRepository.findByIdAndAppUser(id, appUser);
+        if (tagOptional.isEmpty()) {
+            return Optional.empty();
         }
+        Tag prevTag = tagOptional.get();
+        prevTag.setName(tag.getName());
+        prevTag.setColorHex(tag.getColorHex());
+
+        return Optional.of(tagRepository.save(prevTag));
     }
 
     @Override
-    public void deleteTag(Long id, AppUser appUser) throws IllegalStateException, EntityNotFoundException {
-        Optional<Tag> tagOptional = tagRepository.findById(id);
-        if (tagOptional.isPresent()) {
-            Tag prevTag = tagOptional.get();
-            if (!prevTag.getAppUser().equals(appUser)) {
-                throw new IllegalStateException();
-            }
-            tagRepository.delete(prevTag);
-        } else {
-            throw new EntityNotFoundException();
+    public Boolean deleteTag(Long id, AppUser appUser) {
+        Optional<Tag> tagOptional = tagRepository.findByIdAndAppUser(id, appUser);
+        if (tagOptional.isEmpty()) {
+            return false;
         }
+        tagRepository.delete(tagOptional.get());
+
+        return true;
     }
 
 }

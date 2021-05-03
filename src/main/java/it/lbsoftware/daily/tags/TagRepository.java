@@ -1,17 +1,19 @@
 package it.lbsoftware.daily.tags;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
     /**
-     * Finds tags by their name
+     * Finds a tag by its id and AppUser
      *
-     * @param name The name of the tag
-     * @return Found tags or empty list
+     * @param id      Tag id
+     * @param appUser User
+     * @return Found tag or empty value
      */
-    List<Tag> findByName(String name);
+    Optional<Tag> findByIdAndAppUser(Long id, AppUser appUser);
 
 }
