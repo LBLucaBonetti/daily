@@ -2,7 +2,7 @@ package it.lbsoftware.daily.appusers;
 
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 public interface AppUserService {
 
@@ -17,9 +17,8 @@ public interface AppUserService {
      * Gets the user from the provided token
      *
      * @param jwtAuthenticationToken Token that contains user details
-     * @return Found user
-     * @throws EntityNotFoundException If the user does not exist
+     * @return Found user or empty value
      */
-    AppUser getAppUserFromToken(JwtAuthenticationToken jwtAuthenticationToken) throws EntityNotFoundException;
+    Optional<AppUser> getAppUserFromToken(JwtAuthenticationToken jwtAuthenticationToken);
 
 }

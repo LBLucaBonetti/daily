@@ -2,7 +2,7 @@ package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUser;
 
-import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 public interface TagService {
 
@@ -20,31 +20,27 @@ public interface TagService {
      *
      * @param id      Tag id
      * @param appUser User
-     * @return Read tag
-     * @throws IllegalStateException   If the user does not own the tag
-     * @throws EntityNotFoundException If the tag does not exist
+     * @return Read tag or empty value
      */
-    Tag readTag(Long id, AppUser appUser) throws IllegalStateException, EntityNotFoundException;
+    Optional<Tag> readTag(Long id, AppUser appUser);
 
     /**
      * Updates a tag
      *
      * @param id      Tag id
-     * @param tag     Updated tag
+     * @param tag     Tag object with new data
      * @param appUser User
-     * @throws IllegalStateException   If the user does not own the tag
-     * @throws EntityNotFoundException If the tag does not exist
+     * @return Updated tag or empty value
      */
-    void updateTag(Long id, Tag tag, AppUser appUser) throws IllegalStateException, EntityNotFoundException;
+    Optional<Tag> updateTag(Long id, Tag tag, AppUser appUser);
 
     /**
      * Deletes a tag
      *
      * @param id      Tag id
      * @param appUser User
-     * @throws IllegalStateException   If the user does not own the tag
-     * @throws EntityNotFoundException If the tag does not exist
+     * @return True if the tag is deleted, false otherwise
      */
-    void deleteTag(Long id, AppUser appUser) throws IllegalStateException, EntityNotFoundException;
+    Boolean deleteTag(Long id, AppUser appUser);
 
 }

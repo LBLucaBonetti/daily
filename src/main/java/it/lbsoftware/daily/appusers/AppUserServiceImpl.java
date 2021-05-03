@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -19,16 +18,12 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public void checkAppUserRegistration(JwtAuthenticationToken jwtAuthenticationToken) {
-        AppUser appUser;
-        try {
-            appUser = getAppUserFromToken(jwtAuthenticationToken);
-        } catch (EntityNotFoundException e) {
-            appUser = null;
-        }
+        Optional<AppUser> appUserOptional = getAppUserFromToken(jwtAuthenticationToken);
+
         LocalDateTime now = LocalDateTime.now();
         // By default, the name maps to the sub claim according to Spring Security docs
         String email = jwtAuthenticationToken.getName();
-        if (appUser == null) {
+        if (appUserOptional.isEmpty()) {
             AppUser newUser = AppUser.builder()
                     .uid((String) jwtAuthenticationToken.getTokenAttributes().get("uid"))
                     .email(email)
@@ -38,6 +33,7 @@ public class AppUserServiceImpl implements AppUserService {
             appUserRepository.save(newUser);
 //            emailService.send(newUser.getEmail(), "Welcome!", "Welcome to Daily :)");
         } else {
+            AppUser appUser = appUserOptional.get();
             if (!appUser.getEmail().equals(email)) {
                 // User changed email address, update accordingly
                 appUser.setEmail(email);
@@ -48,20 +44,17 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public AppUser getAppUserFromToken(JwtAuthenticationToken jwtAuthenticationToken) throws EntityNotFoundException {
+    public Optional<AppUser> getAppUserFromToken(JwtAuthenticationToken jwtAuthenticationToken) {
         if (jwtAuthenticationToken == null) {
-            throw new EntityNotFoundException();
+            return Optional.empty();
         }
         String uid = (String) jwtAuthenticationToken.getTokenAttributes().get("uid");
         if (uid == null) {
-            throw new EntityNotFoundException();
+            return Optional.empty();
         }
         Optional<AppUser> appUserOptional = appUserRepository.findByUid(uid);
-        if (appUserOptional.isEmpty()) {
-            throw new EntityNotFoundException();
-        }
 
-        return appUserOptional.get();
+        return appUserOptional;
     }
 
 }
