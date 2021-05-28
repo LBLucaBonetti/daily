@@ -23,19 +23,19 @@ public class Tag {
     private Long id;
     @Column(nullable = false)
     @NotBlank
-    /**
-     * Display name for this tag
+    /*
+      Display name for this tag
      */
     private String name;
     @Column(nullable = false)
     @NotBlank
-    /**
-     * Hex encoding string of the display color for this tag
+    /*
+      Hex encoding string of the display color for this tag
      */
     private String colorHex;
     @ManyToMany(mappedBy = "tagSet")
-    /**
-     * Notes set with this tag
+    /*
+      Notes set with this tag
      */
     private Set<Note> noteSet = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)

@@ -24,16 +24,16 @@ public class Note {
     private Long id;
     @Column(nullable = false)
     @NotBlank
-    /**
-     * Text for this note
+    /*
+      Text for this note
      */
     private String text;
-    /**
-     * Set when this note is created
+    /*
+      Set when this note is created
      */
     private LocalDateTime creationDateTime;
-    /**
-     * Set whenever this note is accessed
+    /*
+      Set whenever this note is accessed
      */
     private LocalDateTime lastAccessDateTime;
     @ManyToMany(cascade = {
@@ -44,8 +44,8 @@ public class Note {
             joinColumns = @JoinColumn(name = "noteId"),
             inverseJoinColumns = @JoinColumn(name = "tagId")
     )
-    /**
-     * Tags set for this note
+    /*
+      Tags set for this note
      */
     private Set<Tag> tagSet = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)
