@@ -52,9 +52,8 @@ public class AppUserServiceImpl implements AppUserService {
         if (uid == null) {
             return Optional.empty();
         }
-        Optional<AppUser> appUserOptional = appUserRepository.findByUid(uid);
 
-        return appUserOptional;
+        return appUserRepository.findByUid(uid);
     }
 
 }

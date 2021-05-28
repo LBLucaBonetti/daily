@@ -21,9 +21,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Optional<Tag> readTag(Long id, AppUser appUser) {
-        Optional<Tag> tagOptional = tagRepository.findByIdAndAppUser(id, appUser);
-
-        return tagOptional;
+        return tagRepository.findByIdAndAppUser(id, appUser);
     }
 
     @Override
