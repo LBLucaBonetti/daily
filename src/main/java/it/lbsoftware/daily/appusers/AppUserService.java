@@ -1,24 +1,23 @@
 package it.lbsoftware.daily.appusers;
 
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 public interface AppUserService {
 
     /**
-     * Creates a new user if it does not exist, updates its information otherwise
+     * Creates a new user if it does not exist, updates its information otherwise; details are stored as Authentication details
      *
-     * @param jwtAuthenticationToken Token that contains user details
+     * @param jwtAuthenticationToken Token that provides user details and to set user details to
      */
-    void checkAppUserRegistration(JwtAuthenticationToken jwtAuthenticationToken);
+    void setAppUserToToken(JwtAuthenticationToken jwtAuthenticationToken);
 
     /**
-     * Gets the user from the provided token
+     * Gets the request user from the token
      *
-     * @param jwtAuthenticationToken Token that contains user details
-     * @return Found user or empty value
+     * @return Found user
+     * @throws ResponseStatusException If the user is not found
      */
-    Optional<AppUser> getAppUserFromToken(JwtAuthenticationToken jwtAuthenticationToken);
+    AppUser getAppUserFromToken() throws ResponseStatusException;
 
 }
