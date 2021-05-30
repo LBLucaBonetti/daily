@@ -29,6 +29,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Cross-origin resource sharing
         http
                 .cors();
+        // Cross-site request forgery (disable)
+        http
+                .csrf()
+                .disable();
         // Stateless session policy
         http
                 .sessionManagement()
