@@ -9,7 +9,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -24,15 +23,12 @@ public class AppUserServiceImpl implements AppUserService {
         String uid = (String) jwtAuthenticationToken.getTokenAttributes().get("uid");
         Optional<AppUser> appUserOptional = appUserRepository.findByUid(uid);
 
-        LocalDateTime now = LocalDateTime.now();
         // By default, the name maps to the sub claim according to Spring Security docs
         String email = jwtAuthenticationToken.getName();
         if (appUserOptional.isEmpty()) {
             AppUser newUser = AppUser.builder()
                     .uid(uid)
                     .email(email)
-                    .registrationDateTime(now)
-                    .lastAccessDateTime(now)
                     .build();
             appUserRepository.save(newUser);
             jwtAuthenticationToken.setDetails(newUser);
@@ -43,7 +39,6 @@ public class AppUserServiceImpl implements AppUserService {
                 // User changed email address, update accordingly
                 appUser.setEmail(email);
             }
-            appUser.setLastAccessDateTime(now);
             appUserRepository.save(appUser);
             jwtAuthenticationToken.setDetails(appUser);
         }
