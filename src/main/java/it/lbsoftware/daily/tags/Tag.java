@@ -2,6 +2,7 @@ package it.lbsoftware.daily.tags;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.entities.BaseEntity;
 import it.lbsoftware.daily.notes.Note;
 import lombok.*;
 
@@ -16,11 +17,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class Tag {
+public class Tag extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
     @Column(nullable = false)
     @NotBlank
     /*
