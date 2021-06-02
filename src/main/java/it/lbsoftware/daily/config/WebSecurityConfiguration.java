@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.security;
+package it.lbsoftware.daily.config;
 
 import com.okta.spring.boot.oauth.Okta;
 import it.lbsoftware.daily.appusers.AppUserRegistrationFilter;
