@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,13 +21,13 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Optional<Tag> readTag(Long id, AppUser appUser) {
-        return tagRepository.findByIdAndAppUser(id, appUser);
+    public Optional<Tag> readTag(UUID uuid, AppUser appUser) {
+        return tagRepository.findByUuidAndAppUser(uuid, appUser);
     }
 
     @Override
-    public Optional<Tag> updateTag(Long id, Tag tag, AppUser appUser) {
-        Optional<Tag> tagOptional = tagRepository.findByIdAndAppUser(id, appUser);
+    public Optional<Tag> updateTag(UUID uuid, Tag tag, AppUser appUser) {
+        Optional<Tag> tagOptional = tagRepository.findByUuidAndAppUser(uuid, appUser);
         if (tagOptional.isEmpty()) {
             return Optional.empty();
         }
@@ -38,8 +39,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Boolean deleteTag(Long id, AppUser appUser) {
-        Optional<Tag> tagOptional = tagRepository.findByIdAndAppUser(id, appUser);
+    public Boolean deleteTag(UUID uuid, AppUser appUser) {
+        Optional<Tag> tagOptional = tagRepository.findByUuidAndAppUser(uuid, appUser);
         if (tagOptional.isEmpty()) {
             return false;
         }

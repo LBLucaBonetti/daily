@@ -4,12 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class TagDto {
 
-    private Long id;
+    private UUID uuid;
     @NotBlank
     private String name;
     @NotBlank

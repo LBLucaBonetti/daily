@@ -3,6 +3,7 @@ package it.lbsoftware.daily.tags;
 import it.lbsoftware.daily.appusers.AppUser;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface TagService {
 
@@ -18,29 +19,29 @@ public interface TagService {
     /**
      * Reads a tag
      *
-     * @param id      Tag id
+     * @param uuid    Tag uuid
      * @param appUser User
      * @return Read tag or empty value
      */
-    Optional<Tag> readTag(Long id, AppUser appUser);
+    Optional<Tag> readTag(UUID uuid, AppUser appUser);
 
     /**
      * Updates a tag
      *
-     * @param id      Tag id
+     * @param uuid    Tag uuid
      * @param tag     Tag object with new data
      * @param appUser User
      * @return Updated tag or empty value
      */
-    Optional<Tag> updateTag(Long id, Tag tag, AppUser appUser);
+    Optional<Tag> updateTag(UUID uuid, Tag tag, AppUser appUser);
 
     /**
      * Deletes a tag
      *
-     * @param id      Tag id
+     * @param uuid    Tag uuid
      * @param appUser User
      * @return True if the tag is deleted, false otherwise
      */
-    Boolean deleteTag(Long id, AppUser appUser);
+    Boolean deleteTag(UUID uuid, AppUser appUser);
 
 }
