@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
+@Table(indexes = @Index(name = "idx_note_uuid", columnList = "uuid"))
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
