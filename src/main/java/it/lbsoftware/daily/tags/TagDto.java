@@ -1,16 +1,15 @@
 package it.lbsoftware.daily.tags;
 
+import it.lbsoftware.daily.entities.BaseDto;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import java.util.UUID;
 
 @Getter
 @Setter
-public class TagDto {
+public class TagDto extends BaseDto {
 
-    private UUID uuid;
     @NotBlank
     private String name;
     @NotBlank
