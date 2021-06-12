@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +45,15 @@ class TagController {
         TagDto readTagDto = tagConverter.convertToDto(readTag.get(), TagDto.class);
 
         return ResponseEntity.ok(readTagDto);
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<TagDto>> readTags() {
+        AppUser appUser = appUserService.getAppUserFromToken();
+        List<Tag> readTags = tagService.readTags(appUser);
+        List<TagDto> readTagDtos = readTags.stream().map(readTag -> tagConverter.convertToDto(readTag, TagDto.class)).collect(Collectors.toList());
+
+        return ResponseEntity.ok(readTagDtos);
     }
 
     @PutMapping(value = "/{uuid}")

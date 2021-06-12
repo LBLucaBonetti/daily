@@ -4,6 +4,7 @@ import it.lbsoftware.daily.appusers.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,6 +24,11 @@ public class TagServiceImpl implements TagService {
     @Override
     public Optional<Tag> readTag(UUID uuid, AppUser appUser) {
         return tagRepository.findByUuidAndAppUser(uuid, appUser);
+    }
+
+    @Override
+    public List<Tag> readTags(AppUser appUser) {
+        return tagRepository.findByAppUser(appUser);
     }
 
     @Override

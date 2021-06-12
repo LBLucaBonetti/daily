@@ -2,6 +2,7 @@ package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUser;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +25,14 @@ public interface TagService {
      * @return Read tag or empty value
      */
     Optional<Tag> readTag(UUID uuid, AppUser appUser);
+
+    /**
+     * Reads tags
+     *
+     * @param appUser User
+     * @return Read tags or empty list
+     */
+    List<Tag> readTags(AppUser appUser);
 
     /**
      * Updates a tag
