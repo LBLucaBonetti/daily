@@ -47,7 +47,7 @@ class TagController {
         return ResponseEntity.ok(readTagDto);
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<TagDto>> readTags() {
         AppUser appUser = appUserService.getAppUserFromToken();
         List<Tag> readTags = tagService.readTags(appUser);
