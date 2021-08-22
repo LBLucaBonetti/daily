@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.notes.Note;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +51,11 @@ public class TagServiceImpl implements TagService {
         if (tagOptional.isEmpty()) {
             return false;
         }
-        tagRepository.delete(tagOptional.get());
+        Tag tag = tagOptional.get();
+        for (Note note : tag.getNoteSet()) {
+            note.getTagSet().remove(tag);
+        }
+        tagRepository.delete(tag);
 
         return true;
     }
