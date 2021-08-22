@@ -10,11 +10,11 @@ public class DtoEntityMappingConverter<DTO extends BaseDto, ENTITY extends BaseE
 
     private final ModelMapper modelMapper;
 
-    public <DTO extends BaseDto> DTO convertToDto(Object entity, Class<DTO> dtoType) {
+    public DTO convertToDto(Object entity, Class<DTO> dtoType) {
         return modelMapper.map(entity, dtoType);
     }
 
-    public <ENTITY extends BaseEntity> ENTITY convertToEntity(Object dto, Class<ENTITY> entityType) {
+    public ENTITY convertToEntity(Object dto, Class<ENTITY> entityType) {
         return modelMapper.map(dto, entityType);
     }
 
