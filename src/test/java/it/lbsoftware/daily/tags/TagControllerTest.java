@@ -157,7 +157,7 @@ public class TagControllerTest {
         when(this.appUserService.getAppUserFromToken()).thenReturn(appUser2);
 
         TagDto tagDto = new TagDto();
-        tagDto.setColorHex("0123456789ABCDEF");
+        tagDto.setColorHex("#012DEF");
         tagDto.setName("Name");
         tagDto.setUuid(UUID.randomUUID());
         String content = (new ObjectMapper()).writeValueAsString(tagDto);
@@ -210,7 +210,7 @@ public class TagControllerTest {
         when(this.appUserService.getAppUserFromToken()).thenReturn(appUser1);
 
         TagDto tagDto = new TagDto();
-        tagDto.setColorHex("0123456789ABCDEF");
+        tagDto.setColorHex("#FFFFFf");
         tagDto.setName("Name");
         tagDto.setUuid(UUID.randomUUID());
         String content = (new ObjectMapper()).writeValueAsString(tagDto);
@@ -298,5 +298,6 @@ public class TagControllerTest {
                 .perform(requestBuilder);
         actualPerformResult.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+
 }
 

@@ -9,6 +9,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +29,8 @@ public class Tag extends BaseEntity {
      */
     private String name;
     @Column(nullable = false)
-    @NotBlank
+    @NotNull
+    @Pattern(regexp = "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$")
     /*
       Hex encoding string of the display color for this tag
      */
