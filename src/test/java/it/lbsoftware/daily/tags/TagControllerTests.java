@@ -20,7 +20,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TagController.class)
-class TagControllerTest {
+class TagControllerTests {
 
     @MockBean
     private AppUserService appUserService;
