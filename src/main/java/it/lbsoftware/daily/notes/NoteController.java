@@ -2,8 +2,9 @@ package it.lbsoftware.daily.notes;
 
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserService;
-import it.lbsoftware.daily.entities.DtoEntityMappingConverter;
-import it.lbsoftware.daily.tags.TagService;
+import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDto;
+import it.lbsoftware.daily.tags.TagDtoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,47 +26,44 @@ class NoteController {
 
     private final AppUserService appUserService;
     private final NoteService noteService;
-    private final DtoEntityMappingConverter<NoteDtoIn, Note> noteInConverter;
-    private final DtoEntityMappingConverter<NoteDtoOut, Note> noteOutConverter;
-    private final TagService tagService;
+    private final NoteDtoMapper noteDtoMapper;
+    private final TagDtoMapper tagDtoMapper;
 
     @PostMapping
-    public ResponseEntity<NoteDtoOut> createNote(@Valid @RequestBody NoteDtoIn noteDtoIn) {
+    public ResponseEntity<NoteDto> createNote(@Valid @RequestBody NoteDto noteDto) {
         AppUser appUser = appUserService.getAppUserFromToken();
-        Note note = noteInConverter.convertToEntity(noteDtoIn, Note.class);
-        noteDtoIn.getTagSet().forEach(tagUuid -> tagService.readTag(tagUuid, appUser).ifPresent(value -> note.getTagSet().add(value)));
+        Note note = noteDtoMapper.convertToEntity(noteDto);
         Note createdNote = noteService.createNote(note, appUser);
-        NoteDtoOut createdNoteDtoOut = noteOutConverter.convertToDto(createdNote, NoteDtoOut.class);
+        NoteDto createdNoteDto = noteDtoMapper.convertToDto(createdNote);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdNoteDtoOut);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdNoteDto);
     }
 
     @GetMapping(value = "/{uuid}")
-    public ResponseEntity<NoteDtoOut> readNote(@PathVariable("uuid") UUID uuid) {
+    public ResponseEntity<NoteDto> readNote(@PathVariable("uuid") UUID uuid) {
         AppUser appUser = appUserService.getAppUserFromToken();
         Optional<Note> readNote = noteService.readNote(uuid, appUser);
         if (readNote.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        NoteDtoOut readNoteDtoOut = noteOutConverter.convertToDto(readNote.get(), NoteDtoOut.class);
+        NoteDto readNoteDto = noteDtoMapper.convertToDto(readNote.get());
 
-        return ResponseEntity.ok(readNoteDtoOut);
+        return ResponseEntity.ok(readNoteDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteDtoOut>> readNotes() {
+    public ResponseEntity<List<NoteDto>> readNotes() {
         AppUser appUser = appUserService.getAppUserFromToken();
         List<Note> readNotes = noteService.readNotes(appUser);
-        List<NoteDtoOut> readNoteDtoOuts = readNotes.stream().map(readNote -> noteOutConverter.convertToDto(readNote, NoteDtoOut.class)).collect(Collectors.toList());
+        List<NoteDto> readNoteDtos = readNotes.stream().map(noteDtoMapper::convertToDto).collect(Collectors.toList());
 
-        return ResponseEntity.ok(readNoteDtoOuts);
+        return ResponseEntity.ok(readNoteDtos);
     }
 
     @PutMapping(value = "/{uuid}")
-    public ResponseEntity<NoteDtoOut> updateNote(@PathVariable("uuid") UUID uuid, @Valid @RequestBody NoteDtoIn noteDtoIn) {
+    public ResponseEntity<NoteDto> updateNote(@PathVariable("uuid") UUID uuid, @Valid @RequestBody NoteDto noteDto) {
         AppUser appUser = appUserService.getAppUserFromToken();
-        Note note = noteInConverter.convertToEntity(noteDtoIn, Note.class);
-        noteDtoIn.getTagSet().forEach(tagUuid -> tagService.readTag(tagUuid, appUser).ifPresent(value -> note.getTagSet().add(value)));
+        Note note = noteDtoMapper.convertToEntity(noteDto);
         Optional<Note> updatedNote = noteService.updateNote(uuid, note, appUser);
         if (updatedNote.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -74,13 +73,42 @@ class NoteController {
     }
 
     @DeleteMapping(value = "/{uuid}")
-    public ResponseEntity<NoteDtoOut> deleteNote(@PathVariable("uuid") UUID uuid) {
+    public ResponseEntity<NoteDto> deleteNote(@PathVariable("uuid") UUID uuid) {
         AppUser appUser = appUserService.getAppUserFromToken();
         if (!noteService.deleteNote(uuid, appUser)) {
             return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/{uuid}/tags/{tagUuid}")
+    public ResponseEntity<TagDto> addTagToNote(@PathVariable("uuid") UUID uuid, @PathVariable("tagUuid") UUID tagUuid) {
+        AppUser appUser = appUserService.getAppUserFromToken();
+        if (!noteService.addTagToNote(uuid, tagUuid, appUser)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping(value = "/{uuid}/tags/{tagUuid}")
+    public ResponseEntity<TagDto> removeTagFromNote(@PathVariable("uuid") UUID uuid, @PathVariable("tagUuid") UUID tagUuid) {
+        AppUser appUser = appUserService.getAppUserFromToken();
+        if (!noteService.removeTagFromNote(uuid, tagUuid, appUser)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/{uuid}/tags")
+    public ResponseEntity<Set<TagDto>> readNoteTags(@PathVariable("uuid") UUID uuid) {
+        AppUser appUser = appUserService.getAppUserFromToken();
+        Set<Tag> readNoteTags = noteService.readNoteTags(uuid, appUser);
+        Set<TagDto> readNoteTagDtos = readNoteTags.stream().map(tagDtoMapper::convertToDto).collect(Collectors.toSet());
+
+        return ResponseEntity.ok(readNoteTagDtos);
     }
 
 }

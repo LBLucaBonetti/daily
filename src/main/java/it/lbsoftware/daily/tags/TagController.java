@@ -2,7 +2,6 @@ package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserService;
-import it.lbsoftware.daily.entities.DtoEntityMappingConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +22,14 @@ class TagController {
 
     private final AppUserService appUserService;
     private final TagService tagService;
-    private final DtoEntityMappingConverter<TagDto, Tag> tagConverter;
+    private final TagDtoMapper tagDtoMapper;
 
     @PostMapping
     public ResponseEntity<TagDto> createTag(@Valid @RequestBody TagDto tagDto) {
         AppUser appUser = appUserService.getAppUserFromToken();
-        Tag tag = tagConverter.convertToEntity(tagDto, Tag.class);
+        Tag tag = tagDtoMapper.convertToEntity(tagDto);
         Tag createdTag = tagService.createTag(tag, appUser);
-        TagDto createdTagDto = tagConverter.convertToDto(createdTag, TagDto.class);
+        TagDto createdTagDto = tagDtoMapper.convertToDto(createdTag);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTagDto);
     }
@@ -42,7 +41,7 @@ class TagController {
         if (readTag.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        TagDto readTagDto = tagConverter.convertToDto(readTag.get(), TagDto.class);
+        TagDto readTagDto = tagDtoMapper.convertToDto(readTag.get());
 
         return ResponseEntity.ok(readTagDto);
     }
@@ -51,7 +50,7 @@ class TagController {
     public ResponseEntity<List<TagDto>> readTags() {
         AppUser appUser = appUserService.getAppUserFromToken();
         List<Tag> readTags = tagService.readTags(appUser);
-        List<TagDto> readTagDtos = readTags.stream().map(readTag -> tagConverter.convertToDto(readTag, TagDto.class)).collect(Collectors.toList());
+        List<TagDto> readTagDtos = readTags.stream().map(tagDtoMapper::convertToDto).collect(Collectors.toList());
 
         return ResponseEntity.ok(readTagDtos);
     }
@@ -59,7 +58,7 @@ class TagController {
     @PutMapping(value = "/{uuid}")
     public ResponseEntity<TagDto> updateTag(@PathVariable("uuid") UUID uuid, @Valid @RequestBody TagDto tagDto) {
         AppUser appUser = appUserService.getAppUserFromToken();
-        Tag tag = tagConverter.convertToEntity(tagDto, Tag.class);
+        Tag tag = tagDtoMapper.convertToEntity(tagDto);
         Optional<Tag> updatedTag = tagService.updateTag(uuid, tag, appUser);
         if (updatedTag.isEmpty()) {
             return ResponseEntity.notFound().build();

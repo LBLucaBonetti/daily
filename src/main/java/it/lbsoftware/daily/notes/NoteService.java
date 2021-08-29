@@ -1,9 +1,11 @@
 package it.lbsoftware.daily.notes;
 
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.tags.Tag;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface NoteService {
@@ -52,5 +54,34 @@ public interface NoteService {
      * @return True if the note is deleted, false otherwise
      */
     Boolean deleteNote(UUID uuid, AppUser appUser);
+
+    /**
+     * Adds a tag to a note
+     *
+     * @param uuid    Note uuid
+     * @param tagUuid Tag uuid
+     * @param appUser User
+     * @return True if the tag is correctly added to the note, false otherwise
+     */
+    Boolean addTagToNote(UUID uuid, UUID tagUuid, AppUser appUser);
+
+    /**
+     * Removes a tag from a note
+     *
+     * @param uuid    Note uuid
+     * @param tagUuid Tag uuid
+     * @param appUser User
+     * @return True if the tag is correctly removed from the note, false otherwise
+     */
+    Boolean removeTagFromNote(UUID uuid, UUID tagUuid, AppUser appUser);
+
+    /**
+     * Reads note tags
+     *
+     * @param uuid    Note uuid
+     * @param appUser User
+     * @return Read note tags or empty set
+     */
+    Set<Tag> readNoteTags(UUID uuid, AppUser appUser);
 
 }
