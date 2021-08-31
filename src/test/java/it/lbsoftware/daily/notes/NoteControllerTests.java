@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.*;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -238,10 +239,8 @@ public class NoteControllerTests {
         given(this.tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
         this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", n1.getUuid()).with(jwt()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name").value(t1dto.getName()))
-                .andExpect(jsonPath("$.[0].colorHex").value(t1dto.getColorHex()))
-                .andExpect(jsonPath("$.[1].name").value(t2dto.getName()))
-                .andExpect(jsonPath("$.[1].colorHex").value(t2dto.getColorHex()));
+                .andExpect(jsonPath("$.[*].name", containsInAnyOrder(t1dto.getName(), t2dto.getName())))
+                .andExpect(jsonPath("$.[*].colorHex", containsInAnyOrder(t1dto.getColorHex(), t2dto.getColorHex())));
     }
 
     @Test
