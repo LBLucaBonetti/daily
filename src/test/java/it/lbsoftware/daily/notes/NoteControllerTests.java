@@ -1,7 +1,10 @@
 package it.lbsoftware.daily.notes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserService;
+import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -173,6 +174,91 @@ public class NoteControllerTests {
         given(this.noteService.deleteNote(any(), any())).willReturn(false);
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}", UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenAnotherAppUserNote_whenGetNote_thenNotFound() throws Exception {
+        AppUser au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
+        AppUser au2 = AppUser.builder().uid("234").email("au2@daily.it").build();
+        NoteDto n1dto = new NoteDto();
+        n1dto.setText("Note1");
+        Note n1 = Note.builder().text("Note1").appUser(au1).build();
+        n1.setUuid(UUID.randomUUID());
+        given(this.appUserService.getAppUserFromToken()).willReturn(au2);
+        given(this.noteDtoMapper.convertToEntity(any())).willReturn(n1);
+        given(this.noteService.readNote(n1.getUuid(), au2)).willReturn(Optional.empty());
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", n1.getUuid()).with(jwt()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenTagAndNote_whenAddTagToNote_thenNoContent() throws Exception {
+        given(this.noteService.addTagToNote(any(), any(), any())).willReturn(true);
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/notes/{uuid}/tags/{uuid}", UUID.randomUUID(), UUID.randomUUID()).with(jwt()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void givenNoTagsAndNotes_whenAddTagToNote_thenNotFound() throws Exception {
+        given(this.noteService.addTagToNote(any(), any(), any())).willReturn(false);
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/notes/{uuid}/tags/{uuid}", UUID.randomUUID(), UUID.randomUUID()).with(jwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenTagAndNote_whenRemoveTagFromNote_thenNoContent() throws Exception {
+        given(this.noteService.removeTagFromNote(any(), any(), any())).willReturn(true);
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}/tags/{uuid}", UUID.randomUUID(), UUID.randomUUID()).with(jwt()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void givenNoTagsAndNotes_whenRemoveTagFromNote_thenNotFound() throws Exception {
+        given(this.noteService.removeTagFromNote(any(), any(), any())).willReturn(false);
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}/tags/{uuid}", UUID.randomUUID(), UUID.randomUUID()).with(jwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenTwoTagsAndOneNote_whenGetNoteTags_thenOk() throws Exception {
+        Tag t1 = Tag.builder().name("Tag1").colorHex("112233").build();
+        TagDto t1dto = new TagDto();
+        t1dto.setName("Tag1");
+        t1dto.setColorHex("#112233");
+        Tag t2 = Tag.builder().name("Tag2").colorHex("223344").build();
+        TagDto t2dto = new TagDto();
+        t2dto.setName("Tag2");
+        t2dto.setColorHex("#223344");
+        AppUser au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
+        Note n1 = Note.builder().text("Note1").appUser(au1).build();
+        n1.setUuid(UUID.randomUUID());
+        given(this.appUserService.getAppUserFromToken()).willReturn(au1);
+        given(this.noteService.readNoteTags(n1.getUuid(), au1)).willReturn(Optional.of(Set.of(t1, t2)));
+        given(this.tagDtoMapper.convertToDto(t1)).willReturn(t1dto);
+        given(this.tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", n1.getUuid()).with(jwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].name").value(t1dto.getName()))
+                .andExpect(jsonPath("$.[0].colorHex").value(t1dto.getColorHex()))
+                .andExpect(jsonPath("$.[1].name").value(t2dto.getName()))
+                .andExpect(jsonPath("$.[1].colorHex").value(t2dto.getColorHex()));
+    }
+
+    @Test
+    void givenNoTagsAndNotes_whenGetNoteTags_thenNotFound() throws Exception {
+        given(this.noteService.readNoteTags(any(), any())).willReturn(Optional.empty());
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", UUID.randomUUID()).with(jwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenNoTagsAndOneNote_whenGetNoteTags_thenOk() throws Exception {
+        Note n1 = Note.builder().text("Note1").build();
+        n1.setUuid(UUID.randomUUID());
+        given(this.noteService.readNoteTags(any(), any())).willReturn(Optional.of(Collections.emptySet()));
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", n1.getUuid()).with(jwt()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
 }
