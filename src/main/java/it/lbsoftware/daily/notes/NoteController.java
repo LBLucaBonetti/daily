@@ -86,7 +86,7 @@ class NoteController {
     public ResponseEntity<TagDto> addTagToNote(@PathVariable("uuid") UUID uuid, @PathVariable("tagUuid") UUID tagUuid) {
         AppUser appUser = appUserService.getAppUserFromToken();
         if (!noteService.addTagToNote(uuid, tagUuid, appUser)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.noContent().build();
@@ -96,7 +96,7 @@ class NoteController {
     public ResponseEntity<TagDto> removeTagFromNote(@PathVariable("uuid") UUID uuid, @PathVariable("tagUuid") UUID tagUuid) {
         AppUser appUser = appUserService.getAppUserFromToken();
         if (!noteService.removeTagFromNote(uuid, tagUuid, appUser)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.noContent().build();
@@ -105,8 +105,11 @@ class NoteController {
     @GetMapping(value = "/{uuid}/tags")
     public ResponseEntity<Set<TagDto>> readNoteTags(@PathVariable("uuid") UUID uuid) {
         AppUser appUser = appUserService.getAppUserFromToken();
-        Set<Tag> readNoteTags = noteService.readNoteTags(uuid, appUser);
-        Set<TagDto> readNoteTagDtos = readNoteTags.stream().map(tagDtoMapper::convertToDto).collect(Collectors.toSet());
+        Optional<Set<Tag>> readNoteTags = noteService.readNoteTags(uuid, appUser);
+        if (readNoteTags.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Set<TagDto> readNoteTagDtos = readNoteTags.get().stream().map(tagDtoMapper::convertToDto).collect(Collectors.toSet());
 
         return ResponseEntity.ok(readNoteTagDtos);
     }

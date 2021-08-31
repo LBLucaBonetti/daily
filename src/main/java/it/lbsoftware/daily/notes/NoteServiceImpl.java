@@ -93,14 +93,14 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Set<Tag> readNoteTags(UUID uuid, AppUser appUser) {
+    public Optional<Set<Tag>> readNoteTags(UUID uuid, AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
-            return Collections.emptySet();
+            return Optional.empty();
         }
         Note note = noteOptional.get();
 
-        return note.getTagSet();
+        return Optional.of(note.getTagSet());
     }
 
 }

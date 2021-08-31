@@ -80,8 +80,8 @@ public interface NoteService {
      *
      * @param uuid    Note uuid
      * @param appUser User
-     * @return Read note tags or empty set
+     * @return Read note tags or empty value if the note does not exist
      */
-    Set<Tag> readNoteTags(UUID uuid, AppUser appUser);
+    Optional<Set<Tag>> readNoteTags(UUID uuid, AppUser appUser);
 
 }
