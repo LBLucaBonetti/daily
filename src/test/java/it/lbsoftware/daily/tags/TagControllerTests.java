@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.tags;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,6 +205,22 @@ class TagControllerTests {
     void givenNoTags_whenDeleteTag_thenNotFound() throws Exception {
         given(this.tagService.deleteTag(any(), any())).willReturn(false);
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/tags/{uuid}", UUID.randomUUID()).with(jwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenAnotherAppUserTag_whenGetTag_thenNotFound() throws Exception {
+        AppUser au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
+        AppUser au2 = AppUser.builder().uid("234").email("au2@daily.it").build();
+        TagDto t1dto = new TagDto();
+        t1dto.setName("Tag1");
+        t1dto.setColorHex("#112233");
+        Tag t1 = Tag.builder().name("Tag1").colorHex("112233").appUser(au1).build();
+        t1.setUuid(UUID.randomUUID());
+        given(this.appUserService.getAppUserFromToken()).willReturn(au2);
+        given(this.tagDtoMapper.convertToEntity(any())).willReturn(t1);
+        given(this.tagService.readTag(t1.getUuid(), au2)).willReturn(Optional.empty());
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", t1.getUuid()).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
