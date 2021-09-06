@@ -45,14 +45,14 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public AppUser getAppUserFromToken() throws ResponseStatusException {
+    public Optional<AppUser> getAppUserFromToken() throws ResponseStatusException {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         if (jwtAuthenticationToken == null || jwtAuthenticationToken.getDetails() == null || !(jwtAuthenticationToken.getDetails() instanceof AppUser)) {
             // As per the current system design, this situation should not happen
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+            return Optional.empty();
         }
 
-        return (AppUser) jwtAuthenticationToken.getDetails();
+        return Optional.of((AppUser) jwtAuthenticationToken.getDetails());
     }
 
 }

@@ -3,6 +3,8 @@ package it.lbsoftware.daily.appusers;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 public interface AppUserService {
 
     /**
@@ -15,9 +17,8 @@ public interface AppUserService {
     /**
      * Gets the request user from the token
      *
-     * @return Found user
-     * @throws ResponseStatusException If the user is not found
+     * @return Found user or empty value
      */
-    AppUser getAppUserFromToken() throws ResponseStatusException;
+    Optional<AppUser> getAppUserFromToken() throws ResponseStatusException;
 
 }

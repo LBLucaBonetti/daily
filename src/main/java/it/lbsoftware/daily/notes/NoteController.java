@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -31,7 +32,11 @@ class NoteController {
 
     @PostMapping
     public ResponseEntity<NoteDto> createNote(@Valid @RequestBody NoteDto noteDto) {
-        AppUser appUser = appUserService.getAppUserFromToken();
+        Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
+        if(appUserOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        }
+        AppUser appUser = appUserOptional.get();
         Note note = noteDtoMapper.convertToEntity(noteDto);
         Note createdNote = noteService.createNote(note, appUser);
         NoteDto createdNoteDto = noteDtoMapper.convertToDto(createdNote);
@@ -41,7 +46,11 @@ class NoteController {
 
     @GetMapping(value = "/{uuid}")
     public ResponseEntity<NoteDto> readNote(@PathVariable("uuid") UUID uuid) {
-        AppUser appUser = appUserService.getAppUserFromToken();
+        Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
+        if(appUserOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        }
+        AppUser appUser = appUserOptional.get();
         Optional<Note> readNote = noteService.readNote(uuid, appUser);
         if (readNote.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -53,7 +62,11 @@ class NoteController {
 
     @GetMapping
     public ResponseEntity<List<NoteDto>> readNotes() {
-        AppUser appUser = appUserService.getAppUserFromToken();
+        Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
+        if(appUserOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        }
+        AppUser appUser = appUserOptional.get();
         List<Note> readNotes = noteService.readNotes(appUser);
         List<NoteDto> readNoteDtos = readNotes.stream().map(noteDtoMapper::convertToDto).collect(Collectors.toList());
 
@@ -62,7 +75,11 @@ class NoteController {
 
     @PutMapping(value = "/{uuid}")
     public ResponseEntity<NoteDto> updateNote(@PathVariable("uuid") UUID uuid, @Valid @RequestBody NoteDto noteDto) {
-        AppUser appUser = appUserService.getAppUserFromToken();
+        Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
+        if(appUserOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        }
+        AppUser appUser = appUserOptional.get();
         Note note = noteDtoMapper.convertToEntity(noteDto);
         Optional<Note> updatedNote = noteService.updateNote(uuid, note, appUser);
         if (updatedNote.isEmpty()) {
@@ -74,7 +91,11 @@ class NoteController {
 
     @DeleteMapping(value = "/{uuid}")
     public ResponseEntity<NoteDto> deleteNote(@PathVariable("uuid") UUID uuid) {
-        AppUser appUser = appUserService.getAppUserFromToken();
+        Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
+        if(appUserOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        }
+        AppUser appUser = appUserOptional.get();
         if (!noteService.deleteNote(uuid, appUser)) {
             return ResponseEntity.notFound().build();
         }
@@ -84,7 +105,11 @@ class NoteController {
 
     @PutMapping(value = "/{uuid}/tags/{tagUuid}")
     public ResponseEntity<TagDto> addTagToNote(@PathVariable("uuid") UUID uuid, @PathVariable("tagUuid") UUID tagUuid) {
-        AppUser appUser = appUserService.getAppUserFromToken();
+        Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
+        if(appUserOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        }
+        AppUser appUser = appUserOptional.get();
         if (!noteService.addTagToNote(uuid, tagUuid, appUser)) {
             return ResponseEntity.notFound().build();
         }
@@ -94,7 +119,11 @@ class NoteController {
 
     @DeleteMapping(value = "/{uuid}/tags/{tagUuid}")
     public ResponseEntity<TagDto> removeTagFromNote(@PathVariable("uuid") UUID uuid, @PathVariable("tagUuid") UUID tagUuid) {
-        AppUser appUser = appUserService.getAppUserFromToken();
+        Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
+        if(appUserOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        }
+        AppUser appUser = appUserOptional.get();
         if (!noteService.removeTagFromNote(uuid, tagUuid, appUser)) {
             return ResponseEntity.notFound().build();
         }
@@ -104,7 +133,11 @@ class NoteController {
 
     @GetMapping(value = "/{uuid}/tags")
     public ResponseEntity<Set<TagDto>> readNoteTags(@PathVariable("uuid") UUID uuid) {
-        AppUser appUser = appUserService.getAppUserFromToken();
+        Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
+        if(appUserOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        }
+        AppUser appUser = appUserOptional.get();
         Optional<Set<Tag>> readNoteTags = noteService.readNoteTags(uuid, appUser);
         if (readNoteTags.isEmpty()) {
             return ResponseEntity.notFound().build();
