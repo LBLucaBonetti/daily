@@ -3,7 +3,6 @@ package it.lbsoftware.daily.appusers;
 //import it.lbsoftware.daily.emails.EmailService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
