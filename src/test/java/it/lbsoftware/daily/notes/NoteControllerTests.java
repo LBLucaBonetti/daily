@@ -48,6 +48,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNoNotes_whenGetNotes_thenOk() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         this.mockMvc.perform(MockMvcRequestBuilders.get("/notes").with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string("[]"));
@@ -55,6 +56,7 @@ public class NoteControllerTests {
 
     @Test
     void givenTwoNotes_whenGetNotes_thenOk() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Note n1 = Note.builder().text("Note1").build();
         n1.setUuid(UUID.randomUUID());
         Note n2 = Note.builder().text("Note2").build();
@@ -78,6 +80,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNote_whenPostNote_thenCreated() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         NoteDto n1dto = new NoteDto();
         n1dto.setText("Note1");
         Note n1 = Note.builder().text("Note1").build();
@@ -107,6 +110,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNote_whenGetNote_thenOk() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Note n1 = Note.builder().text("Note1").build();
         n1.setUuid(UUID.randomUUID());
         given(this.noteService.readNote(any(), any())).willReturn(Optional.of(n1));
@@ -122,12 +126,14 @@ public class NoteControllerTests {
 
     @Test
     void givenNoNotes_whenGetNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", UUID.randomUUID()).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void givenNote_whenUpdateNote_thenNoContent() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         NoteDto n1dto = new NoteDto();
         n1dto.setText("Note1");
         Note n1 = Note.builder().text("Note1").build();
@@ -155,6 +161,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNoNotes_whenUpdateNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         NoteDto n1dto = new NoteDto();
         n1dto.setText("Note1");
         Note n1 = Note.builder().text("").build();
@@ -165,6 +172,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNote_whenDeleteNote_thenNoContent() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.noteService.deleteNote(any(), any())).willReturn(true);
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}", UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNoContent());
@@ -172,6 +180,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNoNotes_whenDeleteNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.noteService.deleteNote(any(), any())).willReturn(false);
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}", UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNotFound());
@@ -185,7 +194,7 @@ public class NoteControllerTests {
         n1dto.setText("Note1");
         Note n1 = Note.builder().text("Note1").appUser(au1).build();
         n1.setUuid(UUID.randomUUID());
-        given(this.appUserService.getAppUserFromToken()).willReturn(au2);
+        given(this.appUserService.getAppUserFromToken()).willReturn(Optional.of(au2));
         given(this.noteDtoMapper.convertToEntity(any())).willReturn(n1);
         given(this.noteService.readNote(n1.getUuid(), au2)).willReturn(Optional.empty());
         this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", n1.getUuid()).with(jwt()).accept(MediaType.APPLICATION_JSON))
@@ -194,6 +203,7 @@ public class NoteControllerTests {
 
     @Test
     void givenTagAndNote_whenAddTagToNote_thenNoContent() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.noteService.addTagToNote(any(), any(), any())).willReturn(true);
         this.mockMvc.perform(MockMvcRequestBuilders.put("/notes/{uuid}/tags/{uuid}", UUID.randomUUID(), UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNoContent());
@@ -201,6 +211,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNoTagsAndNotes_whenAddTagToNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.noteService.addTagToNote(any(), any(), any())).willReturn(false);
         this.mockMvc.perform(MockMvcRequestBuilders.put("/notes/{uuid}/tags/{uuid}", UUID.randomUUID(), UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNotFound());
@@ -208,6 +219,7 @@ public class NoteControllerTests {
 
     @Test
     void givenTagAndNote_whenRemoveTagFromNote_thenNoContent() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.noteService.removeTagFromNote(any(), any(), any())).willReturn(true);
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}/tags/{uuid}", UUID.randomUUID(), UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNoContent());
@@ -215,6 +227,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNoTagsAndNotes_whenRemoveTagFromNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.noteService.removeTagFromNote(any(), any(), any())).willReturn(false);
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}/tags/{uuid}", UUID.randomUUID(), UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNotFound());
@@ -233,7 +246,7 @@ public class NoteControllerTests {
         AppUser au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
         Note n1 = Note.builder().text("Note1").appUser(au1).build();
         n1.setUuid(UUID.randomUUID());
-        given(this.appUserService.getAppUserFromToken()).willReturn(au1);
+        given(this.appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(this.noteService.readNoteTags(n1.getUuid(), au1)).willReturn(Optional.of(Set.of(t1, t2)));
         given(this.tagDtoMapper.convertToDto(t1)).willReturn(t1dto);
         given(this.tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
@@ -245,6 +258,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNoTagsAndNotes_whenGetNoteTags_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.noteService.readNoteTags(any(), any())).willReturn(Optional.empty());
         this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNotFound());
@@ -252,6 +266,7 @@ public class NoteControllerTests {
 
     @Test
     void givenNoTagsAndOneNote_whenGetNoteTags_thenOk() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Note n1 = Note.builder().text("Note1").build();
         n1.setUuid(UUID.randomUUID());
         given(this.noteService.readNoteTags(any(), any())).willReturn(Optional.of(Collections.emptySet()));

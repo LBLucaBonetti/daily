@@ -43,6 +43,7 @@ class TagControllerTests {
 
     @Test
     void givenNoTags_whenGetTags_thenOk() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         this.mockMvc.perform(MockMvcRequestBuilders.get("/tags").with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string("[]"));
@@ -50,6 +51,7 @@ class TagControllerTests {
 
     @Test
     void givenTwoTags_whenGetTags_thenOk() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Tag t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
         t1.setUuid(UUID.randomUUID());
         Tag t2 = Tag.builder().name("Tag2").colorHex("#223344").build();
@@ -77,6 +79,7 @@ class TagControllerTests {
 
     @Test
     void givenTag_whenPostTag_thenCreated() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         TagDto t1dto = new TagDto();
         t1dto.setName("Tag1");
         t1dto.setColorHex("#112233");
@@ -121,6 +124,7 @@ class TagControllerTests {
 
     @Test
     void givenTag_whenGetTag_thenOk() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Tag t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
         t1.setUuid(UUID.randomUUID());
         given(this.tagService.readTag(any(), any())).willReturn(Optional.of(t1));
@@ -138,12 +142,14 @@ class TagControllerTests {
 
     @Test
     void givenNoTags_whenGetTag_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         this.mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", UUID.randomUUID()).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void givenTag_whenUpdateTag_thenNoContent() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         TagDto t1dto = new TagDto();
         t1dto.setName("Tag1");
         t1dto.setColorHex("#112233");
@@ -185,6 +191,7 @@ class TagControllerTests {
 
     @Test
     void givenNoTags_whenUpdateTag_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         TagDto t1dto = new TagDto();
         t1dto.setName("Tag1");
         t1dto.setColorHex("#112233");
@@ -196,6 +203,7 @@ class TagControllerTests {
 
     @Test
     void givenTag_whenDeleteTag_thenNoContent() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.tagService.deleteTag(any(), any())).willReturn(true);
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/tags/{uuid}", UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNoContent());
@@ -203,6 +211,7 @@ class TagControllerTests {
 
     @Test
     void givenNoTags_whenDeleteTag_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         given(this.tagService.deleteTag(any(), any())).willReturn(false);
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/tags/{uuid}", UUID.randomUUID()).with(jwt()))
                 .andExpect(status().isNotFound());
@@ -217,7 +226,7 @@ class TagControllerTests {
         t1dto.setColorHex("#112233");
         Tag t1 = Tag.builder().name("Tag1").colorHex("112233").appUser(au1).build();
         t1.setUuid(UUID.randomUUID());
-        given(this.appUserService.getAppUserFromToken()).willReturn(au2);
+        given(this.appUserService.getAppUserFromToken()).willReturn(Optional.of(au2));
         given(this.tagDtoMapper.convertToEntity(any())).willReturn(t1);
         given(this.tagService.readTag(t1.getUuid(), au2)).willReturn(Optional.empty());
         this.mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", t1.getUuid()).with(jwt()).accept(MediaType.APPLICATION_JSON))
