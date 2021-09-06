@@ -21,6 +21,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        // Cross-origin resource sharing
+        http
+                .cors();
         // Authorization & authentication
         http
                 .authorizeRequests()
@@ -29,9 +32,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .oauth2ResourceServer()
                 .jwt();
-        // Cross-origin resource sharing
-        http
-                .cors();
         // Cross-site request forgery (disable)
         http
                 .csrf()
