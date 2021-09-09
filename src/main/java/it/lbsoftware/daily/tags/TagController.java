@@ -90,7 +90,7 @@ class TagController {
             return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
-        if (!tagService.deleteTag(uuid, appUser)) {
+        if (!Boolean.TRUE.equals(tagService.deleteTag(uuid, appUser))) {
             return ResponseEntity.notFound().build();
         }
 

@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -96,7 +95,7 @@ class NoteController {
             return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
-        if (!noteService.deleteNote(uuid, appUser)) {
+        if (!Boolean.TRUE.equals(noteService.deleteNote(uuid, appUser))) {
             return ResponseEntity.notFound().build();
         }
 
@@ -110,7 +109,7 @@ class NoteController {
             return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
-        if (!noteService.addTagToNote(uuid, tagUuid, appUser)) {
+        if (!Boolean.TRUE.equals(noteService.addTagToNote(uuid, tagUuid, appUser))) {
             return ResponseEntity.notFound().build();
         }
 
@@ -124,7 +123,7 @@ class NoteController {
             return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
-        if (!noteService.removeTagFromNote(uuid, tagUuid, appUser)) {
+        if (!Boolean.TRUE.equals(noteService.removeTagFromNote(uuid, tagUuid, appUser))) {
             return ResponseEntity.notFound().build();
         }
 
