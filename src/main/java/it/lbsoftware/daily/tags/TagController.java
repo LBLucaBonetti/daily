@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,8 +27,8 @@ class TagController {
     @PostMapping
     public ResponseEntity<TagDto> createTag(@Valid @RequestBody TagDto tagDto) {
         Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
-        if(appUserOptional.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        if (appUserOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
         Tag tag = tagDtoMapper.convertToEntity(tagDto);
@@ -42,8 +41,8 @@ class TagController {
     @GetMapping(value = "/{uuid}")
     public ResponseEntity<TagDto> readTag(@PathVariable("uuid") UUID uuid) {
         Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
-        if(appUserOptional.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        if (appUserOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
         Optional<Tag> readTag = tagService.readTag(uuid, appUser);
@@ -58,8 +57,8 @@ class TagController {
     @GetMapping
     public ResponseEntity<List<TagDto>> readTags() {
         Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
-        if(appUserOptional.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        if (appUserOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
         List<Tag> readTags = tagService.readTags(appUser);
@@ -71,8 +70,8 @@ class TagController {
     @PutMapping(value = "/{uuid}")
     public ResponseEntity<TagDto> updateTag(@PathVariable("uuid") UUID uuid, @Valid @RequestBody TagDto tagDto) {
         Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
-        if(appUserOptional.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        if (appUserOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
         Tag tag = tagDtoMapper.convertToEntity(tagDto);
@@ -87,8 +86,8 @@ class TagController {
     @DeleteMapping(value = "/{uuid}")
     public ResponseEntity<TagDto> deleteTag(@PathVariable("uuid") UUID uuid) {
         Optional<AppUser> appUserOptional = appUserService.getAppUserFromToken();
-        if(appUserOptional.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be found");
+        if (appUserOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
         AppUser appUser = appUserOptional.get();
         if (!tagService.deleteTag(uuid, appUser)) {
