@@ -4,6 +4,7 @@ import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.notes.Note;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +47,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional
     public Boolean deleteTag(UUID uuid, AppUser appUser) {
         Optional<Tag> tagOptional = tagRepository.findByUuidAndAppUser(uuid, appUser);
         if (tagOptional.isEmpty()) {
