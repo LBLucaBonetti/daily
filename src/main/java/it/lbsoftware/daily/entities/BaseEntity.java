@@ -1,8 +1,6 @@
 package it.lbsoftware.daily.entities;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,8 +10,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @MappedSuperclass
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public class BaseEntity {
