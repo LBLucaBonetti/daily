@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.entities;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,13 +12,13 @@ import java.util.UUID;
 
 @MappedSuperclass
 @Getter
-@Setter
 public class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     protected Long id;
     @Column(updatable = false, nullable = false)
+    @Setter(AccessLevel.PRIVATE)
     protected UUID uuid;
     @Column(updatable = false, nullable = false)
     @CreationTimestamp
