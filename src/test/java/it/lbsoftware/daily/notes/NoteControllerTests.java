@@ -58,16 +58,14 @@ class NoteControllerTests {
     void givenTwoNotes_whenGetNotes_thenOk() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Note n1 = Note.builder().text("Note1").build();
-        n1.setUuid(UUID.randomUUID());
         Note n2 = Note.builder().text("Note2").build();
-        n2.setUuid(UUID.randomUUID());
         given(this.noteService.readNotes(any())).willReturn(List.of(n1, n2));
         NoteDto n1dto = new NoteDto();
         n1dto.setText(n1.getText());
-        n1dto.setUuid(n1.getUuid());
+        n1dto.setUuid(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
         NoteDto n2dto = new NoteDto();
         n2dto.setText(n2.getText());
-        n2dto.setUuid(n2.getUuid());
+        n2dto.setUuid(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"));
         given(this.noteDtoMapper.convertToDto(n1)).willReturn(n1dto);
         given(this.noteDtoMapper.convertToDto(n2)).willReturn(n2dto);
         this.mockMvc.perform(MockMvcRequestBuilders.get("/notes").with(jwt()).accept(MediaType.APPLICATION_JSON))
@@ -85,10 +83,9 @@ class NoteControllerTests {
         n1dto.setText("Note1");
         Note n1 = Note.builder().text("Note1").build();
         Note n2 = Note.builder().text("Note1").build();
-        n2.setUuid(UUID.randomUUID());
         NoteDto n2dto = new NoteDto();
         n2dto.setText("Note1");
-        n2dto.setUuid(n2.getUuid());
+        n2dto.setUuid(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
         given(this.noteDtoMapper.convertToEntity(n1dto)).willReturn(n1);
         given(this.noteService.createNote(any(), any())).willReturn(n2);
         given(this.noteDtoMapper.convertToDto(n2)).willReturn(n2dto);
@@ -112,13 +109,12 @@ class NoteControllerTests {
     void givenNote_whenGetNote_thenOk() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Note n1 = Note.builder().text("Note1").build();
-        n1.setUuid(UUID.randomUUID());
         given(this.noteService.readNote(any(), any())).willReturn(Optional.of(n1));
         NoteDto n1dto = new NoteDto();
         n1dto.setText(n1.getText());
-        n1dto.setUuid(n1.getUuid());
+        n1dto.setUuid(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
         given(this.noteDtoMapper.convertToDto(n1)).willReturn(n1dto);
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", n1.getUuid()).with(jwt()).accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.text").value(n1dto.getText()))
                 .andExpect(jsonPath("$.uuid").value(n1dto.getUuid().toString()));
@@ -139,13 +135,12 @@ class NoteControllerTests {
         Note n1 = Note.builder().text("Note1").build();
         given(this.noteDtoMapper.convertToEntity(n1dto)).willReturn(n1);
         Note n2 = Note.builder().text("Note1Updated").build();
-        n2.setUuid(UUID.randomUUID());
         NoteDto n2dto = new NoteDto();
         n2dto.setText("Note1Updated");
-        n2dto.setUuid(n2.getUuid());
+        n2dto.setUuid(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
         given(this.noteService.updateNote(any(), any(), any())).willReturn(Optional.of(n2));
         given(this.noteDtoMapper.convertToDto(n2)).willReturn(n2dto);
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/notes/{uuid}", n2.getUuid()).with(jwt()).content(objectMapper.writeValueAsString(n1dto)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/notes/{uuid}", UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")).with(jwt()).content(objectMapper.writeValueAsString(n1dto)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
@@ -193,11 +188,10 @@ class NoteControllerTests {
         NoteDto n1dto = new NoteDto();
         n1dto.setText("Note1");
         Note n1 = Note.builder().text("Note1").appUser(au1).build();
-        n1.setUuid(UUID.randomUUID());
         given(this.appUserService.getAppUserFromToken()).willReturn(Optional.of(au2));
         given(this.noteDtoMapper.convertToEntity(any())).willReturn(n1);
-        given(this.noteService.readNote(n1.getUuid(), au2)).willReturn(Optional.empty());
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", n1.getUuid()).with(jwt()).accept(MediaType.APPLICATION_JSON))
+        given(this.noteService.readNote(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), au2)).willReturn(Optional.empty());
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -234,7 +228,7 @@ class NoteControllerTests {
     }
 
     @Test
-    void givenTwoTagsAndOneNote_whenGetNoteTags_thenOk() throws Exception {
+    void givenTwoTagsAndOneNoteUuid_whenGetNoteTags_thenOk() throws Exception {
         Tag t1 = Tag.builder().name("Tag1").colorHex("112233").build();
         TagDto t1dto = new TagDto();
         t1dto.setName("Tag1");
@@ -244,13 +238,11 @@ class NoteControllerTests {
         t2dto.setName("Tag2");
         t2dto.setColorHex("#223344");
         AppUser au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
-        Note n1 = Note.builder().text("Note1").appUser(au1).build();
-        n1.setUuid(UUID.randomUUID());
         given(this.appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-        given(this.noteService.readNoteTags(n1.getUuid(), au1)).willReturn(Optional.of(Set.of(t1, t2)));
+        given(this.noteService.readNoteTags(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), au1)).willReturn(Optional.of(Set.of(t1, t2)));
         given(this.tagDtoMapper.convertToDto(t1)).willReturn(t1dto);
         given(this.tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", n1.getUuid()).with(jwt()))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")).with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[*].name", containsInAnyOrder(t1dto.getName(), t2dto.getName())))
                 .andExpect(jsonPath("$.[*].colorHex", containsInAnyOrder(t1dto.getColorHex(), t2dto.getColorHex())));
@@ -265,12 +257,10 @@ class NoteControllerTests {
     }
 
     @Test
-    void givenNoTagsAndOneNote_whenGetNoteTags_thenOk() throws Exception {
+    void givenNoTagsAndOneNoteUuid_whenGetNoteTags_thenOk() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
-        Note n1 = Note.builder().text("Note1").build();
-        n1.setUuid(UUID.randomUUID());
         given(this.noteService.readNoteTags(any(), any())).willReturn(Optional.of(Collections.emptySet()));
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", n1.getUuid()).with(jwt()))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")).with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("[]"));
     }

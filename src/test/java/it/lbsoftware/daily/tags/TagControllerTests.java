@@ -53,18 +53,16 @@ class TagControllerTests {
     void givenTwoTags_whenGetTags_thenOk() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Tag t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
-        t1.setUuid(UUID.randomUUID());
         Tag t2 = Tag.builder().name("Tag2").colorHex("#223344").build();
-        t2.setUuid(UUID.randomUUID());
         given(this.tagService.readTags(any())).willReturn(List.of(t1, t2));
         TagDto t1dto = new TagDto();
         t1dto.setName(t1.getName());
         t1dto.setColorHex(t1.getColorHex());
-        t1dto.setUuid(t1.getUuid());
+        t1dto.setUuid(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
         TagDto t2dto = new TagDto();
         t2dto.setName(t2.getName());
         t2dto.setColorHex(t2.getColorHex());
-        t2dto.setUuid(t2.getUuid());
+        t2dto.setUuid(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"));
         given(this.tagDtoMapper.convertToDto(t1)).willReturn(t1dto);
         given(this.tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
         this.mockMvc.perform(MockMvcRequestBuilders.get("/tags").with(jwt()).accept(MediaType.APPLICATION_JSON))
@@ -85,11 +83,10 @@ class TagControllerTests {
         t1dto.setColorHex("#112233");
         Tag t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
         Tag t2 = Tag.builder().name("Tag1").colorHex("#112233").build();
-        t2.setUuid(UUID.randomUUID());
         TagDto t2dto = new TagDto();
         t2dto.setName("Tag1");
         t2dto.setColorHex("#112233");
-        t2dto.setUuid(t2.getUuid());
+        t2dto.setUuid(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
         given(this.tagDtoMapper.convertToEntity(t1dto)).willReturn(t1);
         given(this.tagService.createTag(any(), any())).willReturn(t2);
         given(this.tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
@@ -126,14 +123,13 @@ class TagControllerTests {
     void givenTag_whenGetTag_thenOk() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(AppUser.builder().build()));
         Tag t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
-        t1.setUuid(UUID.randomUUID());
         given(this.tagService.readTag(any(), any())).willReturn(Optional.of(t1));
         TagDto t1dto = new TagDto();
         t1dto.setName(t1.getName());
         t1dto.setColorHex(t1.getColorHex());
-        t1dto.setUuid(t1.getUuid());
+        t1dto.setUuid(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
         given(this.tagDtoMapper.convertToDto(t1)).willReturn(t1dto);
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", t1.getUuid()).with(jwt()).accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(t1dto.getName()))
                 .andExpect(jsonPath("$.colorHex").value(t1dto.getColorHex()))
@@ -156,14 +152,13 @@ class TagControllerTests {
         Tag t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
         given(this.tagDtoMapper.convertToEntity(t1dto)).willReturn(t1);
         Tag t2 = Tag.builder().name("Tag1Updated").colorHex("#223344").build();
-        t2.setUuid(UUID.randomUUID());
         TagDto t2dto = new TagDto();
         t2dto.setName("Tag1Updated");
         t2dto.setColorHex("#223344");
-        t2dto.setUuid(t2.getUuid());
+        t2dto.setUuid(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
         given(this.tagService.updateTag(any(), any(), any())).willReturn(Optional.of(t2));
         given(this.tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/tags/{uuid}", t2.getUuid()).with(jwt()).content(objectMapper.writeValueAsString(t1dto)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/tags/{uuid}", UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")).with(jwt()).content(objectMapper.writeValueAsString(t1dto)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
@@ -225,11 +220,10 @@ class TagControllerTests {
         t1dto.setName("Tag1");
         t1dto.setColorHex("#112233");
         Tag t1 = Tag.builder().name("Tag1").colorHex("112233").appUser(au1).build();
-        t1.setUuid(UUID.randomUUID());
         given(this.appUserService.getAppUserFromToken()).willReturn(Optional.of(au2));
         given(this.tagDtoMapper.convertToEntity(any())).willReturn(t1);
-        given(this.tagService.readTag(t1.getUuid(), au2)).willReturn(Optional.empty());
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", t1.getUuid()).with(jwt()).accept(MediaType.APPLICATION_JSON))
+        given(this.tagService.readTag(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), au2)).willReturn(Optional.empty());
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
