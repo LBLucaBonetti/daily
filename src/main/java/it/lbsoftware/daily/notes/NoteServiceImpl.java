@@ -68,7 +68,7 @@ public class NoteServiceImpl implements NoteService {
         }
         Note note = noteOptional.get();
         Tag tag = tagOptional.get();
-        note.getTagSet().add(tag);
+        tag.addToNote(note);
         noteRepository.save(note);
 
         return true;
@@ -86,7 +86,7 @@ public class NoteServiceImpl implements NoteService {
         }
         Note note = noteOptional.get();
         Tag tag = tagOptional.get();
-        note.getTagSet().remove(tag);
+        tag.removeFromNote(note);
         noteRepository.save(note);
 
         return true;
