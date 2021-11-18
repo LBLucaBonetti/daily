@@ -229,11 +229,11 @@ class NoteControllerTests {
 
     @Test
     void givenTwoTagsAndOneNoteUuid_whenGetNoteTags_thenOk() throws Exception {
-        Tag t1 = Tag.builder().name("Tag1").colorHex("112233").build();
+        Tag t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
         TagDto t1dto = new TagDto();
         t1dto.setName("Tag1");
         t1dto.setColorHex("#112233");
-        Tag t2 = Tag.builder().name("Tag2").colorHex("223344").build();
+        Tag t2 = Tag.builder().name("Tag2").colorHex("#223344").build();
         TagDto t2dto = new TagDto();
         t2dto.setName("Tag2");
         t2dto.setColorHex("#223344");
