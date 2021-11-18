@@ -3,6 +3,7 @@ package it.lbsoftware.daily.notes;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,24 +17,24 @@ public class NoteServiceImpl implements NoteService {
     private final TagService tagService;
 
     @Override
-    public Note createNote(Note note, AppUser appUser) {
+    public Note createNote(@NonNull Note note, @NonNull AppUser appUser) {
         note.setAppUser(appUser);
 
         return noteRepository.save(note);
     }
 
     @Override
-    public Optional<Note> readNote(UUID uuid, AppUser appUser) {
+    public Optional<Note> readNote(@NonNull UUID uuid, @NonNull AppUser appUser) {
         return noteRepository.findByUuidAndAppUser(uuid, appUser);
     }
 
     @Override
-    public List<Note> readNotes(AppUser appUser) {
+    public List<Note> readNotes(@NonNull AppUser appUser) {
         return noteRepository.findByAppUser(appUser);
     }
 
     @Override
-    public Optional<Note> updateNote(UUID uuid, Note note, AppUser appUser) {
+    public Optional<Note> updateNote(@NonNull UUID uuid, @NonNull Note note, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
             return Optional.empty();
@@ -45,7 +46,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Boolean deleteNote(UUID uuid, AppUser appUser) {
+    public Boolean deleteNote(@NonNull UUID uuid, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
             return false;
@@ -57,7 +58,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Boolean addTagToNote(UUID uuid, UUID tagUuid, AppUser appUser) {
+    public Boolean addTagToNote(@NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
             return false;
@@ -75,7 +76,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Boolean removeTagFromNote(UUID uuid, UUID tagUuid, AppUser appUser) {
+    public Boolean removeTagFromNote(@NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
             return false;
@@ -93,7 +94,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Optional<Set<Tag>> readNoteTags(UUID uuid, AppUser appUser) {
+    public Optional<Set<Tag>> readNoteTags(@NonNull UUID uuid, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
             return Optional.empty();
