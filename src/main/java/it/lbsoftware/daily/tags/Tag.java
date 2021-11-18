@@ -46,4 +46,24 @@ public class Tag extends BaseEntity {
     @NotNull
     private AppUser appUser;
 
+    /**
+     * Adds a tag to the specified note and vice-versa
+     *
+     * @param note Note object to link
+     */
+    public void addToNote(Note note) {
+        note.getTagSet().add(this);
+        this.getNoteSet().add(note);
+    }
+
+    /**
+     * Removes a tag from the specified note and vice-versa
+     *
+     * @param note Note object to unlink
+     */
+    public void removeFromNote(Note note) {
+        note.getTagSet().remove(this);
+        this.getNoteSet().remove(note);
+    }
+
 }
