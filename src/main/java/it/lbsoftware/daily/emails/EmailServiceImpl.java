@@ -13,7 +13,7 @@ import javax.mail.internet.MimeMessage;
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-    private final static String EMAIL_FAILURE_MSG = "Failed to send email";
+    private static final String EMAIL_FAILURE_MSG = "Failed to send email";
 
     private final JavaMailSender javaMailSender;
 
