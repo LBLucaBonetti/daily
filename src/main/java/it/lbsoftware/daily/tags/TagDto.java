@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.entities.BaseDto;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 public class TagDto extends BaseDto {
 
     @NotBlank
