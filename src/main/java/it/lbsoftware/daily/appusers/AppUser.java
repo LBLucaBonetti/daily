@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(indexes = @Index(name = "idx_appuser_uuid", columnList = "uuid"))
@@ -39,13 +40,13 @@ public class AppUser extends BaseEntity {
     /*
       Private tags for this user
      */
-    private List<Tag> tagList;
+    private List<Tag> tagList = new ArrayList<>();
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
     @JsonManagedReference
     /*
       Private notes for this user
      */
-    private List<Note> noteList;
+    private List<Note> noteList = new ArrayList<>();
 
     @Override
     public boolean equals(Object object) {
