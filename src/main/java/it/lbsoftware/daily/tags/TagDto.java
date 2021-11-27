@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.tags;
 
-import it.lbsoftware.daily.entities.BaseDto;
+import it.lbsoftware.daily.bases.BaseDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

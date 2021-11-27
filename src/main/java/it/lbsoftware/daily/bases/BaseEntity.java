@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.entities;
+package it.lbsoftware.daily.bases;
 
 import lombok.AccessLevel;
 import lombok.Getter;

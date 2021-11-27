@@ -1,7 +1,7 @@
 package it.lbsoftware.daily.appusers;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import it.lbsoftware.daily.entities.BaseEntity;
+import it.lbsoftware.daily.bases.BaseEntity;
 import it.lbsoftware.daily.notes.Note;
 import it.lbsoftware.daily.tags.Tag;
 import lombok.*;
