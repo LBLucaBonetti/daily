@@ -51,18 +51,18 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void givenNoNoteAndAppUser_whenCreateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.createNote(null, au1));
+    void givenNoNoteAndAppUser_whenCreateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.createNote(null, au1));
     }
 
     @Test
-    void givenNoteAndNoAppUser_whenCreateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.createNote(n1, null));
+    void givenNoteAndNoAppUser_whenCreateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.createNote(n1, null));
     }
 
     @Test
-    void givenNoNoteAndNoAppUser_whenCreateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.createNote(null, null));
+    void givenNoNoteAndNoAppUser_whenCreateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.createNote(null, null));
     }
 
     @Test
@@ -74,18 +74,18 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void givenNoUuidAndAppUser_whenReadNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.readNote(null, au1));
+    void givenNoUuidAndAppUser_whenReadNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.readNote(null, au1));
     }
 
     @Test
-    void givenUuidAndNoAppUser_whenReadNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.readNote(uuid1, null));
+    void givenUuidAndNoAppUser_whenReadNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.readNote(uuid1, null));
     }
 
     @Test
-    void givenNoUuidAndNoAppUser_whenReadNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.readNote(null, null));
+    void givenNoUuidAndNoAppUser_whenReadNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.readNote(null, null));
     }
 
     @Test
@@ -105,8 +105,8 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void givenNoAppUser_whenReadNotes_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.readNotes(null));
+    void givenNoAppUser_whenReadNotes_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.readNotes(null));
     }
 
     @Test
@@ -126,38 +126,38 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void givenNoUuidAndNoteAndAppUser_whenUpdateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.updateNote(null, n1, au1));
+    void givenNoUuidAndNoteAndAppUser_whenUpdateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(null, n1, au1));
     }
 
     @Test
-    void givenUuidAndNoNoteAndAppUser_whenUpdateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.updateNote(uuid1, null, au1));
+    void givenUuidAndNoNoteAndAppUser_whenUpdateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(uuid1, null, au1));
     }
 
     @Test
-    void givenUuidAndNoteAndNoAppUser_whenUpdateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.updateNote(uuid1, n1, null));
+    void givenUuidAndNoteAndNoAppUser_whenUpdateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(uuid1, n1, null));
     }
 
     @Test
-    void givenNoUuidAndNoNoteAndAppUser_whenUpdateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.updateNote(null, null, au1));
+    void givenNoUuidAndNoNoteAndAppUser_whenUpdateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(null, null, au1));
     }
 
     @Test
-    void givenNoUuidAndNoteAndNoAppUser_whenUpdateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.updateNote(null, n1, null));
+    void givenNoUuidAndNoteAndNoAppUser_whenUpdateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(null, n1, null));
     }
 
     @Test
-    void givenUuidAndNoNoteAndNoAppUser_whenUpdateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.updateNote(uuid1, null, null));
+    void givenUuidAndNoNoteAndNoAppUser_whenUpdateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(uuid1, null, null));
     }
 
     @Test
-    void givenNoUuidAndNoNoteAndNoAppUser_whenUpdateNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.updateNote(null, null, null));
+    void givenNoUuidAndNoNoteAndNoAppUser_whenUpdateNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(null, null, null));
     }
 
     @Test
@@ -180,18 +180,18 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void givenNoUuidAndAppUser_whenDeleteNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.deleteNote(null, au1));
+    void givenNoUuidAndAppUser_whenDeleteNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.deleteNote(null, au1));
     }
 
     @Test
-    void givenUuidAndNoAppUser_whenDeleteNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.deleteNote(uuid1, null));
+    void givenUuidAndNoAppUser_whenDeleteNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.deleteNote(uuid1, null));
     }
 
     @Test
-    void givenNoUuidAndNoAppUser_whenDeleteNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.deleteNote(null, null));
+    void givenNoUuidAndNoAppUser_whenDeleteNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.deleteNote(null, null));
     }
 
     @Test
@@ -212,38 +212,38 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void givenNoUuidAndTagUuidAndAppUser_whenAddTagToNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.addTagToNote(null, uuid1, au1));
+    void givenNoUuidAndTagUuidAndAppUser_whenAddTagToNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.addTagToNote(null, uuid1, au1));
     }
 
     @Test
-    void givenUuidAndNoTagUuidAndAppUser_whenAddTagToNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.addTagToNote(uuid1, null, au1));
+    void givenUuidAndNoTagUuidAndAppUser_whenAddTagToNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.addTagToNote(uuid1, null, au1));
     }
 
     @Test
-    void givenUuidAndTagUuidAndNoAppUser_whenAddTagToNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.addTagToNote(uuid1, uuid2, null));
+    void givenUuidAndTagUuidAndNoAppUser_whenAddTagToNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.addTagToNote(uuid1, uuid2, null));
     }
 
     @Test
-    void givenNoUuidAndNoTagUuidAndAppUser_whenAddTagToNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.addTagToNote(null, null, au1));
+    void givenNoUuidAndNoTagUuidAndAppUser_whenAddTagToNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.addTagToNote(null, null, au1));
     }
 
     @Test
-    void givenNoUuidAndTagUuidAndNoAppUser_whenAddTagToNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.addTagToNote(null, uuid1, null));
+    void givenNoUuidAndTagUuidAndNoAppUser_whenAddTagToNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.addTagToNote(null, uuid1, null));
     }
 
     @Test
-    void givenUuidAndNoTagUuidAndNoAppUser_whenAddTagToNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.addTagToNote(uuid1, null, null));
+    void givenUuidAndNoTagUuidAndNoAppUser_whenAddTagToNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.addTagToNote(uuid1, null, null));
     }
 
     @Test
-    void givenNoUuidAndNoTagUuidAndNoAppUser_whenAddTagToNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.addTagToNote(null, null, null));
+    void givenNoUuidAndNoTagUuidAndNoAppUser_whenAddTagToNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.addTagToNote(null, null, null));
     }
 
     @Test
@@ -298,38 +298,38 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void givenNoUuidAndTagUuidAndAppUser_whenRemoveTagFromNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.removeTagFromNote(null, uuid1, au1));
+    void givenNoUuidAndTagUuidAndAppUser_whenRemoveTagFromNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.removeTagFromNote(null, uuid1, au1));
     }
 
     @Test
-    void givenUuidAndNoTagUuidAndAppUser_whenRemoveTagFromNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.removeTagFromNote(uuid1, null, au1));
+    void givenUuidAndNoTagUuidAndAppUser_whenRemoveTagFromNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.removeTagFromNote(uuid1, null, au1));
     }
 
     @Test
-    void givenUuidAndTagUuidAndNoAppUser_whenRemoveTagFromNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.removeTagFromNote(uuid1, uuid2, null));
+    void givenUuidAndTagUuidAndNoAppUser_whenRemoveTagFromNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.removeTagFromNote(uuid1, uuid2, null));
     }
 
     @Test
-    void givenNoUuidAndNoTagUuidAndAppUser_whenRemoveTagFromNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.removeTagFromNote(null, null, au1));
+    void givenNoUuidAndNoTagUuidAndAppUser_whenRemoveTagFromNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.removeTagFromNote(null, null, au1));
     }
 
     @Test
-    void givenNoUuidAndTagUuidAndNoAppUser_whenRemoveTagFromNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.removeTagFromNote(null, uuid1, null));
+    void givenNoUuidAndTagUuidAndNoAppUser_whenRemoveTagFromNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.removeTagFromNote(null, uuid1, null));
     }
 
     @Test
-    void givenUuidAndNoTagUuidAndNoAppUser_whenRemoveTagFromNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.removeTagFromNote(uuid1, null, null));
+    void givenUuidAndNoTagUuidAndNoAppUser_whenRemoveTagFromNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.removeTagFromNote(uuid1, null, null));
     }
 
     @Test
-    void givenNoUuidAndNoTagUuidAndNoAppUser_whenRemoveTagFromNote_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.removeTagFromNote(null, null, null));
+    void givenNoUuidAndNoTagUuidAndNoAppUser_whenRemoveTagFromNote_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.removeTagFromNote(null, null, null));
     }
 
     @Test
@@ -384,18 +384,18 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void givenNoUuidAndAppUser_whenReadNoteTags_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.readNoteTags(null, au1));
+    void givenNoUuidAndAppUser_whenReadNoteTags_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.readNoteTags(null, au1));
     }
 
     @Test
-    void givenUuidAndNoAppUser_whenReadNoteTags_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.readNoteTags(uuid1, null));
+    void givenUuidAndNoAppUser_whenReadNoteTags_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.readNoteTags(uuid1, null));
     }
 
     @Test
-    void givenNoUuidAndNoAppUser_whenReadNoteTags_thenNullPointerException() {
-        assertThrows(NullPointerException.class, () -> noteService.readNoteTags(null, null));
+    void givenNoUuidAndNoAppUser_whenReadNoteTags_thenIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> noteService.readNoteTags(null, null));
     }
 
     @Test
