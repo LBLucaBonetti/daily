@@ -20,22 +20,22 @@ public class AppUserServiceImpl implements AppUserService {
 
         // By default, the name maps to the sub claim according to Spring Security docs
         String email = jwtAuthenticationToken.getName();
+        AppUser appUser;
         if (appUserOptional.isEmpty()) {
-            AppUser newUser = AppUser.builder()
+            appUser = AppUser.builder()
                     .uid(uid)
                     .email(email)
                     .build();
-            appUserRepository.save(newUser);
-            jwtAuthenticationToken.setDetails(newUser);
         } else {
-            AppUser appUser = appUserOptional.get();
+            appUser = appUserOptional.get();
             if (!appUser.getEmail().equals(email)) {
                 // User changed email address, update accordingly
                 appUser.setEmail(email);
             }
-            appUserRepository.save(appUser);
-            jwtAuthenticationToken.setDetails(appUser);
         }
+
+        appUser = appUserRepository.save(appUser);
+        jwtAuthenticationToken.setDetails(appUser);
     }
 
     @Override
