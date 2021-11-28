@@ -19,6 +19,6 @@ public interface AppUserService {
      *
      * @return Found user or empty value
      */
-    Optional<AppUser> getAppUserFromToken() throws ResponseStatusException;
+    Optional<AppUser> getAppUserFromToken();
 
 }

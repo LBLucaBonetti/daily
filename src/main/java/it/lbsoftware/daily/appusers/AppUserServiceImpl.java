@@ -1,12 +1,9 @@
 package it.lbsoftware.daily.appusers;
 
-//import it.lbsoftware.daily.emails.EmailService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -15,7 +12,6 @@ import java.util.Optional;
 public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository appUserRepository;
-//    private final EmailService emailService;
 
     @Override
     public void setAppUserToToken(JwtAuthenticationToken jwtAuthenticationToken) {
@@ -31,7 +27,6 @@ public class AppUserServiceImpl implements AppUserService {
                     .build();
             appUserRepository.save(newUser);
             jwtAuthenticationToken.setDetails(newUser);
-//            emailService.send(newUser.getEmail(), "Welcome!", "Welcome to Daily :)");
         } else {
             AppUser appUser = appUserOptional.get();
             if (!appUser.getEmail().equals(email)) {
@@ -44,7 +39,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public Optional<AppUser> getAppUserFromToken() throws ResponseStatusException {
+    public Optional<AppUser> getAppUserFromToken() {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         if (jwtAuthenticationToken == null || jwtAuthenticationToken.getDetails() == null || !(jwtAuthenticationToken.getDetails() instanceof AppUser)) {
             // As per the current system design, this situation should not happen
