@@ -34,6 +34,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional
     public Optional<Tag> updateTag(UUID uuid, Tag tag, AppUser appUser) {
         Optional<Tag> tagOptional = tagRepository.findByUuidAndAppUser(uuid, appUser);
         if (tagOptional.isEmpty()) {

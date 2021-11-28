@@ -6,6 +6,7 @@ import it.lbsoftware.daily.tags.TagService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -34,6 +35,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public Optional<Note> updateNote(@NonNull UUID uuid, @NonNull Note note, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
@@ -46,6 +48,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public Boolean deleteNote(@NonNull UUID uuid, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
@@ -58,6 +61,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public Boolean addTagToNote(@NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
@@ -76,6 +80,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public Boolean removeTagFromNote(@NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull AppUser appUser) {
         Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
         if (noteOptional.isEmpty()) {
