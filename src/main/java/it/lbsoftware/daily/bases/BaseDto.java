@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class BaseDto {
+public abstract class BaseDto {
 
     private UUID uuid;
 
