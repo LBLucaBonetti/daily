@@ -17,7 +17,7 @@ public abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     protected Long id;
-    @Column(updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false, unique = true)
     @Setter(AccessLevel.PRIVATE)
     protected UUID uuid;
     @Column(updatable = false, nullable = false)
