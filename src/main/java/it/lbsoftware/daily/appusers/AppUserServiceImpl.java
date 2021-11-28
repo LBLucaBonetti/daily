@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ public class AppUserServiceImpl implements AppUserService {
     private final AppUserRepository appUserRepository;
 
     @Override
+    @Transactional
     public void setAppUserToToken(JwtAuthenticationToken jwtAuthenticationToken) {
         String uid = (String) jwtAuthenticationToken.getTokenAttributes().get("uid");
         Optional<AppUser> appUserOptional = appUserRepository.findByUid(uid);
