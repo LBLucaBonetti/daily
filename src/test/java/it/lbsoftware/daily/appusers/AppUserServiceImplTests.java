@@ -55,7 +55,7 @@ class AppUserServiceImplTests {
         AppUser detailsAppUser = (AppUser) token.getDetails();
         assertEquals(appUser.getEmail(), detailsAppUser.getEmail());
         assertEquals(appUser.getUid(), detailsAppUser.getUid());
-        assertTrue(appUserRepository.count() == 1);
+        assertEquals(1, appUserRepository.count());
     }
 
     @Test
@@ -78,7 +78,7 @@ class AppUserServiceImplTests {
         AppUser detailsAppUser = (AppUser) token.getDetails();
         assertEquals(newAppUserEmail, detailsAppUser.getEmail());
         assertEquals(appUserUid, detailsAppUser.getUid());
-        assertTrue(appUserRepository.count() == 1);
+        assertEquals(1, appUserRepository.count());
     }
 
     @Test

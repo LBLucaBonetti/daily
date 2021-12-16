@@ -44,14 +44,13 @@ class TagControllerTests {
     private AppUser au1;
     private AppUser au2;
     private UUID uuid1;
-    private UUID uuid2;
 
     @BeforeEach
     void setUp() {
         t1 = Tag.builder().name("Tag1").colorHex("#112233").noteSet(new HashSet<>()).build();
         t2 = Tag.builder().name("Tag2").colorHex("#223344").noteSet(new HashSet<>()).build();
         uuid1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        uuid2 = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+        UUID uuid2 = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         t1dto = new TagDto();
         t1dto.setName(t1.getName());
         t1dto.setColorHex(t1.getColorHex());
