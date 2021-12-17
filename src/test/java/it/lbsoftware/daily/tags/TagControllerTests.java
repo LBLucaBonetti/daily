@@ -104,6 +104,13 @@ class TagControllerTests {
     }
 
     @Test
+    void givenNoAppUser_whenReadTags_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.get("/tags").with(jwt()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void givenTag_whenCreateTag_thenCreated() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(tagDtoMapper.convertToEntity(t1dto)).willReturn(t1);
@@ -129,6 +136,13 @@ class TagControllerTests {
     }
 
     @Test
+    void givenNoAppUser_whenCreateTag_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.post("/tags").with(jwt()).content(objectMapper.writeValueAsString(t1dto)).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void givenTag_whenReadTag_thenOk() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(tagService.readTag(uuid1, au1)).willReturn(Optional.of(t1));
@@ -144,6 +158,13 @@ class TagControllerTests {
     void givenNoTags_whenReadTag_thenNotFound() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(tagService.readTag(uuid1, au1)).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", uuid1).with(jwt()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenNoAppUser_whenReadTag_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.get("/tags/{uuid}", uuid1).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -180,6 +201,13 @@ class TagControllerTests {
     }
 
     @Test
+    void givenNoAppUser_whenUpdateTag_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.put("/tags/{uuid}", uuid1).with(jwt()).content(objectMapper.writeValueAsString(t1dto)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void givenTag_whenDeleteTag_thenNoContent() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(tagService.deleteTag(uuid1, au1)).willReturn(true);
@@ -191,6 +219,13 @@ class TagControllerTests {
     void givenNoTags_whenDeleteTag_thenNotFound() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(tagService.deleteTag(uuid1, au1)).willReturn(false);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/tags/{uuid}", uuid1).with(jwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenNoAppUser_whenDeleteTag_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.delete("/tags/{uuid}", uuid1).with(jwt()))
                 .andExpect(status().isNotFound());
     }

@@ -126,6 +126,13 @@ class NoteControllerTests {
     }
 
     @Test
+    void givenNoAppUser_whenReadNotes_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes").with(jwt()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void givenNote_whenCreateNote_thenCreated() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(noteDtoMapper.convertToEntity(n3dto)).willReturn(n1);
@@ -144,6 +151,13 @@ class NoteControllerTests {
     }
 
     @Test
+    void givenNoAppUser_whenCreateNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.post("/notes").with(jwt()).content(objectMapper.writeValueAsString(n3dto)).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void givenNote_whenReadNote_thenOk() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(noteService.readNote(uuid1, au1)).willReturn(Optional.of(n1));
@@ -158,6 +172,13 @@ class NoteControllerTests {
     void givenNoNotes_whenReadNote_thenNotFound() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(noteService.readNote(uuid1, au1)).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", uuid1).with(jwt()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenNoAppUser_whenReadNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}", uuid1).with(jwt()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -187,6 +208,13 @@ class NoteControllerTests {
     }
 
     @Test
+    void givenNoAppUser_whenUpdateNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.put("/notes/{uuid}", uuid1).with(jwt()).content(objectMapper.writeValueAsString(n5dto)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void givenNote_whenDeleteNote_thenNoContent() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(noteService.deleteNote(uuid1, au1)).willReturn(true);
@@ -198,6 +226,13 @@ class NoteControllerTests {
     void givenNoNotes_whenDeleteNote_thenNotFound() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(noteService.deleteNote(uuid1, au1)).willReturn(false);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}", uuid1).with(jwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenNoAppUser_whenDeleteNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}", uuid1).with(jwt()))
                 .andExpect(status().isNotFound());
     }
@@ -227,6 +262,13 @@ class NoteControllerTests {
     }
 
     @Test
+    void givenNoAppUser_whenAddTagToNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.put("/notes/{uuid}/tags/{uuid}", uuid1, uuid2).with(jwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void givenTagAndNote_whenRemoveTagFromNote_thenNoContent() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(noteService.removeTagFromNote(uuid1, uuid2, au1)).willReturn(true);
@@ -238,6 +280,13 @@ class NoteControllerTests {
     void givenNoTagsAndNoNotes_whenRemoveTagFromNote_thenNotFound() throws Exception {
         given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
         given(noteService.removeTagFromNote(uuid1, uuid2, au1)).willReturn(false);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}/tags/{uuid}", uuid1, uuid2).with(jwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenNoAppUser_whenRemoveTagFromNote_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders.delete("/notes/{uuid}/tags/{uuid}", uuid1, uuid2).with(jwt()))
                 .andExpect(status().isNotFound());
     }
@@ -269,6 +318,13 @@ class NoteControllerTests {
         mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", uuid1).with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("[]"));
+    }
+
+    @Test
+    void givenNoAppUser_whenReadNoteTags_thenNotFound() throws Exception {
+        given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/{uuid}/tags", uuid1).with(jwt()))
+                .andExpect(status().isNotFound());
     }
 
 }
