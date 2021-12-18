@@ -47,8 +47,8 @@ class TagControllerTests {
 
     @BeforeEach
     void setUp() {
-        t1 = Tag.builder().name("Tag1").colorHex("#112233").noteSet(new HashSet<>()).build();
-        t2 = Tag.builder().name("Tag2").colorHex("#223344").noteSet(new HashSet<>()).build();
+        t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
+        t2 = Tag.builder().name("Tag2").colorHex("#223344").build();
         uuid1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         UUID uuid2 = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         t1dto = new TagDto();
@@ -67,8 +67,8 @@ class TagControllerTests {
         t4dto.setName("");
         t4dto.setColorHex(t1.getColorHex());
         t4dto.setUuid(uuid1);
-        au1 = AppUser.builder().uid("123").email("au1@daily.it").noteList(new ArrayList<>()).tagList(new ArrayList<>()).build();
-        au2 = AppUser.builder().uid("234").email("au2@daily.it").noteList(new ArrayList<>()).tagList(new ArrayList<>()).build();
+        au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
+        au2 = AppUser.builder().uid("234").email("au2@daily.it").build();
     }
 
     @AfterEach

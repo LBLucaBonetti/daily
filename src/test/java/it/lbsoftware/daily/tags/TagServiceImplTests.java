@@ -35,11 +35,11 @@ class TagServiceImplTests {
 
     @BeforeEach
     void setUp() {
-        t1 = Tag.builder().name("Tag1").colorHex("#112233").noteSet(new HashSet<>()).build();
-        t2 = Tag.builder().name("Tag2").colorHex("#223344").noteSet(new HashSet<>()).build();
+        t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
+        t2 = Tag.builder().name("Tag2").colorHex("#223344").build();
         au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
         uuid1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        n1 = Note.builder().text("Note1").tagSet(new HashSet<>()).build();
+        n1 = Note.builder().text("Note1").build();
         n1.getTagSet().add(t1);
         t1.getNoteSet().add(n1);
     }

@@ -38,12 +38,12 @@ class NoteServiceImplTests {
 
     @BeforeEach
     void setUp() {
-        n1 = Note.builder().text("Note1").tagSet(new HashSet<>()).build();
-        n2 = Note.builder().text("Note2").tagSet(new HashSet<>()).build();
+        n1 = Note.builder().text("Note1").build();
+        n2 = Note.builder().text("Note2").build();
         au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
         uuid1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         uuid2 = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
-        t1 = Tag.builder().name("Tag1").colorHex("#112233").noteSet(new HashSet<>()).build();
+        t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
     }
 
     @AfterEach

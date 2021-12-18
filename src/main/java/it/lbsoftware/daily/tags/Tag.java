@@ -36,6 +36,7 @@ public class Tag extends BaseEntity {
      */
     private String colorHex;
     @ManyToMany(mappedBy = "tagSet")
+    @Builder.Default
     /*
       Notes set with this tag
      */

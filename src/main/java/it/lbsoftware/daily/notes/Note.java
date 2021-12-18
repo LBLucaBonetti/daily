@@ -35,6 +35,7 @@ public class Note extends BaseEntity {
             joinColumns = @JoinColumn(name = "noteId"),
             inverseJoinColumns = @JoinColumn(name = "tagId")
     )
+    @Builder.Default
     /*
       Tags set for this note
      */

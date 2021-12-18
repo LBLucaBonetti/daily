@@ -64,34 +64,34 @@ class NoteControllerTests {
     void setUp() {
         uuid1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         uuid2 = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
-        n1 = Note.builder().text("Note1").tagSet(new HashSet<>()).build();
-        n2 = Note.builder().text("Note2").tagSet(new HashSet<>()).build();
+        n1 = Note.builder().text("Note1").build();
+        n2 = Note.builder().text("Note2").build();
         n1dto = new NoteDto();
         n1dto.setText(n1.getText());
         n1dto.setUuid(uuid1);
         n2dto = new NoteDto();
         n2dto.setText(n2.getText());
         n2dto.setUuid(uuid2);
-        t1 = Tag.builder().name("Tag1").colorHex("#112233").noteSet(new HashSet<>()).build();
-        t2 = Tag.builder().name("Tag2").colorHex("#223344").noteSet(new HashSet<>()).build();
+        t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
+        t2 = Tag.builder().name("Tag2").colorHex("#223344").build();
         t1dto = new TagDto();
         t1dto.setName(t1.getName());
         t1dto.setColorHex(t1.getColorHex());
         t2dto = new TagDto();
         t2dto.setName(t2.getName());
         t2dto.setColorHex(t2.getColorHex());
-        au1 = AppUser.builder().uid("123").email("au1@daily.it").noteList(new ArrayList<>()).tagList(new ArrayList<>()).build();
-        au2 = AppUser.builder().uid("234").email("au2@daily.it").noteList(new ArrayList<>()).tagList(new ArrayList<>()).build();
+        au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
+        au2 = AppUser.builder().uid("234").email("au2@daily.it").build();
         n3dto = new NoteDto();
         n3dto.setText(n1.getText());
         n4dto = new NoteDto();
         n4dto.setText("");
-        n3 = Note.builder().text("").tagSet(new HashSet<>()).build();
-        n4 = Note.builder().text("Note1Updated").tagSet(new HashSet<>()).build();
+        n3 = Note.builder().text("").build();
+        n4 = Note.builder().text("Note1Updated").build();
         n5dto = new NoteDto();
         n5dto.setText(n4.getText());
         n5dto.setUuid(uuid1);
-        n5 = Note.builder().text("Note1Updated").appUser(au1).tagSet(new HashSet<>()).build();
+        n5 = Note.builder().text("Note1Updated").appUser(au1).build();
     }
 
     @AfterEach
