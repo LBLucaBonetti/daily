@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @MappedSuperclass
@@ -33,6 +34,21 @@ public abstract class BaseEntity {
     @PrePersist
     private void generateUuid() {
         setUuid(UUID.randomUUID());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof BaseEntity))
+            return false;
+        BaseEntity that = (BaseEntity) obj;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
 }
