@@ -69,6 +69,14 @@ class NoteServiceImplTests {
     }
 
     @Test
+    void givenNoteAndAppUser_whenCreateNote_thenNoteListHasNote() {
+        given(noteRepository.save(n1)).willReturn(n1);
+        assertFalse(au1.getNoteList().contains(n1));
+        noteService.createNote(n1, au1);
+        assertTrue(au1.getNoteList().contains(n1));
+    }
+
+    @Test
     void givenNoUuidAndAppUser_whenReadNote_thenIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> noteService.readNote(null, au1));
     }
@@ -174,6 +182,15 @@ class NoteServiceImplTests {
         verify(noteRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
         verify(noteRepository, times(1)).delete(n1);
         assertTrue(res);
+    }
+
+    @Test
+    void givenUuidAndAppUser_whenDeleteNote_thenNoteListHasNotNote() {
+        given(noteRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.of(n1));
+        au1.getNoteList().add(n1);
+        assertTrue(au1.getNoteList().contains(n1));
+        noteService.deleteNote(uuid1, au1);
+        assertFalse(au1.getNoteList().contains(n1));
     }
 
     @Test
