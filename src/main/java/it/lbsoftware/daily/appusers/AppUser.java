@@ -63,12 +63,10 @@ public class AppUser extends BaseEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj)
             return true;
-        }
-        if (!(obj instanceof AppUser)) {
+        if (!(obj instanceof AppUser))
             return false;
-        }
         AppUser that = (AppUser) obj;
         EqualsBuilder eb = new EqualsBuilder();
         eb.append(uid, that.uid);
