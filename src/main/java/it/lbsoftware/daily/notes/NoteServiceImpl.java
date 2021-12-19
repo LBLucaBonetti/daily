@@ -19,7 +19,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Note createNote(@NonNull Note note, @NonNull AppUser appUser) {
-        note.setAppUser(appUser);
+        appUser.addNote(note);
 
         return noteRepository.save(note);
     }
@@ -55,6 +55,7 @@ public class NoteServiceImpl implements NoteService {
             return false;
         }
         Note note = noteOptional.get();
+        appUser.removeNote(note);
         noteRepository.delete(note);
 
         return true;
