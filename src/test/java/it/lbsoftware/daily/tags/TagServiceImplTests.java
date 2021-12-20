@@ -67,13 +67,6 @@ class TagServiceImplTests {
     }
 
     @Test
-    void givenTagAndAppUser_whenCreateTag_thenTagListHasTag() {
-        given(tagRepository.save(t1)).willReturn(t1);
-        tagService.createTag(t1, au1);
-        assertTrue(au1.getTagList().contains(t1));
-    }
-
-    @Test
     void givenNoUuidAndAppUser_whenReadTag_thenIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> tagService.readTag(null, au1));
     }
@@ -187,15 +180,6 @@ class TagServiceImplTests {
         given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.of(t1));
         tagService.deleteTag(uuid1, au1);
         assertEquals(0, n1.getTagSet().size());
-    }
-
-    @Test
-    void givenUuidAndAppUser_whenDeleteTag_thenTagListHasNotTag() {
-        given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.of(t1));
-        au1.getTagList().add(t1);
-        assertTrue(au1.getTagList().contains(t1));
-        tagService.deleteTag(uuid1, au1);
-        assertFalse(au1.getTagList().contains(t1));
     }
 
 }

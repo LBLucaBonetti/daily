@@ -1,6 +1,5 @@
 package it.lbsoftware.daily.notes;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.bases.BaseEntity;
 import it.lbsoftware.daily.tags.Tag;
@@ -42,7 +41,6 @@ public class Note extends BaseEntity {
     private Set<Tag> tagSet = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appUserId")
-    @JsonBackReference
     @NotNull
     private AppUser appUser;
 

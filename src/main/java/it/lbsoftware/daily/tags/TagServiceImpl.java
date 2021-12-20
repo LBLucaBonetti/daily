@@ -19,7 +19,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag createTag(@NonNull Tag tag, @NonNull AppUser appUser) {
-        appUser.addTag(tag);
+        tag.setAppUser(appUser);
 
         return tagRepository.save(tag);
     }
@@ -59,7 +59,6 @@ public class TagServiceImpl implements TagService {
         for (Note note : tag.getNoteSet()) {
             note.getTagSet().remove(tag);
         }
-        appUser.removeTag(tag);
         tagRepository.delete(tag);
 
         return true;
