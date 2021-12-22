@@ -17,7 +17,7 @@
         <java.version>11</java.version>
         <okta.spring.version>2.1.2</okta.spring.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-        <org.apache.commons.version>3.12.0</org.apache.commons.version>
+        <org.apache.commons.lang3.version>3.12.0</org.apache.commons.lang3.version>
     </properties>
     <dependencies>
         <dependency>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${org.apache.commons.version}</version>
+            <version>${org.apache.commons.lang3.version}</version>
         </dependency>
     </dependencies>
 
