@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
     /**
-     * Finds a tag by its id and AppUser
+     * Finds a tag by its uuid and AppUser
      *
      * @param uuid    Tag uuid
      * @param appUser User
