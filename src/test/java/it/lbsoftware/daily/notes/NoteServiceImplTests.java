@@ -320,18 +320,18 @@ class NoteServiceImplTests {
 
     @Test
     void givenUuidAndAppUser_whenReadNoteTags_thenReturnEmpty() {
-        given(noteRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.empty());
+        given(noteRepository.findByUuidAndAppUserFetchTags(uuid1, au1)).willReturn(Optional.empty());
         Optional<Set<Tag>> res = noteService.readNoteTags(uuid1, au1);
-        verify(noteRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
+        verify(noteRepository, times(1)).findByUuidAndAppUserFetchTags(uuid1, au1);
         assertEquals(Optional.empty(), res);
     }
 
     @Test
     void givenUuidAndAppUser_whenReadNoteTags_thenReturnTagSet() {
-        given(noteRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.of(n1));
+        given(noteRepository.findByUuidAndAppUserFetchTags(uuid1, au1)).willReturn(Optional.of(n1));
         t1.addToNote(n1);
         Optional<Set<Tag>> res = noteService.readNoteTags(uuid1, au1);
-        verify(noteRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
+        verify(noteRepository, times(1)).findByUuidAndAppUserFetchTags(uuid1, au1);
         assertEquals(Optional.of(Set.of(t1)), res);
     }
 
