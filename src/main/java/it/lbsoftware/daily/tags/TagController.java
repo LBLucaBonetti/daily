@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,7 +63,7 @@ class TagController {
         }
         AppUser appUser = appUserOptional.get();
         List<Tag> readTags = tagService.readTags(appUser);
-        List<TagDto> readTagDtos = readTags.stream().map(tagDtoMapper::convertToDto).collect(Collectors.toList());
+        List<TagDto> readTagDtos = readTags.stream().map(tagDtoMapper::convertToDto).collect(Collectors.toCollection(LinkedList::new));
 
         return ResponseEntity.ok(readTagDtos);
     }

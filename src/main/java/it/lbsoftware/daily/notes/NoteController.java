@@ -11,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -67,7 +64,7 @@ class NoteController {
         }
         AppUser appUser = appUserOptional.get();
         List<Note> readNotes = noteService.readNotes(appUser);
-        List<NoteDto> readNoteDtos = readNotes.stream().map(noteDtoMapper::convertToDto).collect(Collectors.toList());
+        List<NoteDto> readNoteDtos = readNotes.stream().map(noteDtoMapper::convertToDto).collect(Collectors.toCollection(LinkedList::new));
 
         return ResponseEntity.ok(readNoteDtos);
     }
