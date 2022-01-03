@@ -5,8 +5,7 @@ import org.mapstruct.Mapper;
 @Mapper
 public interface TagDtoMapper {
 
-    Tag convertToEntity(TagDto tagDto);
+  Tag convertToEntity(TagDto tagDto);
 
-    TagDto convertToDto(Tag tag);
-
+  TagDto convertToDto(Tag tag);
 }

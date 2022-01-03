@@ -17,40 +17,28 @@ import org.springframework.security.web.firewall.RequestRejectedHandler;
 @RequiredArgsConstructor
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final AppUserService appUserService;
+  private final AppUserService appUserService;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        // Cross-origin resource sharing
-        http
-                .cors();
-        // Authorization & authentication
-        http
-                .authorizeRequests()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .oauth2ResourceServer()
-                .jwt();
-        // Cross-site request forgery (disable)
-        http
-                .csrf()
-                .disable();
-        // Stateless session policy
-        http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        // Custom filters
-        http
-                .addFilterAfter(new AppUserRegistrationFilter(appUserService), BearerTokenAuthenticationFilter.class);
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    // Cross-origin resource sharing
+    http.cors();
+    // Authorization & authentication
+    http.authorizeRequests().anyRequest().authenticated().and().oauth2ResourceServer().jwt();
+    // Cross-site request forgery (disable)
+    http.csrf().disable();
+    // Stateless session policy
+    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    // Custom filters
+    http.addFilterAfter(
+        new AppUserRegistrationFilter(appUserService), BearerTokenAuthenticationFilter.class);
 
-        Okta.configureResourceServer401ResponseBody(http);
-    }
+    Okta.configureResourceServer401ResponseBody(http);
+  }
 
-    @Bean
-    RequestRejectedHandler requestRejectedHandler() {
-        // Returns a status code 400 (Bad Request) for every http method that is not allowed
-        return new HttpStatusRequestRejectedHandler();
-    }
-
+  @Bean
+  RequestRejectedHandler requestRejectedHandler() {
+    // Returns a status code 400 (Bad Request) for every http method that is not allowed
+    return new HttpStatusRequestRejectedHandler();
+  }
 }
