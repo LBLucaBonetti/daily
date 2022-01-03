@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 // TODO Change @CrossOrigin to match the deployed frontend URL
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin
 @RequestMapping(value = "/tags")
 class TagController {
 
