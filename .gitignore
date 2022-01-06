@@ -43,4 +43,3 @@ buildNumber.properties
 .mvn/timing.properties
 
 ### Daily ###
-application-develop-okta.properties
