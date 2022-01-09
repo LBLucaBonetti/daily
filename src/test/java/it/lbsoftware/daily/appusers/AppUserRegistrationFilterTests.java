@@ -18,7 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles(profiles = {"test", "okta"})
 @ExtendWith(MockitoExtension.class)
 class AppUserRegistrationFilterTests {
 
