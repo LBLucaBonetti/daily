@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import it.lbsoftware.daily.TestUtils;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusers.AppUserService;
@@ -19,12 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles(profiles = {"test", "okta"})
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class TagsIntegrationTests {
 
   private final String appUserUid = "123";
@@ -33,6 +33,7 @@ class TagsIntegrationTests {
   @Autowired private TagController tagController;
   @Autowired private AppUserService appUserService;
   @Autowired private AppUserRepository appUserRepository;
+  @Autowired private JdbcTemplate jdbcTemplate;
   private AppUser au1;
   private TagDto t1dto;
   private TagDto t2dto;
@@ -55,7 +56,9 @@ class TagsIntegrationTests {
   }
 
   @AfterEach
-  void tearDown() {}
+  void tearDown() {
+    TestUtils.cleanDatabase(jdbcTemplate);
+  }
 
   @Test
   @WithMockAppUser(uid = appUserUid, email = appUserEmail, setAppUserAsDetails = true)
