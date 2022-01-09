@@ -1,32 +1,59 @@
 package it.lbsoftware.daily.appusers;
 
-import lombok.*;
-
-import javax.persistence.*;
+import it.lbsoftware.daily.bases.BaseEntity;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+@Table(indexes = @Index(name = "idx_appuser_uuid", columnList = "uuid"))
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Builder
-public class AppUser {
+public class AppUser extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-    @Column(unique = true, nullable = false)
-    @NotBlank
-    private String uid;
-    @Column(unique = true, nullable = false)
-    @Email
-    @NotNull
-    private String email;
-    private LocalDateTime registrationDateTime;
-    private LocalDateTime lastAccessDateTime;
+  @Column(updatable = false, nullable = false, unique = true)
+  @NotBlank
+  /*
+   Okta unique identifier for this user
+  */
+  private String uid;
 
+  @Column(nullable = false, unique = true)
+  @Email
+  @NotNull
+  @Setter
+  /*
+   Okta registration email for this user
+  */
+  private String email;
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder hcb = new HashCodeBuilder();
+    hcb.append(uid);
+    return hcb.toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!(obj instanceof AppUser)) return false;
+    AppUser that = (AppUser) obj;
+    EqualsBuilder eb = new EqualsBuilder();
+    eb.append(uid, that.uid);
+    return eb.isEquals();
+  }
 }
