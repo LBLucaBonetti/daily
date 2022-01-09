@@ -32,6 +32,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     // Custom filters
     http.addFilterAfter(
         new AppUserRegistrationFilter(appUserService), BearerTokenAuthenticationFilter.class);
+    // Heroku-specific HTTPS settings
+    // (https://devcenter.heroku.com/articles/preparing-a-spring-boot-app-for-production-on-heroku)
+    http.requiresChannel()
+        .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
+        .requiresSecure();
 
     Okta.configureResourceServer401ResponseBody(http);
   }
