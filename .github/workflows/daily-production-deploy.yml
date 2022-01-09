@@ -21,4 +21,4 @@ jobs:
         TEST_SPRING_DATASOURCE_URL: ${{ secrets.TEST_SPRING_DATASOURCE_URL }}
         TEST_SPRING_DATASOURCE_USERNAME: ${{ secrets.TEST_SPRING_DATASOURCE_USERNAME }}
         TEST_SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_SPRING_DATASOURCE_PASSWORD }}
-      run: mvn -B clean package
+      run: mvn -B clean verify
