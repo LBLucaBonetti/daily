@@ -1,9 +1,7 @@
 package it.lbsoftware.daily.appusers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles(profiles = {"test", "okta"})
-public class AppUserTests {
+class AppUserTests {
 
   private AppUser au1;
   private AppUser au2;
@@ -49,11 +47,11 @@ public class AppUserTests {
 
   @Test
   void givenDifferentUidAppUsers_whenEquals_thenDiffer() {
-    assertFalse(au1.equals(au2));
+    assertNotEquals(au1, au2);
   }
 
   @Test
   void givenEqualUidAppUsers_whenEquals_thenEqual() {
-    assertTrue(au1.equals(au3));
+    assertEquals(au1, au3);
   }
 }

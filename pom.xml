@@ -10,7 +10,7 @@
     </parent>
     <groupId>it.lbsoftware</groupId>
     <artifactId>daily</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <name>daily</name>
     <description>Daily</description>
     <properties>
@@ -18,6 +18,8 @@
         <okta.spring.version>2.1.2</okta.spring.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <org.apache.commons.lang3.version>3.12.0</org.apache.commons.lang3.version>
+        <sonar.organization>lblucabonetti</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <dependencies>
         <dependency>
