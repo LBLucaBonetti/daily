@@ -8,7 +8,7 @@ on:
 
 jobs:
   sonarcloud_test_and_build:
-    name: SonarCloud, test and build
+    name: SonarCloud, test, build, ZAP
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -39,3 +39,7 @@ jobs:
         TEST_SPRING_DATASOURCE_USERNAME: ${{ secrets.TEST_SPRING_DATASOURCE_USERNAME }}
         TEST_SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_SPRING_DATASOURCE_PASSWORD }}
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=LBLucaBonetti_daily
+    - name: ZAP Scan
+      uses: zaproxy/action-baseline@v0.6.1
+      with:
+        target: 'https://daily-prod.herokuapp.com'
