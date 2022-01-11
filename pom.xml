@@ -20,6 +20,7 @@
         <org.apache.commons.lang3.version>3.12.0</org.apache.commons.lang3.version>
         <sonar.organization>lblucabonetti</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <org.jacoco.version>0.8.7</org.jacoco.version>
     </properties>
     <dependencies>
         <dependency>
@@ -135,6 +136,25 @@
                         </arg>
                     </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${org.jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
