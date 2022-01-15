@@ -3,8 +3,6 @@ name: Daily production deploy
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   sonarcloud_test_and_build:
