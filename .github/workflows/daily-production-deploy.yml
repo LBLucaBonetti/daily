@@ -1,4 +1,4 @@
-name: Daily production deploy
+name: daily production deploy
 
 on:
   push:
