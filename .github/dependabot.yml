@@ -1,0 +1,16 @@
+version: 2
+
+updates:
+  # Maven
+  - package-ecosystem: 'maven'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 10
+
+  # GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 10
