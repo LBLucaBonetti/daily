@@ -16,7 +16,7 @@
     <properties>
         <java.version>17</java.version>
         <okta.spring.version>2.1.5</okta.spring.version>
-        <org.mapstruct.version>1.5.1.Final</org.mapstruct.version>
+        <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
         <org.apache.commons.lang3.version>3.12.0</org.apache.commons.lang3.version>
         <sonar.organization>lblucabonetti</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
