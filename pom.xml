@@ -22,7 +22,7 @@
     <sonar.organization>lblucabonetti</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <org.jacoco.version>0.8.8</org.jacoco.version>
-    <com.github.eirslett.version>1.9.1</com.github.eirslett.version>
+    <com.github.eirslett.version>1.12.1</com.github.eirslett.version>
   </properties>
   <dependencies>
     <dependency>
@@ -112,7 +112,7 @@
             </goals>
             <configuration>
               <!-- See https://nodejs.org/en/download/ for latest node and npm (lts) versions -->
-              <nodeVersion>16.17.0</nodeVersion>
+              <nodeVersion>v16.17.0</nodeVersion>
               <npmVersion>8.15.0</npmVersion>
             </configuration>
           </execution>
