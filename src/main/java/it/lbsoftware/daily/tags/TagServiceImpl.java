@@ -1,6 +1,5 @@
 package it.lbsoftware.daily.tags;
 
-import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.notes.Note;
 import java.util.List;
 import java.util.Optional;
@@ -17,25 +16,25 @@ public class TagServiceImpl implements TagService {
   private final TagRepository tagRepository;
 
   @Override
-  public Tag createTag(@NonNull Tag tag, @NonNull AppUser appUser) {
+  public Tag createTag(@NonNull Tag tag, @NonNull String appUser) {
     tag.setAppUser(appUser);
 
     return tagRepository.save(tag);
   }
 
   @Override
-  public Optional<Tag> readTag(@NonNull UUID uuid, @NonNull AppUser appUser) {
+  public Optional<Tag> readTag(@NonNull UUID uuid, @NonNull String appUser) {
     return tagRepository.findByUuidAndAppUser(uuid, appUser);
   }
 
   @Override
-  public List<Tag> readTags(@NonNull AppUser appUser) {
+  public List<Tag> readTags(@NonNull String appUser) {
     return tagRepository.findByAppUser(appUser);
   }
 
   @Override
   @Transactional
-  public Optional<Tag> updateTag(@NonNull UUID uuid, @NonNull Tag tag, @NonNull AppUser appUser) {
+  public Optional<Tag> updateTag(@NonNull UUID uuid, @NonNull Tag tag, @NonNull String appUser) {
     Optional<Tag> tagOptional = tagRepository.findByUuidAndAppUser(uuid, appUser);
     if (tagOptional.isEmpty()) {
       return Optional.empty();
@@ -49,7 +48,7 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional
-  public Boolean deleteTag(@NonNull UUID uuid, @NonNull AppUser appUser) {
+  public Boolean deleteTag(@NonNull UUID uuid, @NonNull String appUser) {
     Optional<Tag> tagOptional = tagRepository.findByUuidAndAppUser(uuid, appUser);
     if (tagOptional.isEmpty()) {
       return false;

@@ -1,6 +1,5 @@
 package it.lbsoftware.daily.notes;
 
-import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.bases.BaseEntity;
 import it.lbsoftware.daily.tags.Tag;
 import java.util.HashSet;
@@ -8,15 +7,12 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,8 +46,10 @@ public class Note extends BaseEntity {
   */
   private Set<Tag> tagSet = new HashSet<>();
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "appUserId")
-  @NotNull
-  private AppUser appUser;
+  @Column(name = "app_user", nullable = false)
+  @NotBlank
+  /*
+   Unique id of the user
+   */
+  private String appUser;
 }
