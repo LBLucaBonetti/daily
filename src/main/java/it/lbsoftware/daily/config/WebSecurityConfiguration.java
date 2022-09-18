@@ -1,44 +1,51 @@
 package it.lbsoftware.daily.config;
 
-import com.okta.spring.boot.oauth.Okta;
-import it.lbsoftware.daily.appusers.AppUserRegistrationFilter;
-import it.lbsoftware.daily.appusers.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.firewall.HttpStatusRequestRejectedHandler;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @RequiredArgsConstructor
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration {
 
-  private final AppUserService appUserService;
-
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    // Cross-origin resource sharing
-    http.cors();
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    // CSRF configuration
+    http
+        .csrf(csrf -> csrf
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        );
     // Authorization & authentication
-    http.authorizeRequests().anyRequest().authenticated().and().oauth2ResourceServer().jwt();
-    // Cross-site request forgery (disable)
-    http.csrf().disable();
-    // Stateless session policy
-    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    // Custom filters
-    http.addFilterAfter(
-        new AppUserRegistrationFilter(appUserService), BearerTokenAuthenticationFilter.class);
+    http.authorizeRequests().anyRequest().authenticated();
+    // OAuth2 login
+    http.oauth2Login()
+        .successHandler(new SimpleUrlAuthenticationSuccessHandler("/"))
+        // Overriding the login page avoids the automatically generated Spring Security login page
+        // rendered to the /login endpoint which would show the Okta link to authenticate; the /login, the
+        // /logout and the /login?logout endpoints will silently display index.html due to the
+        // ErrorConfiguration controller handling the requests. Making a GET to /oauth2/authorization/okta by
+        // entering the URL in the browser will simply do a new "authorization dance"
+        .loginPage("/oauth2/authorization/okta");
+    http.exceptionHandling()
+        .defaultAuthenticationEntryPointFor(
+            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+            new AntPathRequestMatcher("/api/**")
+        );
     // Heroku-specific HTTPS settings
     // (https://devcenter.heroku.com/articles/preparing-a-spring-boot-app-for-production-on-heroku)
     http.requiresChannel()
         .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
         .requiresSecure();
-
-    Okta.configureResourceServer401ResponseBody(http);
+    return http.build();
   }
 
   @Bean
