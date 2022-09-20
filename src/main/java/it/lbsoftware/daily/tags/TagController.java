@@ -1,11 +1,9 @@
 package it.lbsoftware.daily.tags;
 
 import java.security.Principal;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,9 +49,7 @@ class TagController {
   public ResponseEntity<List<TagDto>> readTags(Principal appUser) {
     List<Tag> readTags = tagService.readTags(appUser.getName());
     List<TagDto> readTagDtos =
-        readTags.stream()
-            .map(tagDtoMapper::convertToDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+        tagDtoMapper.convertToDto(readTags);
 
     return ResponseEntity.ok(readTagDtos);
   }

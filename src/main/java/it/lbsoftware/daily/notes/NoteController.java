@@ -4,7 +4,6 @@ import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
 import java.security.Principal;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -56,9 +55,7 @@ class NoteController {
   public ResponseEntity<List<NoteDto>> readNotes(Principal appUser) {
     List<Note> readNotes = noteService.readNotes(appUser.getName());
     List<NoteDto> readNoteDtos =
-        readNotes.stream()
-            .map(noteDtoMapper::convertToDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+        noteDtoMapper.convertToDto(readNotes);
 
     return ResponseEntity.ok(readNoteDtos);
   }
