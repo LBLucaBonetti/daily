@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -108,7 +107,7 @@ class NoteController {
       return ResponseEntity.notFound().build();
     }
     Set<TagDto> readNoteTagDtos =
-        readNoteTags.get().stream().map(tagDtoMapper::convertToDto).collect(Collectors.toSet());
+        tagDtoMapper.convertToDto(readNoteTags.get());
 
     return ResponseEntity.ok(readNoteTagDtos);
   }
