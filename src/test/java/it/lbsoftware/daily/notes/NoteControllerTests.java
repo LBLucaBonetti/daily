@@ -43,7 +43,7 @@ class NoteControllerTests extends DailyAbstractTests {
   private static final String TEXT = "text";
   private static final String APP_USER = "appUser";
   private static final String NAME = "name";
-  private static final String COLOR_HEX = "colorHex";
+  private static final String COLOR_HEX = "#123456";
 
   @BeforeEach
   void beforeEach() {
