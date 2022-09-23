@@ -7,6 +7,8 @@ import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractTests;
 import it.lbsoftware.daily.tags.Tag;
@@ -67,6 +69,9 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<NoteDto> res = noteController.createNote(noteDto, appUser);
 
     // Then
+    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
+    verify(noteService, times(1)).createNote(note, appUser.getName());
+    verify(noteDtoMapper, times(1)).convertToDto(createdNote);
     assertEquals(HttpStatus.CREATED, res.getStatusCode());
     assertEquals(createdNoteDto, res.getBody());
   }
@@ -83,6 +88,7 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<NoteDto> res = noteController.readNote(uuid, appUser);
 
     // Then
+    verify(noteService, times(1)).readNote(uuid, appUser.getName());
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -101,6 +107,8 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<NoteDto> res = noteController.readNote(uuid, appUser);
 
     // Then
+    verify(noteService,times(1)).readNote(uuid, appUser.getName());
+    verify(noteDtoMapper, times(1)).convertToDto(readNote.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readNoteDto, res.getBody());
   }
@@ -118,6 +126,8 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<List<NoteDto>> res = noteController.readNotes(appUser);
 
     // Then
+    verify(noteService, times(1)).readNotes(appUser.getName());
+    verify(noteDtoMapper, times(1)).convertToDto(readNotes);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readNoteDtos, res.getBody());
   }
@@ -137,6 +147,8 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<NoteDto> res = noteController.updateNote(uuid, noteDto, appUser);
 
     // Then
+    verify(noteDtoMapper,times(1)).convertToEntity(noteDto);
+    verify(noteService,times(1)).updateNote(uuid, note, appUser.getName());
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -156,6 +168,8 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<NoteDto> res = noteController.updateNote(uuid, noteDto, appUser);
 
     // Then
+    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
+    verify(noteService,times(1)).updateNote(uuid, note, appUser.getName());
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -171,6 +185,7 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<NoteDto> res = noteController.deleteNote(uuid, appUser);
 
     // Then
+    verify(noteService,times(1)).deleteNote(uuid,appUser.getName());
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -186,6 +201,7 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<NoteDto> res = noteController.deleteNote(uuid, appUser);
 
     // Then
+    verify(noteService, times(1)).deleteNote(uuid, appUser.getName());
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -202,6 +218,7 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<TagDto> res = noteController.addTagToNote(uuid, tagUuid, appUser);
 
     // Then
+    verify(noteService, times(1)).addTagToNote(uuid, tagUuid, appUser.getName());
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -218,6 +235,7 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<TagDto> res = noteController.addTagToNote(uuid, tagUuid, appUser);
 
     // Then
+    verify(noteService, times(1)).addTagToNote(uuid, tagUuid, appUser.getName());
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -234,6 +252,7 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<TagDto> res = noteController.removeTagFromNote(uuid, tagUuid, appUser);
 
     // Then
+    verify(noteService, times(1)).removeTagFromNote(uuid, tagUuid, appUser.getName());
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -250,6 +269,7 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<TagDto> res = noteController.removeTagFromNote(uuid, tagUuid, appUser);
 
     // Then
+    verify(noteService, times(1)).removeTagFromNote(uuid, tagUuid, appUser.getName());
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -266,6 +286,7 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<Set<TagDto>> res = noteController.readNoteTags(uuid, appUser);
 
     // Then
+    verify(noteService, times(1)).readNoteTags(uuid, appUser.getName());
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -284,6 +305,8 @@ class NoteControllerTests extends DailyAbstractTests {
     ResponseEntity<Set<TagDto>> res = noteController.readNoteTags(uuid, appUser);
 
     // Then
+    verify(noteService, times(1)).readNoteTags(uuid, appUser.getName());
+    verify(tagDtoMapper,times(1)).convertToDto(readNoteTags.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readNoteTagDtos, res.getBody());
   }
