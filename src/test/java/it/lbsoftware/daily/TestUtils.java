@@ -17,7 +17,7 @@ public final class TestUtils {
    * @param jdbcTemplate The jdbc handle instance to operate on
    * @return The number of deleted rows
    */
-  public static int cleanDatabase(JdbcTemplate jdbcTemplate) {
+  public static int cleanDatabase(final JdbcTemplate jdbcTemplate) {
     return JdbcTestUtils.deleteFromTables(jdbcTemplate, tableNames);
   }
 }

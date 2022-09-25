@@ -12,6 +12,7 @@ public final class NoteTestUtils {
 
   /**
    * NoteDto generator
+   *
    * @param uuid
    * @param text
    * @return The created NoteDto
@@ -25,6 +26,7 @@ public final class NoteTestUtils {
 
   /**
    * Note generator; the created instance is not persisted
+   *
    * @param text
    * @param tagSet
    * @param appUser

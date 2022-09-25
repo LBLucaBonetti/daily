@@ -49,7 +49,7 @@ public class Note extends BaseEntity {
   @Column(name = "app_user", nullable = false)
   @NotBlank
   /*
-   Unique id of the user
+   Unique user id
    */
   private String appUser;
 }

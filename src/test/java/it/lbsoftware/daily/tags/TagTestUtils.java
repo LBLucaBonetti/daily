@@ -12,6 +12,7 @@ public final class TagTestUtils {
 
   /**
    * TagDto generator
+   *
    * @param uuid
    * @param name
    * @param colorHex
@@ -27,6 +28,7 @@ public final class TagTestUtils {
 
   /**
    * Tag generator; the created instance is not persisted
+   *
    * @param name
    * @param colorHex
    * @param noteSet
