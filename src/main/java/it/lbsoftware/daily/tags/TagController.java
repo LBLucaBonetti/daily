@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.tags;
 
-import java.security.Principal;
+import it.lbsoftware.daily.appusers.AppUserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,6 +8,8 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,19 +26,20 @@ class TagController {
 
   private final TagService tagService;
   private final TagDtoMapper tagDtoMapper;
+  private final AppUserService appUserService;
 
   @PostMapping
-  public ResponseEntity<TagDto> createTag(@Valid @RequestBody TagDto tagDto, Principal appUser) {
+  public ResponseEntity<TagDto> createTag(@Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal OidcUser appUser) {
     Tag tag = tagDtoMapper.convertToEntity(tagDto);
-    Tag createdTag = tagService.createTag(tag, appUser.getName());
+    Tag createdTag = tagService.createTag(tag, appUserService.getUid(appUser));
     TagDto createdTagDto = tagDtoMapper.convertToDto(createdTag);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdTagDto);
   }
 
   @GetMapping(value = "/{uuid}")
-  public ResponseEntity<TagDto> readTag(@PathVariable("uuid") UUID uuid, Principal appUser) {
-    Optional<Tag> readTag = tagService.readTag(uuid, appUser.getName());
+  public ResponseEntity<TagDto> readTag(@PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
+    Optional<Tag> readTag = tagService.readTag(uuid, appUserService.getUid(appUser));
     if (readTag.isEmpty()) {
       return ResponseEntity.notFound().build();
     }
@@ -46,8 +49,8 @@ class TagController {
   }
 
   @GetMapping
-  public ResponseEntity<List<TagDto>> readTags(Principal appUser) {
-    List<Tag> readTags = tagService.readTags(appUser.getName());
+  public ResponseEntity<List<TagDto>> readTags(@AuthenticationPrincipal OidcUser appUser) {
+    List<Tag> readTags = tagService.readTags(appUserService.getUid(appUser));
     List<TagDto> readTagDtos =
         tagDtoMapper.convertToDto(readTags);
 
@@ -56,9 +59,9 @@ class TagController {
 
   @PutMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> updateTag(
-      @PathVariable("uuid") UUID uuid, @Valid @RequestBody TagDto tagDto, Principal appUser) {
+      @PathVariable("uuid") UUID uuid, @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal OidcUser appUser) {
     Tag tag = tagDtoMapper.convertToEntity(tagDto);
-    Optional<Tag> updatedTag = tagService.updateTag(uuid, tag, appUser.getName());
+    Optional<Tag> updatedTag = tagService.updateTag(uuid, tag, appUserService.getUid(appUser));
     if (updatedTag.isEmpty()) {
       return ResponseEntity.notFound().build();
     }
@@ -67,8 +70,8 @@ class TagController {
   }
 
   @DeleteMapping(value = "/{uuid}")
-  public ResponseEntity<TagDto> deleteTag(@PathVariable("uuid") UUID uuid, Principal appUser) {
-    if (!Boolean.TRUE.equals(tagService.deleteTag(uuid, appUser.getName()))) {
+  public ResponseEntity<TagDto> deleteTag(@PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
+    if (!Boolean.TRUE.equals(tagService.deleteTag(uuid, appUserService.getUid(appUser)))) {
       return ResponseEntity.notFound().build();
     }
 

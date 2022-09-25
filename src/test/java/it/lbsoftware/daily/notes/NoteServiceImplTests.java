@@ -10,7 +10,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import it.lbsoftware.daily.DailyAbstractTests;
+import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagService;
 import java.util.Collections;
@@ -22,13 +22,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 @DisplayName("NoteServiceImpl unit tests")
-class NoteServiceImplTests extends DailyAbstractTests {
+class NoteServiceImplTests extends DailyAbstractUnitTests {
 
   @Mock
   private NoteRepository noteRepository;
