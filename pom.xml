@@ -23,6 +23,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <org.jacoco.version>0.8.8</org.jacoco.version>
     <com.github.eirslett.version>1.12.1</com.github.eirslett.version>
+    <testcontainers.version>1.17.3</testcontainers.version>
   </properties>
   <dependencies>
     <dependency>
@@ -78,6 +79,22 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- This is only used to provide tests with a WebTestClient -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
     </dependency>
@@ -93,6 +110,17 @@
       <version>${org.apache.commons.lang3.version}</version>
     </dependency>
   </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <plugins>
