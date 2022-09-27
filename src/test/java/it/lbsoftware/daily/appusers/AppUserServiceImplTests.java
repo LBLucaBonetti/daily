@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.UID_CLAIM;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,7 +17,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 class AppUserServiceImplTests extends DailyAbstractUnitTests {
 
   private AppUserServiceImpl appUserService;
-  private static final String UID_CLAIM = "sub";
   private static final String UID_INVALID = "The OidcUser did not provide a valid unique id";
   private static final String APP_USER = "appUser";
 

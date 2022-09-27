@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 public final class AppUserTestUtils {
 
   private static final String ID_TOKEN_VALUE = "id-token";
+  public static final String UID_CLAIM = "sub";
 
   private AppUserTestUtils() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");

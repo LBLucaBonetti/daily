@@ -5,7 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class DailyAbstractIntegrationTests extends DailyAbstractTests{
@@ -13,7 +14,8 @@ public abstract class DailyAbstractIntegrationTests extends DailyAbstractTests{
   @Autowired
   private JdbcTemplate jdbcTemplate;
   @Autowired
-  protected WebTestClient webTestClient;
+  protected WebApplicationContext webApplicationContext;
+  protected MockMvc mockMvc;
 
   @AfterEach
   void afterEach() {
