@@ -1,5 +1,9 @@
 package it.lbsoftware.daily.notes;
 
+import static it.lbsoftware.daily.TestUtils.loginOf;
+import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -14,17 +18,21 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @DisplayName("Note integration tests")
 class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
-  @Autowired private ObjectMapper objectMapper;
-  @Autowired private NoteRepository noteRepository;
   private static final String BASE_URL = "/api/notes";
   private static final String TEXT = "text";
   private static final String APP_USER = "appUser";
+  @Autowired private ObjectMapper objectMapper;
+  @Autowired private NoteRepository noteRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -130,5 +138,61 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     mockMvc
         .perform(delete(BASE_URL + "/{uuid}/tags/{tagsUuid}", UUID.randomUUID(), UUID.randomUUID()))
         .andExpect(status().isForbidden());
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(
+      strings = {
+        "   ",
+      })
+  @DisplayName("Should return bad request when create note with wrong text")
+  void test14(final String text) throws Exception {
+    // Given
+    NoteDto noteDto = createNoteDto(null, text);
+
+    // When
+
+    mockMvc
+        .perform(
+            post(BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(noteDto))
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+
+    // Then
+    assertEquals(0, noteRepository.count());
+  }
+
+  @Test
+  @DisplayName("Should create note")
+  void test15() throws Exception {
+    // Given
+    NoteDto noteDto = createNoteDto(null, TEXT);
+
+    // When
+    NoteDto res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(noteDto))
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            NoteDto.class);
+
+    // Then
+    assertNotNull(res.getUuid());
+    assertEquals(TEXT, res.getText());
+    Note resEntity = noteRepository.findByUuidAndAppUser(res.getUuid(), APP_USER).get();
+    assertNotNull(resEntity.getUuid());
+    assertEquals(TEXT, resEntity.getText());
   }
 }
