@@ -27,10 +27,8 @@ import org.mockito.Mock;
 @DisplayName("NoteServiceImpl unit tests")
 class NoteServiceImplTests extends DailyAbstractUnitTests {
 
-  @Mock
-  private NoteRepository noteRepository;
-  @Mock
-  private TagService tagService;
+  @Mock private NoteRepository noteRepository;
+  @Mock private TagService tagService;
   private NoteServiceImpl noteService;
   private static final String TEXT = "text";
   private static final String APP_USER = "appUser";
@@ -130,7 +128,8 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
 
     // When
-    Optional<Note> res = noteService.updateNote(uuid, createNote(TEXT, Collections.emptySet(), APP_USER), APP_USER);
+    Optional<Note> res =
+        noteService.updateNote(uuid, createNote(TEXT, Collections.emptySet(), APP_USER), APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
@@ -149,7 +148,9 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(noteRepository.save(prevNote)).willReturn(updatedNote);
 
     // When
-    Optional<Note> res = noteService.updateNote(uuid, createNote(OTHER_TEXT, Collections.emptySet(), null), APP_USER);
+    Optional<Note> res =
+        noteService.updateNote(
+            uuid, createNote(OTHER_TEXT, Collections.emptySet(), null), APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
@@ -205,7 +206,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService,times(0)).readTag(any(), any());
+    verify(tagService, times(0)).readTag(any(), any());
     verify(noteRepository, times(0)).save(any());
     assertEquals(Boolean.FALSE, res);
   }
@@ -226,7 +227,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService,times(1)).readTag(tagUuid, APP_USER);
+    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
     verify(noteRepository, times(0)).save(any());
     assertEquals(Boolean.FALSE, res);
   }
@@ -249,7 +250,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService,times(1)).readTag(tagUuid, APP_USER);
+    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
     verify(noteRepository, times(1)).save(note);
     assertTrue(note.getTagSet().contains(tag));
     assertTrue(tag.getNoteSet().contains(note));
@@ -269,7 +270,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService,times(0)).readTag(any(), any());
+    verify(tagService, times(0)).readTag(any(), any());
     verify(noteRepository, times(0)).save(any());
     assertEquals(Boolean.FALSE, res);
   }
@@ -290,7 +291,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService,times(1)).readTag(tagUuid, APP_USER);
+    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
     verify(noteRepository, times(0)).save(any());
     assertEquals(Boolean.FALSE, res);
   }
@@ -314,7 +315,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService,times(1)).readTag(tagUuid, APP_USER);
+    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
     verify(noteRepository, times(1)).save(note);
     assertFalse(note.getTagSet().contains(tag));
     assertFalse(tag.getNoteSet().contains(note));
@@ -342,7 +343,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   void test17() {
     // Given
     Set<Tag> tagSet = Set.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
-    Optional<Note> noteOptional = Optional.of(createNote(TEXT, tagSet,APP_USER));
+    Optional<Note> noteOptional = Optional.of(createNote(TEXT, tagSet, APP_USER));
     UUID uuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER)).willReturn(noteOptional);
 

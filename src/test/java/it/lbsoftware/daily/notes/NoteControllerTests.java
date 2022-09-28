@@ -31,16 +31,11 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 @DisplayName("NoteController unit tests")
 class NoteControllerTests extends DailyAbstractUnitTests {
 
-  @Mock
-  private NoteService noteService;
-  @Mock
-  private NoteDtoMapper noteDtoMapper;
-  @Mock
-  private TagDtoMapper tagDtoMapper;
-  @Mock
-  private AppUserService appUserService;
-  @Mock
-  private OidcUser appUser;
+  @Mock private NoteService noteService;
+  @Mock private NoteDtoMapper noteDtoMapper;
+  @Mock private TagDtoMapper tagDtoMapper;
+  @Mock private AppUserService appUserService;
+  @Mock private OidcUser appUser;
   private NoteController noteController;
   private static final String TEXT = "text";
   private static final String APP_USER = "appUser";
@@ -49,7 +44,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    noteController = new NoteController(noteService,noteDtoMapper,tagDtoMapper,appUserService);
+    noteController = new NoteController(noteService, noteDtoMapper, tagDtoMapper, appUserService);
     given(appUserService.getUid(appUser)).willReturn(APP_USER);
   }
 
@@ -110,7 +105,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteService,times(1)).readNote(uuid, APP_USER);
+    verify(noteService, times(1)).readNote(uuid, APP_USER);
     verify(noteDtoMapper, times(1)).convertToDto(readNote.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readNoteDto, res.getBody());
@@ -152,8 +147,8 @@ class NoteControllerTests extends DailyAbstractUnitTests {
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteDtoMapper,times(1)).convertToEntity(noteDto);
-    verify(noteService,times(1)).updateNote(uuid, note, APP_USER);
+    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
+    verify(noteService, times(1)).updateNote(uuid, note, APP_USER);
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -162,10 +157,10 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should update note and return no content")
   void test6() {
     // Given
-    Note note =createNote(TEXT, Collections.emptySet(), APP_USER);
+    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
     Optional<Note> updatedNote = Optional.of(note);
     UUID uuid = UUID.randomUUID();
-    NoteDto noteDto =createNoteDto(uuid, TEXT);
+    NoteDto noteDto = createNoteDto(uuid, TEXT);
     given(noteDtoMapper.convertToEntity(noteDto)).willReturn(note);
     given(noteService.updateNote(uuid, note, APP_USER)).willReturn(updatedNote);
 
@@ -175,7 +170,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
-    verify(noteService,times(1)).updateNote(uuid, note, APP_USER);
+    verify(noteService, times(1)).updateNote(uuid, note, APP_USER);
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -192,7 +187,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteService,times(1)).deleteNote(uuid,APP_USER);
+    verify(noteService, times(1)).deleteNote(uuid, APP_USER);
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -308,7 +303,8 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read note tags and return ok")
   void test14() {
     // Given
-    Optional<Set<Tag>> readNoteTags = Optional.of(Set.of(createTag(NAME,COLOR_HEX,Collections.emptySet(),APP_USER)));
+    Optional<Set<Tag>> readNoteTags =
+        Optional.of(Set.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER)));
     UUID uuid = UUID.randomUUID();
     Set<TagDto> readNoteTagDtos = Set.of(createTagDto(uuid, NAME, COLOR_HEX));
     given(noteService.readNoteTags(uuid, APP_USER)).willReturn(readNoteTags);
@@ -320,9 +316,8 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).readNoteTags(uuid, APP_USER);
-    verify(tagDtoMapper,times(1)).convertToDto(readNoteTags.get());
+    verify(tagDtoMapper, times(1)).convertToDto(readNoteTags.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readNoteTagDtos, res.getBody());
   }
-
 }

@@ -29,19 +29,14 @@ public final class TestUtils {
   }
 
   /**
-   * Configures a mocked OpenID Connect login with an app user whose id token contains a sub claim with the provided appUser as value
+   * Configures a mocked OpenID Connect login with an app user whose id token contains a sub claim
+   * with the provided appUser as value
    *
-   * @param appUser String that will be used as the sub claim of the id token for the mocked app user
+   * @param appUser String that will be used as the sub claim of the id token for the mocked app
+   *     user
    * @return The configured RequestPostProcessor to be used to configure a MockMvc instance
    */
-  public static RequestPostProcessor loginOf(
-      @NonNull final String appUser
-  ) {
-    return oidcLogin()
-        .oidcUser(
-            createAppUser(
-                Map.of(UID_CLAIM, appUser)
-            )
-        );
+  public static RequestPostProcessor loginOf(@NonNull final String appUser) {
+    return oidcLogin().oidcUser(createAppUser(Map.of(UID_CLAIM, appUser)));
   }
 }

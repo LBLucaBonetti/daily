@@ -52,8 +52,8 @@ public class Tag extends BaseEntity {
   @Column(name = "app_user", nullable = false)
   @NotBlank
   /*
-   Unique user id
-   */
+  Unique user id
+  */
   private String appUser;
 
   /**

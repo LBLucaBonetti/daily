@@ -34,10 +34,8 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     OidcUser appUser = createAppUser(idTokenClaims);
 
     // When
-    IllegalArgumentException res = assertThrows(
-        IllegalArgumentException.class,
-        ()->appUserService.getUid(appUser)
-    );
+    IllegalArgumentException res =
+        assertThrows(IllegalArgumentException.class, () -> appUserService.getUid(appUser));
 
     // Then
     assertEquals(UID_INVALID, res.getMessage());
@@ -50,10 +48,8 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     OidcUser appUser = createAppUser(Map.of(UID_CLAIM, ""));
 
     // When
-    IllegalArgumentException res = assertThrows(
-        IllegalArgumentException.class,
-        ()->appUserService.getUid(appUser)
-    );
+    IllegalArgumentException res =
+        assertThrows(IllegalArgumentException.class, () -> appUserService.getUid(appUser));
 
     // Then
     assertEquals(UID_INVALID, res.getMessage());
@@ -66,10 +62,8 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     OidcUser appUser = createAppUser(Map.of(UID_CLAIM, "   "));
 
     // When
-    IllegalArgumentException res = assertThrows(
-        IllegalArgumentException.class,
-        ()->appUserService.getUid(appUser)
-    );
+    IllegalArgumentException res =
+        assertThrows(IllegalArgumentException.class, () -> appUserService.getUid(appUser));
 
     // Then
     assertEquals(UID_INVALID, res.getMessage());
@@ -87,5 +81,4 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     // Then
     assertEquals(APP_USER, res);
   }
-
 }

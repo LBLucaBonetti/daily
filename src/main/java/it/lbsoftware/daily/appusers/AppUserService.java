@@ -11,5 +11,4 @@ public interface AppUserService {
    * @return The unique id of the user
    */
   String getUid(OidcUser appUser);
-
 }

@@ -29,7 +29,8 @@ class TagController {
   private final AppUserService appUserService;
 
   @PostMapping
-  public ResponseEntity<TagDto> createTag(@Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal OidcUser appUser) {
+  public ResponseEntity<TagDto> createTag(
+      @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal OidcUser appUser) {
     Tag tag = tagDtoMapper.convertToEntity(tagDto);
     Tag createdTag = tagService.createTag(tag, appUserService.getUid(appUser));
     TagDto createdTagDto = tagDtoMapper.convertToDto(createdTag);
@@ -38,7 +39,8 @@ class TagController {
   }
 
   @GetMapping(value = "/{uuid}")
-  public ResponseEntity<TagDto> readTag(@PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
+  public ResponseEntity<TagDto> readTag(
+      @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
     Optional<Tag> readTag = tagService.readTag(uuid, appUserService.getUid(appUser));
     if (readTag.isEmpty()) {
       return ResponseEntity.notFound().build();
@@ -51,15 +53,16 @@ class TagController {
   @GetMapping
   public ResponseEntity<List<TagDto>> readTags(@AuthenticationPrincipal OidcUser appUser) {
     List<Tag> readTags = tagService.readTags(appUserService.getUid(appUser));
-    List<TagDto> readTagDtos =
-        tagDtoMapper.convertToDto(readTags);
+    List<TagDto> readTagDtos = tagDtoMapper.convertToDto(readTags);
 
     return ResponseEntity.ok(readTagDtos);
   }
 
   @PutMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> updateTag(
-      @PathVariable("uuid") UUID uuid, @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal OidcUser appUser) {
+      @PathVariable("uuid") UUID uuid,
+      @Valid @RequestBody TagDto tagDto,
+      @AuthenticationPrincipal OidcUser appUser) {
     Tag tag = tagDtoMapper.convertToEntity(tagDto);
     Optional<Tag> updatedTag = tagService.updateTag(uuid, tag, appUserService.getUid(appUser));
     if (updatedTag.isEmpty()) {
@@ -70,7 +73,8 @@ class TagController {
   }
 
   @DeleteMapping(value = "/{uuid}")
-  public ResponseEntity<TagDto> deleteTag(@PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
+  public ResponseEntity<TagDto> deleteTag(
+      @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
     if (!Boolean.TRUE.equals(tagService.deleteTag(uuid, appUserService.getUid(appUser)))) {
       return ResponseEntity.notFound().build();
     }

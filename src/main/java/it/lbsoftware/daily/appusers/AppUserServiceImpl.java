@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AppUserServiceImpl implements AppUserService{
+public class AppUserServiceImpl implements AppUserService {
 
   private static final String UID_CLAIM = "sub";
   private static final String UID_INVALID = "The OidcUser did not provide a valid unique id";

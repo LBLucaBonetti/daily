@@ -23,9 +23,7 @@ public final class AppUserTestUtils {
    * @param idTokenClaims Key-value pairs for the id token claims; the sub claim is required
    * @return The created app user
    */
-  public static OidcUser createAppUser(
-      @NonNull final Map<String, Object> idTokenClaims
-  ) {
+  public static OidcUser createAppUser(@NonNull final Map<String, Object> idTokenClaims) {
     return createAppUser(idTokenClaims, (String[]) null);
   }
 
@@ -37,18 +35,11 @@ public final class AppUserTestUtils {
    * @return The created app user
    */
   public static OidcUser createAppUser(
-      @NonNull final Map<String, Object> idTokenClaims,
-      final String... authorities
-  ) {
+      @NonNull final Map<String, Object> idTokenClaims, final String... authorities) {
     return new DefaultOidcUser(
         Optional.ofNullable(authorities)
             .map(AuthorityUtils::createAuthorityList)
             .orElse(AuthorityUtils.NO_AUTHORITIES),
-        OidcIdToken
-            .withTokenValue(ID_TOKEN_VALUE)
-            .claims(c -> c.putAll(idTokenClaims))
-            .build()
-    );
+        OidcIdToken.withTokenValue(ID_TOKEN_VALUE).claims(c -> c.putAll(idTokenClaims)).build());
   }
-
 }
