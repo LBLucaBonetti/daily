@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.notes;
 
 import static it.lbsoftware.daily.TestUtils.loginOf;
+import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +33,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   private static final String BASE_URL = "/api/notes";
   private static final String TEXT = "text";
   private static final String APP_USER = "appUser";
+  private static final String OTHER_APP_USER = "otherAppUser";
   @Autowired private ObjectMapper objectMapper;
   @Autowired private NoteRepository noteRepository;
 
@@ -152,7 +155,6 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     NoteDto noteDto = createNoteDto(null, text);
 
     // When
-
     mockMvc
         .perform(
             post(BASE_URL)
@@ -194,5 +196,63 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     Note resEntity = noteRepository.findByUuidAndAppUser(res.getUuid(), APP_USER).get();
     assertNotNull(resEntity.getUuid());
     assertEquals(TEXT, resEntity.getText());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when read note with wrong uuid")
+  void test16() throws Exception {
+    // Given
+    String uuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when read note of another app user")
+  void test17() throws Exception {
+    // Given
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+
+    // When & then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(OTHER_APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should read note")
+  void test18() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+
+    // When
+    NoteDto res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL + "/{uuid}", note.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            NoteDto.class);
+
+    // Then
+    assertEquals(note.getUuid(), res.getUuid());
+    assertEquals(note.getText(), res.getText());
   }
 }
