@@ -18,7 +18,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Table(indexes = @Index(name = "idx_tag_uuid", columnList = "uuid"))
+@Table(
+    indexes = {
+      @Index(name = "idx_tag_uuid", columnList = "uuid"),
+      @Index(name = "idx_tag_appuser", columnList = "appUser")
+    })
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
