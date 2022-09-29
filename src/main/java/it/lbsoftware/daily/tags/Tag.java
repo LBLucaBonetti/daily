@@ -21,7 +21,7 @@ import lombok.Setter;
 @Table(
     indexes = {
       @Index(name = "idx_tag_uuid", columnList = "uuid"),
-      @Index(name = "idx_tag_appuser", columnList = "appUser")
+      @Index(name = "idx_tag_appuser", columnList = "app_user")
     })
 @Entity
 @NoArgsConstructor
