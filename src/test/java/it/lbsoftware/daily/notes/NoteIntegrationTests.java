@@ -109,7 +109,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return unauthorized when read note tags and no auth")
   void test8() throws Exception {
     mockMvc
-        .perform(get(BASE_URL + "/{uuid}/tags", UUID.randomUUID()).with(csrf()))
+        .perform(get(BASE_URL + "/{uuid}/tags", UUID.randomUUID()))
         .andExpect(status().isUnauthorized());
   }
 
@@ -215,7 +215,6 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
                 .with(loginOf(APP_USER)))
         .andExpect(status().isBadRequest());
   }
@@ -231,14 +230,28 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
                 .with(loginOf(OTHER_APP_USER)))
         .andExpect(status().isNotFound());
   }
 
   @Test
-  @DisplayName("Should read note")
+  @DisplayName("Should return not found when read note and it does not exist")
   void test18() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+
+    // When & then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should read note")
+  void test19() throws Exception {
     // Given
     Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
 
@@ -249,7 +262,6 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .perform(
                     get(BASE_URL + "/{uuid}", note.getUuid())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(loginOf(APP_USER)))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -264,7 +276,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return empty list when read notes of another app user")
-  void test19() throws Exception {
+  void test20() throws Exception {
     // Given
     noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
     noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER));
@@ -276,7 +288,6 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .perform(
                     get(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
                         .with(loginOf(OTHER_APP_USER)))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -290,7 +301,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should read notes")
-  void test20() throws Exception {
+  void test21() throws Exception {
     // Given
     NoteDto noteDto1 =
         noteDtoMapper.convertToDto(
@@ -304,10 +315,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         objectMapper.readValue(
             mockMvc
                 .perform(
-                    get(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .with(loginOf(APP_USER)))
+                    get(BASE_URL).contentType(MediaType.APPLICATION_JSON).with(loginOf(APP_USER)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
