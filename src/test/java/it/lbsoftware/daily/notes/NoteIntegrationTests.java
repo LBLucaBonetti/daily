@@ -328,4 +328,85 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     assertTrue(res.contains(noteDto1));
     assertTrue(res.contains(noteDto2));
   }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(
+      strings = {
+        "   ",
+      })
+  @DisplayName("Should return bad request when update note with wrong text")
+  void test22(final String text) throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    NoteDto noteDto = createNoteDto(null, text);
+
+    // When
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}", note.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(noteDto))
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+
+    // Then
+    assertEquals(TEXT, noteRepository.findAll().get(0).getText());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when update note with wrong uuid")
+  void test23() throws Exception {
+    // Given
+    String uuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when update note of another app user")
+  void test24() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    NoteDto noteDto = createNoteDto(null, OTHER_TEXT);
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}", note.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(noteDto))
+                .with(csrf())
+                .with(loginOf(OTHER_APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should update note")
+  void test25() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    NoteDto noteDto = createNoteDto(null, OTHER_TEXT);
+
+    // When
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}", note.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(noteDto))
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    assertEquals(OTHER_TEXT, noteRepository.findAll().get(0).getText());
+  }
 }
