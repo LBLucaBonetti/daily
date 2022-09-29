@@ -4,7 +4,9 @@ import static it.lbsoftware.daily.TestUtils.loginOf;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -13,9 +15,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,8 +38,10 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   private static final String TEXT = "text";
   private static final String APP_USER = "appUser";
   private static final String OTHER_APP_USER = "otherAppUser";
+  private static final String OTHER_TEXT = "otherText";
   @Autowired private ObjectMapper objectMapper;
   @Autowired private NoteRepository noteRepository;
+  @Autowired private NoteDtoMapper noteDtoMapper;
 
   @BeforeEach
   void beforeEach() {
@@ -254,5 +260,64 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertEquals(note.getUuid(), res.getUuid());
     assertEquals(note.getText(), res.getText());
+  }
+
+  @Test
+  @DisplayName("Should return empty list when read notes of another app user")
+  void test19() throws Exception {
+    // Given
+    noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER));
+
+    // When
+    List<NoteDto> res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(loginOf(OTHER_APP_USER)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            new TypeReference<>() {});
+
+    // Then
+    assertTrue(res.isEmpty());
+  }
+
+  @Test
+  @DisplayName("Should read notes")
+  void test20() throws Exception {
+    // Given
+    NoteDto noteDto1 =
+        noteDtoMapper.convertToDto(
+            noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)));
+    NoteDto noteDto2 =
+        noteDtoMapper.convertToDto(
+            noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER)));
+
+    // When
+    List<NoteDto> res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            new TypeReference<>() {});
+
+    // Then
+    assertFalse(res.isEmpty());
+    assertEquals(2, res.size());
+    assertTrue(res.contains(noteDto1));
+    assertTrue(res.contains(noteDto2));
   }
 }
