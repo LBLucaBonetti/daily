@@ -607,8 +607,45 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   }
 
   @Test
-  @DisplayName("Should add tag to note")
+  @DisplayName("Should return not found when add tag to note and note is of another app user")
   void test36() throws Exception {
+    // Given
+    UUID uuid =
+        noteRepository.save(createNote(TEXT, Collections.emptySet(), OTHER_APP_USER)).getUuid();
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when add tag to note and tag is of another app user")
+  void test37() throws Exception {
+    // Given
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    UUID tagUuid =
+        tagRepository
+            .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), OTHER_APP_USER))
+            .getUuid();
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should add tag to note")
+  void test38() throws Exception {
     // Given
     UUID uuid = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER)).getUuid();
     UUID tagUuid =
@@ -634,7 +671,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return bad request when remove tag from note with wrong uuid")
-  void test37() throws Exception {
+  void test39() throws Exception {
     // Given
     String uuid = "not-a-uuid";
 
@@ -650,7 +687,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return bad request when remove tag from note with wrong tagUuid")
-  void test38() throws Exception {
+  void test40() throws Exception {
     // Given
     String tagUuid = "not-a-uuid";
 
@@ -666,7 +703,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return bad request when remove tag from note with wrong uuid and tagUuid")
-  void test39() throws Exception {
+  void test41() throws Exception {
     // Given
     String uuid = "not-a-uuid";
     String tagUuid = "not-a-uuid";
@@ -683,7 +720,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return not found when remove tag from note and note does not exist")
-  void test40() throws Exception {
+  void test42() throws Exception {
     // Given
     UUID uuid = UUID.randomUUID();
 
@@ -699,7 +736,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return not found when remove tag from note and tag does not exist")
-  void test41() throws Exception {
+  void test43() throws Exception {
     // Given
     UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
     UUID tagUuid = UUID.randomUUID();
@@ -715,8 +752,45 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   }
 
   @Test
+  @DisplayName("Should return not found when remove tag from note and note is of another app user")
+  void test44() throws Exception {
+    // Given
+    UUID uuid =
+        noteRepository.save(createNote(TEXT, Collections.emptySet(), OTHER_APP_USER)).getUuid();
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when remove tag from note and tag is of another app user")
+  void test45() throws Exception {
+    // Given
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    UUID tagUuid =
+        tagRepository
+            .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), OTHER_APP_USER))
+            .getUuid();
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
   @DisplayName("Should remove tag from note")
-  void test42() throws Exception {
+  void test46() throws Exception {
     // Given
     Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
     Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
@@ -745,7 +819,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return bad request when read note tags with wrong uuid")
-  void test43() throws Exception {
+  void test47() throws Exception {
     // Given
     String uuid = "not-a-uuid";
 
@@ -760,7 +834,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return not found when read note tags and note does not exist")
-  void test44() throws Exception {
+  void test48() throws Exception {
     // Given
     UUID uuid = UUID.randomUUID();
 
@@ -775,7 +849,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should return not found when read note tags and note is of another app user")
-  void test45() throws Exception {
+  void test49() throws Exception {
     // Given
     UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
 
@@ -790,7 +864,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should read note tags")
-  void test46() throws Exception {
+  void test50() throws Exception {
     // Given
     Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
     Tag tag1 = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
