@@ -1,320 +1,203 @@
-//package it.lbsoftware.daily.tags;
-//
-//import static org.hamcrest.Matchers.containsInAnyOrder;
-//import static org.mockito.BDDMockito.given;
-//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import it.lbsoftware.daily.appusers.AppUser;
-//import it.lbsoftware.daily.appusers.AppUserService;
-//import java.util.Collections;
-//import java.util.List;
-//import java.util.Optional;
-//import java.util.UUID;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.http.MediaType;
-//import org.springframework.test.context.ActiveProfiles;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-//
-//@ActiveProfiles(profiles = {"test", "okta"})
-//@WebMvcTest(TagController.class)
-//class TagControllerTests {
-//
-//  @Autowired MockMvc mockMvc;
-//  @Autowired ObjectMapper objectMapper;
-//  @MockBean private AppUserService appUserService;
-//  @MockBean private TagService tagService;
-//  @MockBean private TagDtoMapper tagDtoMapper;
-//  private Tag t1;
-//  private Tag t2;
-//  private TagDto t1dto;
-//  private TagDto t2dto;
-//  private TagDto t3dto;
-//  private TagDto t4dto;
-//  private AppUser au1;
-//  private AppUser au2;
-//  private UUID uuid1;
-//
-//  @BeforeEach
-//  void setUp() {
-//    t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
-//    t2 = Tag.builder().name("Tag2").colorHex("#223344").build();
-//    uuid1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-//    UUID uuid2 = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
-//    t1dto = new TagDto();
-//    t1dto.setName(t1.getName());
-//    t1dto.setColorHex(t1.getColorHex());
-//    t1dto.setUuid(uuid1);
-//    t2dto = new TagDto();
-//    t2dto.setName(t2.getName());
-//    t2dto.setColorHex(t2.getColorHex());
-//    t2dto.setUuid(uuid2);
-//    t3dto = new TagDto();
-//    t3dto.setName(t1.getName());
-//    t3dto.setColorHex("112233");
-//    t3dto.setUuid(uuid1);
-//    t4dto = new TagDto();
-//    t4dto.setName("");
-//    t4dto.setColorHex(t1.getColorHex());
-//    t4dto.setUuid(uuid1);
-//    au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
-//    au2 = AppUser.builder().uid("234").email("au2@daily.it").build();
-//  }
-//
-//  @AfterEach
-//  void tearDown() {}
-//
-//  @Test
-//  void givenNoAuth_whenReadTags_thenUnauthorized() throws Exception {
-//    mockMvc
-//        .perform(MockMvcRequestBuilders.get("/tags").accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isUnauthorized());
-//  }
-//
-//  @Test
-//  void givenNoTags_whenReadTags_thenOk() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagService.readTags(au1)).willReturn(Collections.emptyList());
-//    mockMvc
-//        .perform(MockMvcRequestBuilders.get("/tags").with(jwt()).accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isOk())
-//        .andExpect(content().string("[]"));
-//  }
-//
-//  @Test
-//  void givenTwoTags_whenReadTags_thenOk() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagService.readTags(au1)).willReturn(List.of(t1, t2));
-//    given(tagDtoMapper.convertToDto(t1)).willReturn(t1dto);
-//    given(tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
-//    mockMvc
-//        .perform(MockMvcRequestBuilders.get("/tags").with(jwt()).accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isOk())
-//        .andExpect(jsonPath("$.[*].name", containsInAnyOrder(t1dto.getName(), t2dto.getName())))
-//        .andExpect(
-//            jsonPath(
-//                "$.[*].colorHex", containsInAnyOrder(t1dto.getColorHex(), t2dto.getColorHex())))
-//        .andExpect(
-//            jsonPath(
-//                "$.[*].uuid",
-//                containsInAnyOrder(t1dto.getUuid().toString(), t2dto.getUuid().toString())));
-//  }
-//
-//  @Test
-//  void givenNoAppUser_whenReadTags_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
-//    mockMvc
-//        .perform(MockMvcRequestBuilders.get("/tags").with(jwt()).accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isNotFound());
-//  }
-//
-//  @Test
-//  void givenTag_whenCreateTag_thenCreated() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagDtoMapper.convertToEntity(t1dto)).willReturn(t1);
-//    given(tagService.createTag(t1, au1)).willReturn(t2);
-//    given(tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.post("/tags")
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t1dto))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isCreated())
-//        .andExpect(jsonPath("$.name").value(t2dto.getName()))
-//        .andExpect(jsonPath("$.colorHex").value(t2dto.getColorHex()))
-//        .andExpect(jsonPath("$.uuid").value(t2dto.getUuid().toString()));
-//  }
-//
-//  @Test
-//  void givenWrongColorHexTag_whenCreateTag_thenBadRequest() throws Exception {
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.post("/tags")
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t3dto))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  void givenWrongNameTag_whenCreateTag_thenBadRequest() throws Exception {
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.post("/tags")
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t4dto))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  void givenNoAppUser_whenCreateTag_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.post("/tags")
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t1dto))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isNotFound());
-//  }
-//
-//  @Test
-//  void givenTag_whenReadTag_thenOk() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagService.readTag(uuid1, au1)).willReturn(Optional.of(t1));
-//    given(tagDtoMapper.convertToDto(t1)).willReturn(t1dto);
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.get("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isOk())
-//        .andExpect(jsonPath("$.name").value(t1dto.getName()))
-//        .andExpect(jsonPath("$.colorHex").value(t1dto.getColorHex()))
-//        .andExpect(jsonPath("$.uuid").value(t1dto.getUuid().toString()));
-//  }
-//
-//  @Test
-//  void givenNoTags_whenReadTag_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagService.readTag(uuid1, au1)).willReturn(Optional.empty());
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.get("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isNotFound());
-//  }
-//
-//  @Test
-//  void givenNoAppUser_whenReadTag_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.get("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isNotFound());
-//  }
-//
-//  @Test
-//  void givenTag_whenUpdateTag_thenNoContent() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagDtoMapper.convertToEntity(t1dto)).willReturn(t1);
-//    given(tagService.updateTag(uuid1, t1, au1)).willReturn(Optional.of(t2));
-//    given(tagDtoMapper.convertToDto(t2)).willReturn(t2dto);
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.put("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t1dto))
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isNoContent());
-//  }
-//
-//  @Test
-//  void givenWrongColorHexTag_whenUpdateTag_thenBadRequest() throws Exception {
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.put("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t3dto))
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  void givenWrongNameTag_whenUpdateTag_thenBadRequest() throws Exception {
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.put("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t4dto))
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isBadRequest());
-//  }
-//
-//  @Test
-//  void givenNoTags_whenUpdateTag_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagDtoMapper.convertToEntity(t1dto)).willReturn(t1);
-//    given(tagService.updateTag(uuid1, t1, au1)).willReturn(Optional.empty());
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.put("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t1dto))
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isNotFound());
-//  }
-//
-//  @Test
-//  void givenNoAppUser_whenUpdateTag_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.put("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .content(objectMapper.writeValueAsString(t1dto))
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isNotFound());
-//  }
-//
-//  @Test
-//  void givenTag_whenDeleteTag_thenNoContent() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagService.deleteTag(uuid1, au1)).willReturn(true);
-//    mockMvc
-//        .perform(MockMvcRequestBuilders.delete("/tags/{uuid}", uuid1).with(jwt()))
-//        .andExpect(status().isNoContent());
-//  }
-//
-//  @Test
-//  void givenNoTags_whenDeleteTag_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au1));
-//    given(tagService.deleteTag(uuid1, au1)).willReturn(false);
-//    mockMvc
-//        .perform(MockMvcRequestBuilders.delete("/tags/{uuid}", uuid1).with(jwt()))
-//        .andExpect(status().isNotFound());
-//  }
-//
-//  @Test
-//  void givenNoAppUser_whenDeleteTag_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.empty());
-//    mockMvc
-//        .perform(MockMvcRequestBuilders.delete("/tags/{uuid}", uuid1).with(jwt()))
-//        .andExpect(status().isNotFound());
-//  }
-//
-//  @Test
-//  void givenAnotherAppUserTag_whenReadTag_thenNotFound() throws Exception {
-//    given(appUserService.getAppUserFromToken()).willReturn(Optional.of(au2));
-//    given(tagService.readTag(uuid1, au2)).willReturn(Optional.empty());
-//    mockMvc
-//        .perform(
-//            MockMvcRequestBuilders.get("/tags/{uuid}", uuid1)
-//                .with(jwt())
-//                .accept(MediaType.APPLICATION_JSON))
-//        .andExpect(status().isNotFound());
-//  }
-//}
+package it.lbsoftware.daily.tags;
+
+import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUserService;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+
+@DisplayName("TagController unit tests")
+class TagControllerTests extends DailyAbstractUnitTests {
+  private static final String NAME = "name";
+  private static final String COLOR_HEX = "#123456";
+  private static final String APP_USER = "appUser";
+  @Mock private TagService tagService;
+  @Mock private TagDtoMapper tagDtoMapper;
+  @Mock private AppUserService appUserService;
+  @Mock private OidcUser appUser;
+  private TagController tagController;
+
+  @BeforeEach
+  void beforeEach() {
+    tagController = new TagController(tagService, tagDtoMapper, appUserService);
+    given(appUserService.getUid(appUser)).willReturn(APP_USER);
+  }
+
+  @Test
+  @DisplayName("Should create tag and return created")
+  void test1() {
+    // Given
+    TagDto tagDto = createTagDto(null, NAME, COLOR_HEX);
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    Tag createdTag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto createdTagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
+    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
+    given(tagService.createTag(tag, APP_USER)).willReturn(createdTag);
+    given(tagDtoMapper.convertToDto(createdTag)).willReturn(createdTagDto);
+
+    // When
+    ResponseEntity<TagDto> res = tagController.createTag(tagDto, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getUid(appUser);
+    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
+    verify(tagService, times(1)).createTag(tag, APP_USER);
+    verify(tagDtoMapper, times(1)).convertToDto(createdTag);
+    assertEquals(HttpStatus.CREATED, res.getStatusCode());
+    assertEquals(createdTagDto, res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should not read tag and return not found")
+  void test2() {
+    // Given
+    Optional<Tag> readTag = Optional.empty();
+    UUID uuid = UUID.randomUUID();
+    given(tagService.readTag(uuid, APP_USER)).willReturn(readTag);
+
+    // When
+    ResponseEntity<TagDto> res = tagController.readTag(uuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getUid(appUser);
+    verify(tagService, times(1)).readTag(uuid, APP_USER);
+    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+    assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should read tag and return ok")
+  void test3() {
+    // Given
+    Optional<Tag> readTag =
+        Optional.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    UUID uuid = UUID.randomUUID();
+    TagDto readTagDto = createTagDto(uuid, NAME, COLOR_HEX);
+    given(tagService.readTag(uuid, APP_USER)).willReturn(readTag);
+    given(tagDtoMapper.convertToDto(readTag.get())).willReturn(readTagDto);
+
+    // When
+    ResponseEntity<TagDto> res = tagController.readTag(uuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getUid(appUser);
+    verify(tagService, times(1)).readTag(uuid, APP_USER);
+    verify(tagDtoMapper, times(1)).convertToDto(readTag.get());
+    assertEquals(HttpStatus.OK, res.getStatusCode());
+    assertEquals(readTagDto, res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should read tags and return ok")
+  void test4() {
+    // Given
+    List<Tag> readTags = List.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    List<TagDto> readTagDtos = List.of(createTagDto(UUID.randomUUID(), NAME, COLOR_HEX));
+    given(tagService.readTags(APP_USER)).willReturn(readTags);
+    given(tagDtoMapper.convertToDto(readTags)).willReturn(readTagDtos);
+
+    // When
+    ResponseEntity<List<TagDto>> res = tagController.readTags(appUser);
+
+    // Then
+    verify(appUserService, times(1)).getUid(appUser);
+    verify(tagService, times(1)).readTags(APP_USER);
+    verify(tagDtoMapper, times(1)).convertToDto(readTags);
+    assertEquals(HttpStatus.OK, res.getStatusCode());
+    assertEquals(readTagDtos, res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should not update tag and return not found")
+  void test5() {
+    // Given
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    Optional<Tag> updatedTag = Optional.empty();
+    UUID uuid = UUID.randomUUID();
+    TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
+    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
+    given(tagService.updateTag(uuid, tag, APP_USER)).willReturn(updatedTag);
+
+    // When
+    ResponseEntity<TagDto> res = tagController.updateTag(uuid, tagDto, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getUid(appUser);
+    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
+    verify(tagService, times(1)).updateTag(uuid, tag, APP_USER);
+    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+    assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should update tag and return no content")
+  void test6() {
+    // Given
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    Optional<Tag> updatedTag = Optional.of(tag);
+    UUID uuid = UUID.randomUUID();
+    TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
+    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
+    given(tagService.updateTag(uuid, tag, APP_USER)).willReturn(updatedTag);
+
+    // When
+    ResponseEntity<TagDto> res = tagController.updateTag(uuid, tagDto, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getUid(appUser);
+    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
+    verify(tagService, times(1)).updateTag(uuid, tag, APP_USER);
+    assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
+    assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should not delete tag and return not found")
+  void test7() {
+    // Given
+    UUID uuid = UUID.randomUUID();
+    given(tagService.deleteTag(uuid, APP_USER)).willReturn(Boolean.FALSE);
+
+    // When
+    ResponseEntity<TagDto> res = tagController.deleteTag(uuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getUid(appUser);
+    verify(tagService, times(1)).deleteTag(uuid, APP_USER);
+    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+    assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should delete tag and return no content")
+  void test8() {
+    // Given
+    UUID uuid = UUID.randomUUID();
+    given(tagService.deleteTag(uuid, APP_USER)).willReturn(Boolean.TRUE);
+
+    // When
+    ResponseEntity<TagDto> res = tagController.deleteTag(uuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getUid(appUser);
+    verify(tagService, times(1)).deleteTag(uuid, APP_USER);
+    assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
+    assertNull(res.getBody());
+  }
+}
