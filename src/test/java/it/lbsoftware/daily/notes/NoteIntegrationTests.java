@@ -625,4 +625,115 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     assertEquals(1, tag.getNoteSet().size());
     assertTrue(tag.getNoteSet().contains(note));
   }
+
+  @Test
+  @DisplayName("Should return bad request when remove tag from note with wrong uuid")
+  void test37() throws Exception {
+    // Given
+    String uuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when remove tag from note with wrong tagUuid")
+  void test38() throws Exception {
+    // Given
+    String tagUuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when remove tag from note with wrong uuid and tagUuid")
+  void test39() throws Exception {
+    // Given
+    String uuid = "not-a-uuid";
+    String tagUuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when remove tag from note and note does not exist")
+  void test40() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when remove tag from note and tag does not exist")
+  void test41() throws Exception {
+    // Given
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    UUID tagUuid = UUID.randomUUID();
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should remove tag from note")
+  void test42() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    tag.addToNote(note);
+    noteRepository.save(note);
+    assertTrue(note.getTagSet().contains(tag));
+    assertTrue(tag.getNoteSet().contains(note));
+
+    // When
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", note.getUuid(), tag.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    note = noteRepository.findByUuidAndAppUserFetchTags(note.getUuid(), APP_USER).get();
+    tag = tagRepository.findByUuidAndAppUserFetchNotes(tag.getUuid(), APP_USER).get();
+    assertEquals(0, note.getTagSet().size());
+    assertFalse(note.getTagSet().contains(tag));
+    assertEquals(0, tag.getNoteSet().size());
+    assertFalse(tag.getNoteSet().contains(note));
+  }
 }
