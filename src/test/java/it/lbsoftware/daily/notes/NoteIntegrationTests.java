@@ -20,10 +20,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDto;
+import it.lbsoftware.daily.tags.TagDtoMapper;
 import it.lbsoftware.daily.tags.TagRepository;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,10 +48,13 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   private static final String OTHER_TEXT = "otherText";
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
+  private static final String OTHER_NAME = "otherName";
+  private static final String OTHER_COLOR_HEX = "#654321";
   @Autowired private ObjectMapper objectMapper;
   @Autowired private NoteRepository noteRepository;
   @Autowired private NoteDtoMapper noteDtoMapper;
   @Autowired private TagRepository tagRepository;
+  @Autowired private TagDtoMapper tagDtoMapper;
 
   @BeforeEach
   void beforeEach() {
@@ -735,5 +741,82 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     assertFalse(note.getTagSet().contains(tag));
     assertEquals(0, tag.getNoteSet().size());
     assertFalse(tag.getNoteSet().contains(note));
+  }
+
+  @Test
+  @DisplayName("Should return bad request when read note tags with wrong uuid")
+  void test43() throws Exception {
+    // Given
+    String uuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}/tags", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when read note tags and note does not exist")
+  void test44() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+
+    // When & then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}/tags", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when read note tags and note is of another app user")
+  void test45() throws Exception {
+    // Given
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+
+    // When & then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}/tags", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(loginOf(OTHER_APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should read note tags")
+  void test46() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
+    Tag tag1 = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    Tag tag2 =
+        tagRepository.save(createTag(OTHER_NAME, OTHER_COLOR_HEX, new HashSet<>(), APP_USER));
+    tag1.addToNote(note);
+    tag2.addToNote(note);
+    noteRepository.save(note);
+
+    // When
+    Set<TagDto> res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL + "/{uuid}/tags", note.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(loginOf(APP_USER)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            new TypeReference<>() {});
+
+    // Then
+    assertEquals(2, res.size());
+    assertTrue(res.contains(tagDtoMapper.convertToDto(tag1)));
+    assertTrue(res.contains(tagDtoMapper.convertToDto(tag2)));
   }
 }
