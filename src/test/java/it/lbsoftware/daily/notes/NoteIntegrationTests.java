@@ -517,4 +517,79 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertEquals(0, noteRepository.count());
   }
+
+  @Test
+  @DisplayName("Should return bad request when add tag to note with wrong uuid")
+  void test31() throws Exception {
+    // Given
+    String uuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when add tag to note with wrong tagUuid")
+  void test32() throws Exception {
+    // Given
+    String tagUuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when add tag to note with wrong uuid and tagUuid")
+  void test33() throws Exception {
+    // Given
+    String uuid = "not-a-uuid";
+    String tagUuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should add tag to note")
+  void test34() throws Exception {
+    // Given
+    UUID uuid = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER)).getUuid();
+    UUID tagUuid =
+        tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER)).getUuid();
+
+    // When
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    Note note = noteRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER).get();
+    Tag tag = tagRepository.findByUuidAndAppUserFetchNotes(tagUuid, APP_USER).get();
+    assertEquals(1, note.getTagSet().size());
+    assertTrue(note.getTagSet().contains(tag));
+    assertEquals(1, tag.getNoteSet().size());
+    assertTrue(tag.getNoteSet().contains(note));
+  }
 }
