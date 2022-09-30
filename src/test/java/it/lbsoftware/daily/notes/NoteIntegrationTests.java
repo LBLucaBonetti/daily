@@ -568,8 +568,41 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   }
 
   @Test
-  @DisplayName("Should add tag to note")
+  @DisplayName("Should return not found when add tag to note and note does not exist")
   void test34() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when add tag to note and tag does not exist")
+  void test35() throws Exception {
+    // Given
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    UUID tagUuid = UUID.randomUUID();
+
+    // When & then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should add tag to note")
+  void test36() throws Exception {
     // Given
     UUID uuid = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER)).getUuid();
     UUID tagUuid =
