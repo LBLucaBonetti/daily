@@ -3,6 +3,7 @@ package it.lbsoftware.daily.notes;
 import static it.lbsoftware.daily.TestUtils.loginOf;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -18,7 +19,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagRepository;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,9 +43,12 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   private static final String APP_USER = "appUser";
   private static final String OTHER_APP_USER = "otherAppUser";
   private static final String OTHER_TEXT = "otherText";
+  private static final String NAME = "name";
+  private static final String COLOR_HEX = "#123456";
   @Autowired private ObjectMapper objectMapper;
   @Autowired private NoteRepository noteRepository;
   @Autowired private NoteDtoMapper noteDtoMapper;
+  @Autowired private TagRepository tagRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -408,5 +415,106 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
     // Then
     assertEquals(OTHER_TEXT, noteRepository.findAll().get(0).getText());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when delete note with wrong uuid")
+  void test26() throws Exception {
+    // Given
+    String uuid = "not-a-uuid";
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when delete note of another app user")
+  void test27() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+
+    // When
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", note.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(OTHER_APP_USER)))
+        .andExpect(status().isNotFound());
+
+    // Then
+    assertEquals(1, noteRepository.count());
+  }
+
+  @Test
+  @DisplayName("Should return not found when delete note and it does not exist")
+  void test28() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+
+    // When & then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should not delete tag and should remove note from tag noteSet when delete note")
+  void test29() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    tag.addToNote(note);
+    noteRepository.save(note);
+    assertTrue(note.getTagSet().contains(tag));
+    assertTrue(tag.getNoteSet().contains(note));
+
+    // When
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", note.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    assertEquals(0, noteRepository.count());
+    assertEquals(1, tagRepository.count());
+    assertTrue(
+        tagRepository
+            .findByUuidAndAppUserFetchNotes(tag.getUuid(), APP_USER)
+            .get()
+            .getNoteSet()
+            .isEmpty());
+  }
+
+  @Test
+  @DisplayName("Should delete note")
+  void test30() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+
+    // When
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", note.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(APP_USER)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    assertEquals(0, noteRepository.count());
   }
 }
