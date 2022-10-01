@@ -7,6 +7,7 @@ import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -892,5 +893,38 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     assertEquals(2, res.size());
     assertTrue(res.contains(tagDtoMapper.convertToDto(tag1)));
     assertTrue(res.contains(tagDtoMapper.convertToDto(tag2)));
+  }
+
+  @Test
+  @DisplayName("Should have id, createdAt, updatedAt and version when save note")
+  void test51() {
+    // Given
+    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    assertNull(note.getCreatedAt());
+    assertNull(note.getUpdatedAt());
+    assertEquals(0, note.getVersion());
+
+    // When
+    Note res = noteRepository.save(note);
+
+    // Then
+    assertNotNull(res.getCreatedAt());
+    assertNotNull(res.getUpdatedAt());
+    assertEquals(0, res.getVersion());
+  }
+
+  @Test
+  @DisplayName("Should update version when update note")
+  void test52() {
+    // Given
+    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    assertEquals(0, note.getVersion());
+
+    // When
+    noteRepository.save(note);
+    Note res = noteRepository.save(note);
+
+    // Then
+    assertEquals(1, res.getVersion());
   }
 }

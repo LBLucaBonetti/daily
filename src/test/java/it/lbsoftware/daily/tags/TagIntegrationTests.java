@@ -7,6 +7,7 @@ import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -573,5 +574,38 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
 
     // Then
     assertEquals(0, tagRepository.count());
+  }
+
+  @Test
+  @DisplayName("Should have id, createdAt, updatedAt and version when save tag")
+  void test28() {
+    // Given
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    assertNull(tag.getCreatedAt());
+    assertNull(tag.getUpdatedAt());
+    assertEquals(0, tag.getVersion());
+
+    // When
+    Tag res = tagRepository.save(tag);
+
+    // Then
+    assertNotNull(res.getCreatedAt());
+    assertNotNull(res.getUpdatedAt());
+    assertEquals(0, res.getVersion());
+  }
+
+  @Test
+  @DisplayName("Should update version when update tag")
+  void test29() {
+    // Given
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    assertEquals(0, tag.getVersion());
+
+    // When
+    tagRepository.save(tag);
+    Tag res = tagRepository.save(tag);
+
+    // Then
+    assertEquals(1, res.getVersion());
   }
 }
