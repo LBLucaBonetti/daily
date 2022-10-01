@@ -1,187 +1,189 @@
-//package it.lbsoftware.daily.tags;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertFalse;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.junit.jupiter.api.Assertions.assertTrue;
-//import static org.mockito.BDDMockito.given;
-//import static org.mockito.Mockito.times;
-//import static org.mockito.Mockito.verify;
-//
-//import it.lbsoftware.daily.appusers.AppUser;
-//import it.lbsoftware.daily.notes.Note;
-//import java.util.Collections;
-//import java.util.List;
-//import java.util.Optional;
-//import java.util.UUID;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.test.context.ActiveProfiles;
-//
-//@ActiveProfiles(profiles = {"test", "okta"})
-//@ExtendWith(MockitoExtension.class)
-//class TagServiceImplTests {
-//
-//  @Mock private TagRepository tagRepository;
-//
-//  @InjectMocks private TagServiceImpl tagService;
-//
-//  private Tag t1;
-//  private Tag t2;
-//  private AppUser au1;
-//  private UUID uuid1;
-//  private Note n1;
-//
-//  @BeforeEach
-//  void setUp() {
-//    t1 = Tag.builder().name("Tag1").colorHex("#112233").build();
-//    t2 = Tag.builder().name("Tag2").colorHex("#223344").build();
-//    au1 = AppUser.builder().uid("123").email("au1@daily.it").build();
-//    uuid1 = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-//    n1 = Note.builder().text("Note1").build();
-//    n1.getTagSet().add(t1);
-//    t1.getNoteSet().add(n1);
-//  }
-//
-//  @AfterEach
-//  void tearDown() {}
-//
-//  @Test
-//  void givenNoTagAndAppUser_whenCreateTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.createTag(null, au1));
-//  }
-//
-//  @Test
-//  void givenTagAndNoAppUser_whenCreateTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.createTag(t1, null));
-//  }
-//
-//  @Test
-//  void givenTagAndAppUser_whenCreateTag_thenReturnTag() {
-//    given(tagRepository.save(t1)).willReturn(t1);
-//    Tag res = tagService.createTag(t1, au1);
-//    verify(tagRepository, times(1)).save(t1);
-//    assertEquals(t1, res);
-//  }
-//
-//  @Test
-//  void givenNoUuidAndAppUser_whenReadTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.readTag(null, au1));
-//  }
-//
-//  @Test
-//  void givenUuidAndNoAppUser_whenReadTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.readTag(uuid1, null));
-//  }
-//
-//  @Test
-//  void givenUuidAndAppUser_whenReadTag_thenReturnEmpty() {
-//    given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.empty());
-//    Optional<Tag> res = tagService.readTag(uuid1, au1);
-//    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
-//    assertEquals(Optional.empty(), res);
-//  }
-//
-//  @Test
-//  void givenUuidAndAppUser_whenReadTag_thenReturnTag() {
-//    given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.of(t1));
-//    Optional<Tag> res = tagService.readTag(uuid1, au1);
-//    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
-//    assertEquals(Optional.of(t1), res);
-//  }
-//
-//  @Test
-//  void givenNoAppUser_whenReadTags_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.readTags(null));
-//  }
-//
-//  @Test
-//  void givenAppUser_whenReadTags_thenReturnEmpty() {
-//    given(tagRepository.findByAppUser(au1)).willReturn(Collections.emptyList());
-//    List<Tag> res = tagService.readTags(au1);
-//    verify(tagRepository, times(1)).findByAppUser(au1);
-//    assertEquals(Collections.emptyList(), res);
-//  }
-//
-//  @Test
-//  void givenAppUser_whenReadTags_thenReturnTags() {
-//    given(tagRepository.findByAppUser(au1)).willReturn(List.of(t1, t2));
-//    List<Tag> res = tagService.readTags(au1);
-//    verify(tagRepository, times(1)).findByAppUser(au1);
-//    assertEquals(List.of(t1, t2), res);
-//  }
-//
-//  @Test
-//  void givenNoUuidAndTagAndAppUser_whenUpdateTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.updateTag(null, t1, au1));
-//  }
-//
-//  @Test
-//  void givenUuidAndNoTagAndAppUser_whenUpdateTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.updateTag(uuid1, null, au1));
-//  }
-//
-//  @Test
-//  void givenUuidAndTagAndNoAppUser_whenUpdateTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.updateTag(uuid1, t1, null));
-//  }
-//
-//  @Test
-//  void givenUuidAndTagAndAppUser_whenUpdateTag_thenReturnEmpty() {
-//    given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.empty());
-//    Optional<Tag> res = tagService.updateTag(uuid1, t1, au1);
-//    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
-//    assertEquals(Optional.empty(), res);
-//  }
-//
-//  @Test
-//  void givenUuidAndTagAndAppUser_whenUpdateTag_thenReturnTag() {
-//    given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.of(t1));
-//    given(tagRepository.save(t1)).willReturn(t1);
-//    Optional<Tag> res = tagService.updateTag(uuid1, t2, au1);
-//    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
-//    verify(tagRepository, times(1)).save(t1);
-//    assertEquals(Optional.of(t1), res);
-//    assertEquals(t2.getName(), res.get().getName());
-//    assertEquals(t2.getColorHex(), res.get().getColorHex());
-//  }
-//
-//  @Test
-//  void givenNoUuidAndAppUser_whenDeleteTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.deleteTag(null, au1));
-//  }
-//
-//  @Test
-//  void givenUuidAndNoAppUser_whenDeleteTag_thenIllegalArgumentException() {
-//    assertThrows(IllegalArgumentException.class, () -> tagService.deleteTag(uuid1, null));
-//  }
-//
-//  @Test
-//  void givenUuidAndAppUser_whenDeleteTag_thenReturnFalse() {
-//    given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.empty());
-//    Boolean res = tagService.deleteTag(uuid1, au1);
-//    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
-//    assertFalse(res);
-//  }
-//
-//  @Test
-//  void givenUuidAndAppUser_whenDeleteTag_thenReturnTrue() {
-//    given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.of(t1));
-//    Boolean res = tagService.deleteTag(uuid1, au1);
-//    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid1, au1);
-//    verify(tagRepository, times(1)).delete(t1);
-//    assertTrue(res);
-//  }
-//
-//  @Test
-//  void givenUuidAndAppUser_whenDeleteTag_thenDeleteNoteTagAssociations() {
-//    given(tagRepository.findByUuidAndAppUser(uuid1, au1)).willReturn(Optional.of(t1));
-//    tagService.deleteTag(uuid1, au1);
-//    assertEquals(0, n1.getTagSet().size());
-//  }
-//}
+package it.lbsoftware.daily.tags;
+
+import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import it.lbsoftware.daily.DailyAbstractUnitTests;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
+@DisplayName("TagServiceImpl unit tests")
+class TagServiceImplTests extends DailyAbstractUnitTests {
+  private static final String NAME = "name";
+  private static final String COLOR_HEX = "#123456";
+  private static final String APP_USER = "appUser";
+  private static final String OTHER_NAME = "otherText";
+  private static final String OTHER_COLOR_HEX = "#654321";
+  @Mock private TagRepository tagRepository;
+  private TagServiceImpl tagService;
+
+  @BeforeEach
+  void beforeEach() {
+    tagService = new TagServiceImpl(tagRepository);
+  }
+
+  @Test
+  @DisplayName("Should create tag and return tag")
+  void test1() {
+    // Given
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), null);
+    Tag createdTag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    given(tagRepository.save(tag)).willReturn(createdTag);
+
+    // When
+    Tag res = tagService.createTag(tag, APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).save(tag);
+    assertEquals(APP_USER, res.getAppUser());
+  }
+
+  @Test
+  @DisplayName("Should not read tag and return empty optional")
+  void test2() {
+    // Given
+    Optional<Tag> tag = Optional.empty();
+    UUID uuid = UUID.randomUUID();
+    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tag);
+
+    // When
+    Optional<Tag> res = tagService.readTag(uuid, APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    assertEquals(tag, res);
+  }
+
+  @Test
+  @DisplayName("Should read tag and return tag optional")
+  void test3() {
+    // Given
+    Optional<Tag> tag = Optional.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    UUID uuid = UUID.randomUUID();
+    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tag);
+
+    // When
+    Optional<Tag> res = tagService.readTag(uuid, APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    assertEquals(tag, res);
+  }
+
+  @Test
+  @DisplayName("Should not read tags and return empty list")
+  void test4() {
+    // Given
+    List<Tag> tags = Collections.emptyList();
+    given(tagRepository.findByAppUser(APP_USER)).willReturn(tags);
+
+    // When
+    List<Tag> res = tagService.readTags(APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).findByAppUser(APP_USER);
+    assertEquals(tags, res);
+  }
+
+  @Test
+  @DisplayName("Should read tags and return tag list")
+  void test5() {
+    // Given
+    List<Tag> tags = List.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    given(tagRepository.findByAppUser(APP_USER)).willReturn(tags);
+
+    // When
+    List<Tag> res = tagService.readTags(APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).findByAppUser(APP_USER);
+    assertEquals(tags, res);
+  }
+
+  @Test
+  @DisplayName("Should not update tag and return empty optional")
+  void test6() {
+    // Given
+    Optional<Tag> tagOptional = Optional.empty();
+    UUID uuid = UUID.randomUUID();
+    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tagOptional);
+
+    // When
+    Optional<Tag> res =
+        tagService.updateTag(
+            uuid, createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER), APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(0)).save(any());
+    assertEquals(Optional.empty(), res);
+  }
+
+  @Test
+  @DisplayName("Should update tag and return tag optional")
+  void test7() {
+    // Given
+    Tag prevTag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    Tag updatedTag = createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), APP_USER);
+    UUID uuid = UUID.randomUUID();
+    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(Optional.of(prevTag));
+    given(tagRepository.save(prevTag)).willReturn(updatedTag);
+
+    // When
+    Optional<Tag> res =
+        tagService.updateTag(
+            uuid, createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), null), APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(1)).save(prevTag);
+    assertEquals(res, Optional.of(updatedTag));
+    assertEquals(OTHER_NAME, res.get().getName());
+    assertEquals(OTHER_COLOR_HEX, res.get().getColorHex());
+  }
+
+  @Test
+  @DisplayName("Should not delete tag and return false")
+  void test8() {
+    // Given
+    Optional<Tag> tagOptional = Optional.empty();
+    UUID uuid = UUID.randomUUID();
+    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tagOptional);
+
+    // When
+    Boolean res = tagService.deleteTag(uuid, APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(0)).delete(any());
+    assertEquals(Boolean.FALSE, res);
+  }
+
+  @Test
+  @DisplayName("Should delete tag and return true")
+  void test9() {
+    // Given
+    Optional<Tag> tagOptional =
+        Optional.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    UUID uuid = UUID.randomUUID();
+    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tagOptional);
+
+    // When
+    Boolean res = tagService.deleteTag(uuid, APP_USER);
+
+    // Then
+    verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(1)).delete(tagOptional.get());
+    assertEquals(Boolean.TRUE, res);
+  }
+}

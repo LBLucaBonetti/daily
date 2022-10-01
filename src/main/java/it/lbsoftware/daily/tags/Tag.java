@@ -18,7 +18,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Table(indexes = @Index(name = "idx_tag_uuid", columnList = "uuid"))
+@Table(
+    indexes = {
+      @Index(name = "idx_tag_uuid", columnList = "uuid"),
+      @Index(name = "idx_tag_appuser", columnList = "app_user")
+    })
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -52,8 +56,8 @@ public class Tag extends BaseEntity {
   @Column(name = "app_user", nullable = false)
   @NotBlank
   /*
-   Unique id of the user
-   */
+  Unique user id
+  */
   private String appUser;
 
   /**
