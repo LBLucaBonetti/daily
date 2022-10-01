@@ -28,11 +28,10 @@ public class WebSecurityConfiguration {
         .successHandler(new SimpleUrlAuthenticationSuccessHandler("/"))
         // Overriding the login page avoids the automatically generated Spring Security login page
         // rendered to the /login endpoint which would show the Okta link to authenticate; the
-        // /login, the
-        // /logout and the /login?logout endpoints will silently display index.html due to the
-        // ErrorConfiguration controller handling the requests. Making a GET to
-        // /oauth2/authorization/okta by
-        // entering the URL in the browser will simply do a new "authorization dance"
+        // /login, the /logout and the /login?logout endpoints will silently display index.html due
+        // to the ErrorConfiguration controller handling the requests. Making a GET to
+        // /oauth2/authorization/okta by entering the URL in the browser will simply do a new
+        // "authorization dance"
         .loginPage("/oauth2/authorization/okta");
     http.exceptionHandling()
         .defaultAuthenticationEntryPointFor(
