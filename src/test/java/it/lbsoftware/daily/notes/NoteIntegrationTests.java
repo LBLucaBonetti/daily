@@ -927,4 +927,18 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertEquals(1, res.getVersion());
   }
+
+  @Test
+  @DisplayName("Should not equal when ids differ")
+  void test53() {
+    // Given
+    Note note1 = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    Note note2 = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+
+    // When
+    boolean res = note1.equals(note2);
+
+    // Then
+    assertFalse(res);
+  }
 }

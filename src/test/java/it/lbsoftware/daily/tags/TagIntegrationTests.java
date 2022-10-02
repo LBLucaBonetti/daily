@@ -608,4 +608,18 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertEquals(1, res.getVersion());
   }
+
+  @Test
+  @DisplayName("Should not equal when ids differ")
+  void test30() {
+    // Given
+    Tag tag1 = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    Tag tag2 = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+
+    // When
+    boolean res = tag1.equals(tag2);
+
+    // Then
+    assertFalse(res);
+  }
 }
