@@ -4,7 +4,9 @@ import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -19,22 +21,93 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 
 @DisplayName("NoteServiceImpl unit tests")
 class NoteServiceImplTests extends DailyAbstractUnitTests {
 
-  @Mock private NoteRepository noteRepository;
-  @Mock private TagService tagService;
-  private NoteServiceImpl noteService;
   private static final String TEXT = "text";
   private static final String APP_USER = "appUser";
   private static final String OTHER_TEXT = "otherText";
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
+  @Mock private NoteRepository noteRepository;
+  @Mock private TagService tagService;
+  private NoteServiceImpl noteService;
+
+  private static Stream<Arguments> test18() {
+    // Note, appUser
+    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(note, null));
+  }
+
+  private static Stream<Arguments> test19() {
+    // Uuid, appUser
+    UUID uuid = UUID.randomUUID();
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(uuid, null));
+  }
+
+  private static Stream<Arguments> test21() {
+    // Uuid, note, appUser
+    UUID uuid = UUID.randomUUID();
+    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    return Stream.of(
+        arguments(null, null, null),
+        arguments(null, null, APP_USER),
+        arguments(null, note, null),
+        arguments(null, note, APP_USER),
+        arguments(uuid, null, null),
+        arguments(uuid, null, APP_USER),
+        arguments(uuid, note, null));
+  }
+
+  private static Stream<Arguments> test22() {
+    // Uuid, appUser
+    UUID uuid = UUID.randomUUID();
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(uuid, null));
+  }
+
+  private static Stream<Arguments> test23() {
+    // Uuid, tagUuid, appUser
+    UUID uuid = UUID.randomUUID();
+    UUID tagUuid = UUID.randomUUID();
+    return Stream.of(
+        arguments(null, null, null),
+        arguments(null, null, APP_USER),
+        arguments(null, tagUuid, null),
+        arguments(null, tagUuid, APP_USER),
+        arguments(uuid, null, null),
+        arguments(uuid, null, APP_USER),
+        arguments(uuid, tagUuid, null));
+  }
+
+  private static Stream<Arguments> test24() {
+    // Uuid, tagUuid, appUser
+    UUID uuid = UUID.randomUUID();
+    UUID tagUuid = UUID.randomUUID();
+    return Stream.of(
+        arguments(null, null, null),
+        arguments(null, null, APP_USER),
+        arguments(null, tagUuid, null),
+        arguments(null, tagUuid, APP_USER),
+        arguments(uuid, null, null),
+        arguments(uuid, null, APP_USER),
+        arguments(uuid, tagUuid, null));
+  }
+
+  private static Stream<Arguments> test25() {
+    // Uuid, appUser
+    UUID uuid = UUID.randomUUID();
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(uuid, null));
+  }
 
   @BeforeEach
   void beforeEach() {
@@ -353,5 +426,64 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUserFetchTags(uuid, APP_USER);
     assertEquals(Optional.of(tagSet), res);
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when create note with null argument")
+  void test18(Note note, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> noteService.createNote(note, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when read note with null argument")
+  void test19(UUID uuid, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> noteService.readNote(uuid, appUser));
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @DisplayName("Should throw when read notes with null argument")
+  void test20(String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> noteService.readNotes(appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when update note with null argument")
+  void test21(UUID uuid, Note note, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(uuid, note, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when delete note with null argument")
+  void test22(UUID uuid, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> noteService.deleteNote(uuid, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when add tag to note with null argument")
+  void test23(UUID uuid, UUID tagUuid, String appUser) {
+    assertThrows(
+        IllegalArgumentException.class, () -> noteService.addTagToNote(uuid, tagUuid, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when remove tag from note with null argument")
+  void test24(UUID uuid, UUID tagUuid, String appUser) {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> noteService.removeTagFromNote(uuid, tagUuid, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when read note tags with null argument")
+  void test25(UUID uuid, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> noteService.readNoteTags(uuid, appUser));
   }
 }
