@@ -2,6 +2,8 @@ package it.lbsoftware.daily.tags;
 
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -12,9 +14,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 
 @DisplayName("TagServiceImpl unit tests")
@@ -26,6 +33,38 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   private static final String OTHER_COLOR_HEX = "#654321";
   @Mock private TagRepository tagRepository;
   private TagServiceImpl tagService;
+
+  private static Stream<Arguments> test10() {
+    // Tag, appUser
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(tag, null));
+  }
+
+  private static Stream<Arguments> test11() {
+    // Uuid, appUser
+    UUID uuid = UUID.randomUUID();
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(uuid, null));
+  }
+
+  private static Stream<Arguments> test13() {
+    // Uuid, tag, appUser
+    UUID uuid = UUID.randomUUID();
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    return Stream.of(
+        arguments(null, null, null),
+        arguments(null, null, APP_USER),
+        arguments(null, tag, null),
+        arguments(null, tag, APP_USER),
+        arguments(uuid, null, null),
+        arguments(uuid, null, APP_USER),
+        arguments(uuid, tag, null));
+  }
+
+  private static Stream<Arguments> test14() {
+    // Uuid, appUser
+    UUID uuid = UUID.randomUUID();
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(uuid, null));
+  }
 
   @BeforeEach
   void beforeEach() {
@@ -185,5 +224,40 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagRepository, times(1)).delete(tagOptional.get());
     assertEquals(Boolean.TRUE, res);
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when create tag with null argument")
+  void test10(Tag tag, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> tagService.createTag(tag, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when read tag with null argument")
+  void test11(UUID uuid, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> tagService.readTag(uuid, appUser));
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @DisplayName("Should throw when read tags with null argument")
+  void test12(String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> tagService.readTags(appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when update tag with null argument")
+  void test13(UUID uuid, Tag tag, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> tagService.updateTag(uuid, tag, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when delete tag with null argument")
+  void test14(UUID uuid, String appUser) {
+    assertThrows(IllegalArgumentException.class, () -> tagService.deleteTag(uuid, appUser));
   }
 }
