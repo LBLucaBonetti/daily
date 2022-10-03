@@ -37,4 +37,4 @@ jobs:
           TEST_SPRING_DATASOURCE_USERNAME: ${{ secrets.TEST_SPRING_DATASOURCE_USERNAME }}
           TEST_SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_SPRING_DATASOURCE_PASSWORD }}
           OKTA_OAUTH2_CLIENT_SECRET: ${{ secrets.OKTA_OAUTH2_CLIENT_SECRET }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=LBLucaBonetti_daily_be
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=LBLucaBonetti_daily_be -Dsonar.projectName=daily-backend
