@@ -20,7 +20,7 @@ jobs:
         with:
           projectBaseDir: client
           args: >
-            -Dsonar.projectKey=LBLucaBonetti_daily_be
+            -Dsonar.projectKey=LBLucaBonetti_daily_fe
             -Dsonar.projectName=daily-frontend
             -Dsonar.organization=lblucabonetti
       - name: Set up JDK 17
