@@ -14,3 +14,10 @@ updates:
     schedule:
       interval: 'daily'
     open-pull-requests-limit: 10
+
+  # npm
+  - package-ecosystem: 'npm'
+    directory: '/client'
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 10
