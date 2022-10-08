@@ -6,18 +6,18 @@
           flat
           dense
           round
-          icon="menu"
+          :icon="heroOutline24Bars3"
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> daily </q-toolbar-title>
+        <q-toolbar-title class="poppins-regular"> daily </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
-        <q-item-label header> daily </q-item-label>
+        <q-item-label class="poppins-regular" header> daily </q-item-label>
       </q-list>
     </q-drawer>
 
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { heroOutline24Bars3 } from 'quasar-extras-svg-icons/hero-icons-v2';
 
 const leftDrawerOpen = ref(false);
 

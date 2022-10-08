@@ -1,1 +1,63 @@
 // app global css in SCSS form
+
+// Colors
+.text-1 {
+  color: #2f2e41 !important;
+}
+
+.bg-1 {
+  background: #fff7ed !important;
+}
+
+.text-2 {
+  color: #fff7ed !important;
+}
+
+.bg-2 {
+  background: #3f3d56 !important;
+}
+
+.text-disabled {
+  color: #cccccc !important;
+}
+
+.border-1 {
+  border-color: #3f3d56 !important;
+}
+
+// Fonts
+@font-face {
+  font-family: poppins-regular;
+  src: url(./fonts/Poppins-Regular.woff2);
+}
+
+.poppins-regular {
+  font-family: 'poppins-regular';
+}
+
+@font-face {
+  font-family: inter-regular;
+  src: url(./fonts/Inter-Regular.woff2);
+}
+
+.inter-regular {
+  font-family: 'inter-regular';
+}
+
+@font-face {
+  font-family: inter-medium;
+  src: url(./fonts/Inter-Medium.woff2);
+}
+
+.inter-medium {
+  font-family: 'inter-medium';
+}
+
+@font-face {
+  font-family: inter-semibold;
+  src: url(./fonts/Inter-SemiBold.woff2);
+}
+
+.inter-semibold {
+  font-family: 'inter-semibold';
+}
