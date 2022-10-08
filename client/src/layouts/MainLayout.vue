@@ -6,7 +6,7 @@
           flat
           dense
           round
-          icon="menu"
+          :icon="heroOutline24Bars3"
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { heroOutline24Bars3 } from 'quasar-extras-svg-icons/hero-icons-v2';
 
 const leftDrawerOpen = ref(false);
 
