@@ -18,6 +18,7 @@ class AppUserController {
   public ResponseEntity<InfoDto> readInfo(@AuthenticationPrincipal OidcUser appUser) {
     final String fullName = Optional.ofNullable(appUser).map(OidcUser::getFullName).orElse("");
     final String email = Optional.ofNullable(appUser).map(OidcUser::getEmail).orElse("");
+
     return ResponseEntity.ok(new InfoDto(fullName, email));
   }
 }
