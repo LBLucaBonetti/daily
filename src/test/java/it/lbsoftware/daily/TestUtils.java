@@ -1,10 +1,14 @@
 package it.lbsoftware.daily;
 
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.EMAIL_CLAIM;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.FULL_NAME_CLAIM;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.UID_CLAIM;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.NonNull;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -12,11 +16,11 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 public final class TestUtils {
 
+  private static final String[] tableNames = {"note_tag", "tag", "note"};
+
   private TestUtils() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
   }
-
-  private static final String[] tableNames = {"note_tag", "tag", "note"};
 
   /**
    * Deletes all data from the default, hardcoded table names
@@ -37,6 +41,29 @@ public final class TestUtils {
    * @return The configured RequestPostProcessor to be used to configure a MockMvc instance
    */
   public static RequestPostProcessor loginOf(@NonNull final String appUser) {
-    return oidcLogin().oidcUser(createAppUser(Map.of(UID_CLAIM, appUser)));
+    return loginOf(appUser, null, null);
+  }
+
+  /**
+   * Configures a mocked OpenID Connect login with an app user whose id token contains a sub claim
+   * with the provided appUser as value, a name claim with the provided fullName and an email claim
+   * with the provided email
+   *
+   * @param appUser String that will be used as the sub claim of the id token for the mocked app
+   *     user
+   * @param fullName String that will be used as the name claim of the id token for the mocked app
+   *     user
+   * @param email String that will be used as the email claim of the id token for the mocked app
+   *     user
+   * @return The configured RequestPostProcessor to be used to configure a MockMvc instance
+   */
+  public static RequestPostProcessor loginOf(
+      @NonNull final String appUser, final String fullName, final String email) {
+    Map<String, Object> idTokenClaims = new HashMap<>();
+    idTokenClaims.put(UID_CLAIM, appUser);
+    Optional.ofNullable(fullName).ifPresent(e -> idTokenClaims.put(FULL_NAME_CLAIM, e));
+    Optional.ofNullable(email).ifPresent(e -> idTokenClaims.put(EMAIL_CLAIM, e));
+
+    return oidcLogin().oidcUser(createAppUser(idTokenClaims));
   }
 }
