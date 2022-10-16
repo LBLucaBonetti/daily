@@ -1,6 +1,6 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh Lpr lfr">
+    <q-header bordered class="bg-1">
       <q-toolbar>
         <q-btn
           flat
@@ -8,20 +8,33 @@
           round
           :icon="heroOutline24Bars3"
           aria-label="Menu"
+          class="text-1"
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title class="poppins-regular"> daily </q-toolbar-title>
+        <q-toolbar-title class="poppins-regular text-1">
+          daily
+        </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer
+      class="bg-1"
+      v-model="leftDrawerOpen"
+      side="left"
+      overlay
+      bordered
+    >
       <q-list>
         <q-item-label class="poppins-regular" header> daily </q-item-label>
         <q-item class="justify-between items-center">
           <div>
-            <q-item-label>{{ fullName }}</q-item-label>
-            <q-item-label>{{ email }}</q-item-label>
+            <q-item-label class="inter-regular text-1">{{
+              fullName
+            }}</q-item-label>
+            <q-item-label class="inter-regular text-1">{{
+              email
+            }}</q-item-label>
           </div>
           <div>
             <q-btn
