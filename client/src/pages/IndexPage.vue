@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { AxiosResponse } from 'axios';
-import { QBtn, QInput } from 'quasar';
+import { QBtn, QInput, useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
 import { ref, watchEffect } from 'vue';
 
@@ -41,6 +41,7 @@ const noteEditor = ref<QInput | null>(null);
 const noteSaveBtn = ref<QBtn | null>(null);
 const noteSaveBtnLoading = ref(false);
 const noteSaveBtnDisabled = ref(true);
+const $q = useQuasar();
 
 interface NoteDto {
   uuid: string | null;
@@ -55,9 +56,28 @@ async function saveNote() {
       text: note.value,
     };
     const res: AxiosResponse<NoteDto> = await api.post('/notes', noteDto);
-    console.log(res.data);
+    if (res.status === 201)
+      $q.notify({
+        position: 'top-right',
+        progress: true,
+        message: 'Note correctly saved',
+        color: 'white',
+        textColor: 'info',
+        icon: 'img:icons/success.svg',
+        iconColor: 'primary',
+        iconSize: '20px',
+      });
   } catch (err) {
-    console.error('Uncaught error');
+    $q.notify({
+      position: 'top-right',
+      progress: true,
+      message: 'Error saving note',
+      color: 'white',
+      textColor: 'info',
+      icon: 'img:icons/error.svg',
+      iconColor: 'primary',
+      iconSize: '20px',
+    });
   } finally {
     noteSaveBtnLoading.value = false;
   }
