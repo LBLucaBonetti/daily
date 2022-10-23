@@ -9,8 +9,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.firewall.HttpStatusRequestRejectedHandler;
-import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -43,11 +41,5 @@ public class WebSecurityConfiguration {
         .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
         .requiresSecure();
     return http.build();
-  }
-
-  @Bean
-  RequestRejectedHandler requestRejectedHandler() {
-    // Returns a status code 400 (Bad Request) for every http method that is not allowed
-    return new HttpStatusRequestRejectedHandler();
   }
 }
