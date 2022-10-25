@@ -18,7 +18,7 @@
     "quasar-extras-svg-icons": "^1.25.2",
     "vue": "^3.2.41",
     "vue-i18n": "^9.0.0",
-    "vue-router": "^4.0.0"
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
