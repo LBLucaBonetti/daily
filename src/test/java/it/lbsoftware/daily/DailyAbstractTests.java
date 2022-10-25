@@ -6,4 +6,5 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles({"test", "okta"})
 @TestMethodOrder(MethodOrderer.Random.class)
-public abstract class DailyAbstractTests {}
+public sealed class DailyAbstractTests
+    permits DailyAbstractIntegrationTests, DailyAbstractUnitTests {}

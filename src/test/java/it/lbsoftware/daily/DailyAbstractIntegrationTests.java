@@ -9,11 +9,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public abstract class DailyAbstractIntegrationTests extends DailyAbstractTests {
+public non-sealed abstract class DailyAbstractIntegrationTests extends DailyAbstractTests {
 
-  @Autowired private JdbcTemplate jdbcTemplate;
   @Autowired protected WebApplicationContext webApplicationContext;
   protected MockMvc mockMvc;
+  @Autowired private JdbcTemplate jdbcTemplate;
 
   @AfterEach
   void afterEach() {
