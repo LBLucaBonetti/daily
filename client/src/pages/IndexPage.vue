@@ -11,6 +11,8 @@
         v-model="note"
         placeholder="Write something here, then save it"
         min-height="15rem"
+        counter
+        maxlength="255"
         :rules="[noteValidation]"
         ref="noteEditor"
       >

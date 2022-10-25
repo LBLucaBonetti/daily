@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -168,6 +169,21 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @ValueSource(
       strings = {
         "   ",
+        """
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmno
+        """
       })
   @DisplayName("Should return bad request when create note with wrong text")
   void test14(final String text) throws Exception {
@@ -940,5 +956,37 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
     // Then
     assertFalse(res);
+  }
+
+  @Test
+  @DisplayName("Should not save note when text size exceeds the limits")
+  void test54() {
+    // Given
+    String aTextOf256Chars =
+        """
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmnopqrs
+        abcdefghijklmno
+        """;
+
+    // When
+    Exception exception =
+        assertThrows(
+            Exception.class,
+            () ->
+                noteRepository.save(createNote(aTextOf256Chars, Collections.emptySet(), APP_USER)));
+
+    // Then
+    assertNotNull(exception);
   }
 }

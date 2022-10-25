@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.notes;
 
 import it.lbsoftware.daily.bases.BaseEntity;
+import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.tags.Tag;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,7 +33,7 @@ import lombok.Setter;
 @Builder
 public class Note extends BaseEntity {
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = Constants.NOTE_TEXT_MAX)
   @NotBlank
   /*
    Text for this note
