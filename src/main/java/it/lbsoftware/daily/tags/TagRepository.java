@@ -1,8 +1,9 @@
 package it.lbsoftware.daily.tags;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,10 +22,11 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
   /**
    * Finds tags by their AppUser
    *
+   * @param pageable Pagination and sorting object
    * @param appUser Unique id of the appUser
-   * @return Found tags or empty list
+   * @return Found tags or empty page
    */
-  List<Tag> findByAppUser(String appUser);
+  Page<Tag> findByAppUser(Pageable pageable, String appUser);
 
   /**
    * Finds a tag by its uuid and AppUser fetching the associated notes

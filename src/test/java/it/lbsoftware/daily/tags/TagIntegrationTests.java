@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.notes.Note;
 import it.lbsoftware.daily.notes.NoteRepository;
 import java.util.Collections;
@@ -295,7 +296,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     tagRepository.save(createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), APP_USER));
 
     // When
-    List<TagDto> res =
+    PageDto<TagDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
@@ -309,7 +310,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             new TypeReference<>() {});
 
     // Then
-    assertTrue(res.isEmpty());
+    List<TagDto> tagDtos = res.getContent();
+    assertTrue(tagDtos.isEmpty());
   }
 
   @Test
@@ -325,7 +327,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), APP_USER)));
 
     // When
-    List<TagDto> res =
+    PageDto<TagDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
@@ -337,10 +339,11 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             new TypeReference<>() {});
 
     // Then
-    assertFalse(res.isEmpty());
-    assertEquals(2, res.size());
-    assertTrue(res.contains(tagDto1));
-    assertTrue(res.contains(tagDto2));
+    List<TagDto> tagDtos = res.getContent();
+    assertFalse(tagDtos.isEmpty());
+    assertEquals(2, tagDtos.size());
+    assertTrue(tagDtos.contains(tagDto1));
+    assertTrue(tagDtos.contains(tagDto2));
   }
 
   @ParameterizedTest

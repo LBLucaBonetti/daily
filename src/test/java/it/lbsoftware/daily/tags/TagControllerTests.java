@@ -3,6 +3,7 @@ package it.lbsoftware.daily.tags;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
+import it.lbsoftware.daily.bases.PageDto;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +20,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -31,6 +36,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @Mock private TagDtoMapper tagDtoMapper;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
+  @Mock private Pageable pageable;
   private TagController tagController;
 
   @BeforeEach
@@ -107,20 +113,24 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read tags and return ok")
   void test4() {
     // Given
-    List<Tag> readTags = List.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
-    List<TagDto> readTagDtos = List.of(createTagDto(UUID.randomUUID(), NAME, COLOR_HEX));
-    given(tagService.readTags(APP_USER)).willReturn(readTags);
-    given(tagDtoMapper.convertToDto(readTags)).willReturn(readTagDtos);
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
+    Page<Tag> readTags = new PageImpl<>(List.of(tag));
+    given(tagService.readTags(pageable, APP_USER)).willReturn(readTags);
+    given(tagDtoMapper.convertToDto(tag)).willReturn(tagDto);
 
     // When
-    ResponseEntity<List<TagDto>> res = tagController.readTags(appUser);
+    ResponseEntity<PageDto<TagDto>> res = tagController.readTags(pageable, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(tagService, times(1)).readTags(APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(readTags);
+    verify(tagService, times(1)).readTags(pageable, APP_USER);
+    verify(tagDtoMapper, times(1)).convertToDto(tag);
     assertEquals(HttpStatus.OK, res.getStatusCode());
-    assertEquals(readTagDtos, res.getBody());
+    assertNotNull(res.getBody());
+    assertNotNull(res.getBody().getContent());
+    assertEquals(readTags.getContent().size(), res.getBody().getContent().size());
+    assertEquals(tagDto, res.getBody().getContent().get(0));
   }
 
   @Test
