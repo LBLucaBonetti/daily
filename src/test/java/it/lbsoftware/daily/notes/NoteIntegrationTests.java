@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
@@ -312,7 +313,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER));
 
     // When
-    List<NoteDto> res =
+    PageDto<NoteDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
@@ -326,7 +327,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             new TypeReference<>() {});
 
     // Then
-    assertTrue(res.isEmpty());
+    List<NoteDto> noteDtos = res.getContent();
+    assertTrue(noteDtos.isEmpty());
   }
 
   @Test
@@ -341,7 +343,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER)));
 
     // When
-    List<NoteDto> res =
+    PageDto<NoteDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
@@ -353,10 +355,11 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             new TypeReference<>() {});
 
     // Then
-    assertFalse(res.isEmpty());
-    assertEquals(2, res.size());
-    assertTrue(res.contains(noteDto1));
-    assertTrue(res.contains(noteDto2));
+    List<NoteDto> noteDtos = res.getContent();
+    assertFalse(noteDtos.isEmpty());
+    assertEquals(2, noteDtos.size());
+    assertTrue(noteDtos.contains(noteDto1));
+    assertTrue(noteDtos.contains(noteDto2));
   }
 
   @ParameterizedTest

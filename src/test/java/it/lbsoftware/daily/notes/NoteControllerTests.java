@@ -5,6 +5,7 @@ import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
+import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
@@ -24,6 +26,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -31,16 +36,17 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 @DisplayName("NoteController unit tests")
 class NoteControllerTests extends DailyAbstractUnitTests {
 
+  private static final String TEXT = "text";
+  private static final String APP_USER = "appUser";
+  private static final String NAME = "name";
+  private static final String COLOR_HEX = "#123456";
   @Mock private NoteService noteService;
   @Mock private NoteDtoMapper noteDtoMapper;
   @Mock private TagDtoMapper tagDtoMapper;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
+  @Mock private Pageable pageable;
   private NoteController noteController;
-  private static final String TEXT = "text";
-  private static final String APP_USER = "appUser";
-  private static final String NAME = "name";
-  private static final String COLOR_HEX = "#123456";
 
   @BeforeEach
   void beforeEach() {
@@ -115,20 +121,24 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read notes and return ok")
   void test4() {
     // Given
-    List<Note> readNotes = List.of(createNote(TEXT, Collections.emptySet(), APP_USER));
-    List<NoteDto> readNoteDtos = List.of(createNoteDto(UUID.randomUUID(), TEXT));
-    given(noteService.readNotes(APP_USER)).willReturn(readNotes);
-    given(noteDtoMapper.convertToDto(readNotes)).willReturn(readNoteDtos);
+    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    NoteDto noteDto = createNoteDto(UUID.randomUUID(), TEXT);
+    Page<Note> readNotes = new PageImpl<>(List.of(note));
+    given(noteService.readNotes(pageable, APP_USER)).willReturn(readNotes);
+    given(noteDtoMapper.convertToDto(note)).willReturn(noteDto);
 
     // When
-    ResponseEntity<List<NoteDto>> res = noteController.readNotes(appUser);
+    ResponseEntity<PageDto<NoteDto>> res = noteController.readNotes(pageable, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteService, times(1)).readNotes(APP_USER);
-    verify(noteDtoMapper, times(1)).convertToDto(readNotes);
+    verify(noteService, times(1)).readNotes(pageable, APP_USER);
+    verify(noteDtoMapper, times(1)).convertToDto(note);
     assertEquals(HttpStatus.OK, res.getStatusCode());
-    assertEquals(readNoteDtos, res.getBody());
+    assertNotNull(res.getBody());
+    assertNotNull(res.getBody().getContent());
+    assertEquals(readNotes.getContent().size(), res.getBody().getContent().size());
+    assertEquals(noteDto, res.getBody().getContent().get(0));
   }
 
   @Test

@@ -1,10 +1,11 @@
 package it.lbsoftware.daily.notes;
 
 import it.lbsoftware.daily.tags.Tag;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface NoteService {
 
@@ -29,10 +30,11 @@ public interface NoteService {
   /**
    * Reads notes
    *
+   * @param pageable Pagination and sorting object
    * @param appUser Unique id of the appUser
-   * @return Read notes or empty list
+   * @return Read notes or empty page
    */
-  List<Note> readNotes(String appUser);
+  Page<Note> readNotes(Pageable pageable, String appUser);
 
   /**
    * Updates a note
