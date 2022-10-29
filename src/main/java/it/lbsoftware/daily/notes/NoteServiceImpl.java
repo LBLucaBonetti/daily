@@ -2,12 +2,13 @@ package it.lbsoftware.daily.notes;
 
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagService;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +32,8 @@ public class NoteServiceImpl implements NoteService {
   }
 
   @Override
-  public List<Note> readNotes(@NonNull String appUser) {
-    return noteRepository.findByAppUser(appUser);
+  public Page<Note> readNotes(Pageable pageable, @NonNull String appUser) {
+    return noteRepository.findByAppUser(pageable, appUser);
   }
 
   @Override

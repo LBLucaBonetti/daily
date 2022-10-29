@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.notes.Note;
 import it.lbsoftware.daily.notes.NoteRepository;
 import java.util.Collections;
@@ -35,6 +36,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("Tag integration tests")
 class TagIntegrationTests extends DailyAbstractIntegrationTests {
@@ -295,7 +297,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     tagRepository.save(createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), APP_USER));
 
     // When
-    List<TagDto> res =
+    PageDto<TagDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
@@ -309,7 +311,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             new TypeReference<>() {});
 
     // Then
-    assertTrue(res.isEmpty());
+    List<TagDto> tagDtos = res.getContent();
+    assertTrue(tagDtos.isEmpty());
   }
 
   @Test
@@ -325,7 +328,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), APP_USER)));
 
     // When
-    List<TagDto> res =
+    PageDto<TagDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
@@ -337,10 +340,11 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             new TypeReference<>() {});
 
     // Then
-    assertFalse(res.isEmpty());
-    assertEquals(2, res.size());
-    assertTrue(res.contains(tagDto1));
-    assertTrue(res.contains(tagDto2));
+    List<TagDto> tagDtos = res.getContent();
+    assertFalse(tagDtos.isEmpty());
+    assertEquals(2, tagDtos.size());
+    assertTrue(tagDtos.contains(tagDto1));
+    assertTrue(tagDtos.contains(tagDto2));
   }
 
   @ParameterizedTest
@@ -621,5 +625,30 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
 
     // Then
     assertFalse(res);
+  }
+
+  @Test
+  @DisplayName(
+      "Should not read tags because of wrong tag field name as sort parameter and return bad request")
+  void test31() throws Exception {
+    // Given
+    String nonexistentField = "nonexistent-field";
+
+    // When
+
+    Exception res =
+        mockMvc
+            .perform(
+                get(BASE_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("sort", nonexistentField)
+                    .with(loginOf(APP_USER)))
+            .andExpect(status().isBadRequest())
+            .andReturn()
+            .getResolvedException();
+
+    // Then
+    assertTrue(res instanceof ResponseStatusException);
+    assertNull(((ResponseStatusException) res).getReason());
   }
 }

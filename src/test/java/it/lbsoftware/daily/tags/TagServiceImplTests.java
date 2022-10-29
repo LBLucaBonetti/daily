@@ -23,6 +23,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @DisplayName("TagServiceImpl unit tests")
 class TagServiceImplTests extends DailyAbstractUnitTests {
@@ -32,6 +35,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   private static final String OTHER_NAME = "otherText";
   private static final String OTHER_COLOR_HEX = "#654321";
   @Mock private TagRepository tagRepository;
+  @Mock private Pageable pageable;
   private TagServiceImpl tagService;
 
   private static Stream<Arguments> test10() {
@@ -123,14 +127,14 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should not read tags and return empty list")
   void test4() {
     // Given
-    List<Tag> tags = Collections.emptyList();
-    given(tagRepository.findByAppUser(APP_USER)).willReturn(tags);
+    Page<Tag> tags = Page.empty();
+    given(tagRepository.findByAppUser(pageable, APP_USER)).willReturn(tags);
 
     // When
-    List<Tag> res = tagService.readTags(APP_USER);
+    Page<Tag> res = tagService.readTags(pageable, APP_USER);
 
     // Then
-    verify(tagRepository, times(1)).findByAppUser(APP_USER);
+    verify(tagRepository, times(1)).findByAppUser(pageable, APP_USER);
     assertEquals(tags, res);
   }
 
@@ -138,14 +142,15 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should read tags and return tag list")
   void test5() {
     // Given
-    List<Tag> tags = List.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
-    given(tagRepository.findByAppUser(APP_USER)).willReturn(tags);
+    Page<Tag> tags =
+        new PageImpl<>(List.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER)));
+    given(tagRepository.findByAppUser(pageable, APP_USER)).willReturn(tags);
 
     // When
-    List<Tag> res = tagService.readTags(APP_USER);
+    Page<Tag> res = tagService.readTags(pageable, APP_USER);
 
     // Then
-    verify(tagRepository, times(1)).findByAppUser(APP_USER);
+    verify(tagRepository, times(1)).findByAppUser(pageable, APP_USER);
     assertEquals(tags, res);
   }
 
@@ -244,7 +249,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   @NullSource
   @DisplayName("Should throw when read tags with null argument")
   void test12(String appUser) {
-    assertThrows(IllegalArgumentException.class, () -> tagService.readTags(appUser));
+    assertThrows(IllegalArgumentException.class, () -> tagService.readTags(pageable, appUser));
   }
 
   @ParameterizedTest

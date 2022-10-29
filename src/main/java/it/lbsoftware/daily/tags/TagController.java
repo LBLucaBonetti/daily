@@ -1,11 +1,13 @@
 package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUserService;
-import java.util.List;
+import it.lbsoftware.daily.bases.PageDto;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,9 +54,15 @@ class TagController {
   }
 
   @GetMapping
-  public ResponseEntity<List<TagDto>> readTags(@AuthenticationPrincipal OidcUser appUser) {
-    List<Tag> readTags = tagService.readTags(appUserService.getUid(appUser));
-    List<TagDto> readTagDtos = tagDtoMapper.convertToDto(readTags);
+  public ResponseEntity<PageDto<TagDto>> readTags(
+      Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
+    Page<Tag> readTags;
+    try {
+      readTags = tagService.readTags(pageable, appUserService.getUid(appUser));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
+    }
+    PageDto<TagDto> readTagDtos = new PageDto<>(readTags.map(tagDtoMapper::convertToDto));
 
     return ResponseEntity.ok(readTagDtos);
   }

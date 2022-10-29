@@ -1,8 +1,9 @@
 package it.lbsoftware.daily.tags;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TagService {
 
@@ -27,10 +28,11 @@ public interface TagService {
   /**
    * Reads tags
    *
+   * @param pageable Pagination and sorting object
    * @param appUser Unique id of the appUser
    * @return Read tags or empty list
    */
-  List<Tag> readTags(String appUser);
+  Page<Tag> readTags(Pageable pageable, String appUser);
 
   /**
    * Updates a tag

@@ -30,6 +30,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @DisplayName("NoteServiceImpl unit tests")
 class NoteServiceImplTests extends DailyAbstractUnitTests {
@@ -41,6 +44,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   private static final String COLOR_HEX = "#123456";
   @Mock private NoteRepository noteRepository;
   @Mock private TagService tagService;
+  @Mock private Pageable pageable;
   private NoteServiceImpl noteService;
 
   private static Stream<Arguments> test18() {
@@ -166,14 +170,14 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should not read notes and return empty list")
   void test4() {
     // Given
-    List<Note> notes = Collections.emptyList();
-    given(noteRepository.findByAppUser(APP_USER)).willReturn(notes);
+    Page<Note> notes = Page.empty();
+    given(noteRepository.findByAppUser(pageable, APP_USER)).willReturn(notes);
 
     // When
-    List<Note> res = noteService.readNotes(APP_USER);
+    Page<Note> res = noteService.readNotes(pageable, APP_USER);
 
     // Then
-    verify(noteRepository, times(1)).findByAppUser(APP_USER);
+    verify(noteRepository, times(1)).findByAppUser(pageable, APP_USER);
     assertEquals(notes, res);
   }
 
@@ -181,14 +185,14 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should read notes and return note list")
   void test5() {
     // Given
-    List<Note> notes = List.of(createNote(TEXT, Collections.emptySet(), APP_USER));
-    given(noteRepository.findByAppUser(APP_USER)).willReturn(notes);
+    Page<Note> notes = new PageImpl<>(List.of(createNote(TEXT, Collections.emptySet(), APP_USER)));
+    given(noteRepository.findByAppUser(pageable, APP_USER)).willReturn(notes);
 
     // When
-    List<Note> res = noteService.readNotes(APP_USER);
+    Page<Note> res = noteService.readNotes(pageable, APP_USER);
 
     // Then
-    verify(noteRepository, times(1)).findByAppUser(APP_USER);
+    verify(noteRepository, times(1)).findByAppUser(pageable, APP_USER);
     assertEquals(notes, res);
   }
 
@@ -446,7 +450,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @NullSource
   @DisplayName("Should throw when read notes with null argument")
   void test20(String appUser) {
-    assertThrows(IllegalArgumentException.class, () -> noteService.readNotes(appUser));
+    assertThrows(IllegalArgumentException.class, () -> noteService.readNotes(pageable, appUser));
   }
 
   @ParameterizedTest

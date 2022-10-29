@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
@@ -39,6 +40,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("Note integration tests")
 class NoteIntegrationTests extends DailyAbstractIntegrationTests {
@@ -312,7 +314,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER));
 
     // When
-    List<NoteDto> res =
+    PageDto<NoteDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
@@ -326,7 +328,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             new TypeReference<>() {});
 
     // Then
-    assertTrue(res.isEmpty());
+    List<NoteDto> noteDtos = res.getContent();
+    assertTrue(noteDtos.isEmpty());
   }
 
   @Test
@@ -341,7 +344,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER)));
 
     // When
-    List<NoteDto> res =
+    PageDto<NoteDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
@@ -353,10 +356,11 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             new TypeReference<>() {});
 
     // Then
-    assertFalse(res.isEmpty());
-    assertEquals(2, res.size());
-    assertTrue(res.contains(noteDto1));
-    assertTrue(res.contains(noteDto2));
+    List<NoteDto> noteDtos = res.getContent();
+    assertFalse(noteDtos.isEmpty());
+    assertEquals(2, noteDtos.size());
+    assertTrue(noteDtos.contains(noteDto1));
+    assertTrue(noteDtos.contains(noteDto2));
   }
 
   @ParameterizedTest
@@ -988,5 +992,30 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
     // Then
     assertNotNull(exception);
+  }
+
+  @Test
+  @DisplayName(
+      "Should not read notes because of wrong note field name as sort parameter and return bad request")
+  void test55() throws Exception {
+    // Given
+    String nonexistentField = "nonexistent-field";
+
+    // When
+
+    Exception res =
+        mockMvc
+            .perform(
+                get(BASE_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("sort", nonexistentField)
+                    .with(loginOf(APP_USER)))
+            .andExpect(status().isBadRequest())
+            .andReturn()
+            .getResolvedException();
+
+    // Then
+    assertTrue(res instanceof ResponseStatusException);
+    assertNull(((ResponseStatusException) res).getReason());
   }
 }

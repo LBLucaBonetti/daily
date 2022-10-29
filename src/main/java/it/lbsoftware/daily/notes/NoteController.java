@@ -1,15 +1,17 @@
 package it.lbsoftware.daily.notes;
 
 import it.lbsoftware.daily.appusers.AppUserService;
+import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,9 +59,15 @@ class NoteController {
   }
 
   @GetMapping
-  public ResponseEntity<List<NoteDto>> readNotes(@AuthenticationPrincipal OidcUser appUser) {
-    List<Note> readNotes = noteService.readNotes(appUserService.getUid(appUser));
-    List<NoteDto> readNoteDtos = noteDtoMapper.convertToDto(readNotes);
+  public ResponseEntity<PageDto<NoteDto>> readNotes(
+      Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
+    Page<Note> readNotes;
+    try {
+      readNotes = noteService.readNotes(pageable, appUserService.getUid(appUser));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
+    }
+    PageDto<NoteDto> readNoteDtos = new PageDto<>(readNotes.map(noteDtoMapper::convertToDto));
 
     return ResponseEntity.ok(readNoteDtos);
   }
