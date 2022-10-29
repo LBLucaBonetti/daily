@@ -3,18 +3,20 @@ package it.lbsoftware.daily.bases;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 
 @Getter
 @EqualsAndHashCode
+@NoArgsConstructor
 public class PageDto<T> {
 
-  private final List<T> content;
-  private final Integer totalPages;
-  private final Long totalElements;
-  private final Boolean last;
-  private final Integer numberOfElements;
+  private List<T> content;
+  private Integer totalPages;
+  private Long totalElements;
+  private Boolean last;
+  private Integer numberOfElements;
 
   public PageDto(@NonNull Page<T> page) {
     this.content = page.getContent();
