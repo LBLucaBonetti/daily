@@ -7,6 +7,7 @@ import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("NoteController unit tests")
 class NoteControllerTests extends DailyAbstractUnitTests {
@@ -329,5 +331,23 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     verify(tagDtoMapper, times(1)).convertToDto(readNoteTags.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readNoteTagDtos, res.getBody());
+  }
+
+  @Test
+  @DisplayName(
+      "Should not read notes because of wrong note field name as sort parameter and return bad request")
+  void test15() {
+    // Given
+    ResponseStatusException responseStatusException =
+        new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    given(noteService.readNotes(pageable, APP_USER)).willThrow(responseStatusException);
+
+    // When
+    ResponseStatusException res =
+        assertThrows(
+            ResponseStatusException.class, () -> noteController.readNotes(pageable, appUser));
+
+    // Then
+    assertNotNull(res);
   }
 }

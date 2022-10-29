@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,7 +61,12 @@ class NoteController {
   @GetMapping
   public ResponseEntity<PageDto<NoteDto>> readNotes(
       Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
-    Page<Note> readNotes = noteService.readNotes(pageable, appUserService.getUid(appUser));
+    Page<Note> readNotes;
+    try {
+      readNotes = noteService.readNotes(pageable, appUserService.getUid(appUser));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
+    }
     PageDto<NoteDto> readNoteDtos = new PageDto<>(readNotes.map(noteDtoMapper::convertToDto));
 
     return ResponseEntity.ok(readNoteDtos);

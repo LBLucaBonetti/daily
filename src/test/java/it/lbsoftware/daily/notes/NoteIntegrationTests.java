@@ -40,6 +40,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("Note integration tests")
 class NoteIntegrationTests extends DailyAbstractIntegrationTests {
@@ -991,5 +992,30 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
     // Then
     assertNotNull(exception);
+  }
+
+  @Test
+  @DisplayName(
+      "Should not read notes because of wrong note field name as sort parameter and return bad request")
+  void test55() throws Exception {
+    // Given
+    String nonexistentField = "nonexistent-field";
+
+    // When
+
+    Exception res =
+        mockMvc
+            .perform(
+                get(BASE_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("sort", nonexistentField)
+                    .with(loginOf(APP_USER)))
+            .andExpect(status().isBadRequest())
+            .andReturn()
+            .getResolvedException();
+
+    // Then
+    assertTrue(res instanceof ResponseStatusException);
+    assertNull(((ResponseStatusException) res).getReason());
   }
 }
