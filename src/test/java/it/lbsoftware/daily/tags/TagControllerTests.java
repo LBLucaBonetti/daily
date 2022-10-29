@@ -5,6 +5,7 @@ import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("TagController unit tests")
 class TagControllerTests extends DailyAbstractUnitTests {
@@ -209,5 +211,23 @@ class TagControllerTests extends DailyAbstractUnitTests {
     verify(tagService, times(1)).deleteTag(uuid, APP_USER);
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName(
+      "Should not read tags because of wrong tag field name as sort parameter and return bad request")
+  void test9() {
+    // Given
+    ResponseStatusException responseStatusException =
+        new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    given(tagService.readTags(pageable, APP_USER)).willThrow(responseStatusException);
+
+    // When
+    ResponseStatusException res =
+        assertThrows(
+            ResponseStatusException.class, () -> tagController.readTags(pageable, appUser));
+
+    // Then
+    assertNotNull(res);
   }
 }

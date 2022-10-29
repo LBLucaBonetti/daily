@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,7 +56,12 @@ class TagController {
   @GetMapping
   public ResponseEntity<PageDto<TagDto>> readTags(
       Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
-    Page<Tag> readTags = tagService.readTags(pageable, appUserService.getUid(appUser));
+    Page<Tag> readTags;
+    try {
+      readTags = tagService.readTags(pageable, appUserService.getUid(appUser));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
+    }
     PageDto<TagDto> readTagDtos = new PageDto<>(readTags.map(tagDtoMapper::convertToDto));
 
     return ResponseEntity.ok(readTagDtos);
