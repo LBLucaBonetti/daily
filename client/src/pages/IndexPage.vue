@@ -99,6 +99,7 @@ async function saveNote() {
     const res: AxiosResponse<NoteDto> = await api.post('/notes', noteDto);
     if (res.status === 201) {
       $q.notify({
+        classes: 'q-px-lg',
         position: 'top-right',
         progress: true,
         message: 'Note correctly saved',
@@ -120,6 +121,7 @@ async function saveNote() {
     }
   } catch (err) {
     $q.notify({
+      classes: 'q-px-lg',
       position: 'top-right',
       progress: true,
       message: 'Error saving note',
@@ -153,6 +155,7 @@ function onLoad(index: number, done: () => void) {
     })
     .catch(() => {
       $q.notify({
+        classes: 'q-px-lg',
         position: 'top-right',
         progress: true,
         message: 'Error loading notes',
