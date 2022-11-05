@@ -1,5 +1,47 @@
 <template>
-  <q-page class="column bg-1 text-1" padding>
+  <q-page class="bg-1 text-1" padding>
+    <q-dialog v-model="updateNoteDialog"
+      ><q-card>
+        <q-card-section>
+          <div class="text-h6">Update note</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input
+            outlined
+            autogrow
+            autofocus
+            clearable
+            input-class="text-1"
+            v-model="noteTextUpdate"
+            min-height="15rem"
+            counter
+            maxlength="255"
+            :rules="[noteValidation]"
+          >
+          </q-input>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+            class="bg-1 text-1"
+            flat
+            label="Cancel"
+            @click="cancelUpdateNote"
+            aria-label="Cancel"
+          />
+          <q-btn
+            class="bg-1 text-1"
+            flat
+            :disable="noteUpdateBtnDisabled"
+            :loading="noteUpdateBtnLoading"
+            label="Confirm"
+            @click="confirmUpdateNote"
+            aria-label="Confirm"
+          />
+        </q-card-actions> </q-card
+    ></q-dialog>
+
     <q-input
       outlined
       autogrow
@@ -12,20 +54,21 @@
       counter
       maxlength="255"
       :rules="[noteValidation]"
-      ref="noteEditor"
     >
     </q-input>
-    <q-btn
-      unelevated
-      padding="sm xl"
-      aria-label="Save note"
-      class="q-ml-auto q-mt-sm bg-2 text-2"
-      :disable="noteSaveBtnDisabled"
-      @click="saveNote"
-      label="Save"
-      ref="noteSaveBtn"
-      :loading="noteSaveBtnLoading"
-    ></q-btn>
+    <div class="row justify-end">
+      <q-btn
+        unelevated
+        padding="sm xl"
+        aria-label="Save note"
+        class="q-mt-sm bg-2 text-2"
+        :disable="noteSaveBtnDisabled"
+        @click="saveNote"
+        label="Save"
+        ref="noteSaveBtn"
+        :loading="noteSaveBtnLoading"
+      ></q-btn>
+    </div>
 
     <q-infinite-scroll @load="onLoad" ref="infiniteScroll">
       <q-card
@@ -35,14 +78,14 @@
         flat
         bordered
       >
-        <q-card-section>
+        <q-card-section class="break-all">
           {{ note.text }}
         </q-card-section>
 
         <q-separator />
 
-        <q-card-actions>
-          <q-btn flat disable label="Edit"></q-btn>
+        <q-card-actions align="right">
+          <q-btn flat label="Edit" @click="updateNote(note)"></q-btn>
           <q-btn flat disable label="Delete"></q-btn>
         </q-card-actions>
       </q-card>
@@ -63,10 +106,14 @@ import { api } from 'src/boot/axios';
 import { ref, watchEffect } from 'vue';
 
 const note = ref('');
-const noteEditor = ref<QInput | null>(null);
+const noteTextUpdate = ref('');
+const noteUuidUpdate = ref('');
 const noteSaveBtn = ref<QBtn | null>(null);
 const noteSaveBtnLoading = ref(false);
 const noteSaveBtnDisabled = ref(true);
+const noteUpdateBtnLoading = ref(false);
+const noteUpdateBtnDisabled = ref(true);
+const updateNoteDialog = ref(false);
 const $q = useQuasar();
 const notes = ref<NoteDtoWithUuid[]>([]);
 const infiniteScroll = ref<QInfiniteScroll | null>(null);
@@ -136,6 +183,73 @@ async function saveNote() {
   }
 }
 
+function updateNote(noteDtoWithUuid: NoteDtoWithUuid) {
+  const noteToUpdate = notes.value.find(
+    (note) => note.uuid === noteDtoWithUuid.uuid
+  );
+  if (!noteToUpdate) return;
+  noteTextUpdate.value = noteToUpdate.text;
+  noteUuidUpdate.value = noteToUpdate.uuid;
+  updateNoteDialog.value = true;
+}
+
+function cancelUpdateNote() {
+  updateNoteDialog.value = false;
+  noteTextUpdate.value = '';
+  noteUuidUpdate.value = '';
+}
+
+async function confirmUpdateNote() {
+  noteUpdateBtnLoading.value = true;
+  try {
+    const updateNoteDto: NoteDtoWithUuid = {
+      text: noteTextUpdate.value,
+      uuid: noteUuidUpdate.value,
+    };
+    const res: AxiosResponse<NoteDto> = await api.put(
+      '/notes/' + updateNoteDto.uuid,
+      updateNoteDto
+    );
+    if (res.status === 204) {
+      $q.notify({
+        classes: 'q-px-lg',
+        position: 'top-right',
+        progress: true,
+        message: 'Note correctly saved',
+        color: 'white',
+        textColor: 'info',
+        icon: 'img:icons/success.svg',
+        iconColor: 'primary',
+        iconSize: '20px',
+      });
+      // Reload notes
+      if (infiniteScroll.value !== null) {
+        infiniteScroll.value.reset();
+        notes.value = [];
+        infiniteScroll.value.resume();
+        infiniteScroll.value.trigger();
+      }
+      updateNoteDialog.value = false;
+      noteTextUpdate.value = '';
+      noteUuidUpdate.value = '';
+    }
+  } catch (err) {
+    $q.notify({
+      classes: 'q-px-lg',
+      position: 'top-right',
+      progress: true,
+      message: 'Error saving note',
+      color: 'white',
+      textColor: 'info',
+      icon: 'img:icons/error.svg',
+      iconColor: 'primary',
+      iconSize: '20px',
+    });
+  } finally {
+    noteUpdateBtnLoading.value = false;
+  }
+}
+
 function onLoad(index: number, done: () => void) {
   api
     .get('/notes', {
@@ -175,5 +289,6 @@ const noteValidation = (note: string) =>
 
 watchEffect(() => {
   noteSaveBtnDisabled.value = noteValidation(note.value) !== true;
+  noteUpdateBtnDisabled.value = noteValidation(noteTextUpdate.value) !== true;
 });
 </script>
