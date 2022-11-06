@@ -86,7 +86,13 @@
 
         <q-card-actions align="right">
           <q-btn flat label="Edit" @click="updateNote(note)"></q-btn>
-          <q-btn flat disable label="Delete"></q-btn>
+          <q-btn
+            flat
+            :loading="noteDeleteBtnLoading"
+            label="Delete"
+            @click="deleteNote(note)"
+            aria-label="Delete"
+          ></q-btn>
         </q-card-actions>
       </q-card>
 
@@ -113,6 +119,7 @@ const noteSaveBtnLoading = ref(false);
 const noteSaveBtnDisabled = ref(true);
 const noteUpdateBtnLoading = ref(false);
 const noteUpdateBtnDisabled = ref(true);
+const noteDeleteBtnLoading = ref(false);
 const updateNoteDialog = ref(false);
 const $q = useQuasar();
 const notes = ref<NoteDtoWithUuid[]>([]);
@@ -247,6 +254,49 @@ async function confirmUpdateNote() {
     });
   } finally {
     noteUpdateBtnLoading.value = false;
+  }
+}
+
+async function deleteNote(noteDtoWithUuid: NoteDtoWithUuid) {
+  noteDeleteBtnLoading.value = true;
+  try {
+    const res: AxiosResponse<NoteDto> = await api.delete(
+      '/notes/' + noteDtoWithUuid.uuid
+    );
+    if (res.status === 204) {
+      $q.notify({
+        classes: 'q-px-lg',
+        position: 'top-right',
+        progress: true,
+        message: 'Note correctly deleted',
+        color: 'white',
+        textColor: 'info',
+        icon: 'img:icons/success.svg',
+        iconColor: 'primary',
+        iconSize: '20px',
+      });
+      // Reload notes
+      if (infiniteScroll.value !== null) {
+        infiniteScroll.value.reset();
+        notes.value = [];
+        infiniteScroll.value.resume();
+        infiniteScroll.value.trigger();
+      }
+    }
+  } catch (err) {
+    $q.notify({
+      classes: 'q-px-lg',
+      position: 'top-right',
+      progress: true,
+      message: 'Error deleting note',
+      color: 'white',
+      textColor: 'info',
+      icon: 'img:icons/error.svg',
+      iconColor: 'primary',
+      iconSize: '20px',
+    });
+  } finally {
+    noteDeleteBtnLoading.value = false;
   }
 }
 
