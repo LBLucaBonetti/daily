@@ -18,6 +18,8 @@
             counter
             maxlength="255"
             :rules="[noteValidation]"
+            lazy-rules="ondemand"
+            ref="noteUpdateInput"
           >
           </q-input>
         </q-card-section>
@@ -33,7 +35,6 @@
           <q-btn
             class="bg-1 text-1"
             flat
-            :disable="noteUpdateBtnDisabled"
             :loading="noteUpdateBtnLoading"
             label="Confirm"
             @click="confirmUpdateNote"
@@ -54,6 +55,8 @@
       counter
       maxlength="255"
       :rules="[noteValidation]"
+      lazy-rules="ondemand"
+      ref="noteInput"
     >
     </q-input>
     <div class="row justify-end">
@@ -62,7 +65,6 @@
         padding="sm xl"
         aria-label="Save note"
         class="q-mt-sm bg-2 text-2"
-        :disable="noteSaveBtnDisabled"
         @click="saveNote"
         label="Save"
         ref="noteSaveBtn"
@@ -109,16 +111,16 @@
 import { AxiosResponse } from 'axios';
 import { QBtn, QInfiniteScroll, QInput, useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
-import { ref, watchEffect } from 'vue';
+import { ref } from 'vue';
 
 const note = ref('');
+const noteInput = ref<QInput | null>(null);
+const noteUpdateInput = ref<QInput | null>(null);
 const noteTextUpdate = ref('');
 const noteUuidUpdate = ref('');
 const noteSaveBtn = ref<QBtn | null>(null);
 const noteSaveBtnLoading = ref(false);
-const noteSaveBtnDisabled = ref(true);
 const noteUpdateBtnLoading = ref(false);
-const noteUpdateBtnDisabled = ref(true);
 const noteDeleteBtnLoading = ref(false);
 const updateNoteDialog = ref(false);
 const $q = useQuasar();
@@ -144,6 +146,9 @@ interface PageDto<T> {
 }
 
 async function saveNote() {
+  // Validate first
+  if (!noteInput.value || noteInput.value.validate() !== true) return;
+  // Set loading and do stuff
   noteSaveBtnLoading.value = true;
   try {
     const noteDto: NoteDto = {
@@ -207,6 +212,10 @@ function cancelUpdateNote() {
 }
 
 async function confirmUpdateNote() {
+  // Validate first
+  if (!noteUpdateInput.value || noteUpdateInput.value.validate() !== true)
+    return;
+  // Set loading and do stuff
   noteUpdateBtnLoading.value = true;
   try {
     const updateNoteDto: NoteDtoWithUuid = {
@@ -313,8 +322,8 @@ function onLoad(index: number, done: () => void) {
       notes.value.push(...res.data.content);
       done();
       if (res.data.last && infiniteScroll.value !== null) {
+        // Stop infinite scroll
         infiniteScroll.value.stop();
-        console.log('Stopping infinite scroll');
       }
     })
     .catch(() => {
@@ -336,9 +345,4 @@ const noteValidation = (note: string) =>
   !note || note === '' || note.replaceAll(' ', '').replaceAll('\n', '') === ''
     ? 'The note cannot be empty'
     : true;
-
-watchEffect(() => {
-  noteSaveBtnDisabled.value = noteValidation(note.value) !== true;
-  noteUpdateBtnDisabled.value = noteValidation(noteTextUpdate.value) !== true;
-});
 </script>
