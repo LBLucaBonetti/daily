@@ -322,8 +322,8 @@ function onLoad(index: number, done: () => void) {
       notes.value.push(...res.data.content);
       done();
       if (res.data.last && infiniteScroll.value !== null) {
+        // Stop infinite scroll
         infiniteScroll.value.stop();
-        console.log('Stopping infinite scroll');
       }
     })
     .catch(() => {
