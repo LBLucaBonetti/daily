@@ -178,7 +178,11 @@ async function saveNote() {
       // Reset note text
       note.value = '';
     }
-  } catch (err) {
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      window.location.href = window.location.href;
+      return;
+    }
     $q.notify({
       classes: 'q-px-lg',
       position: 'top-right',
@@ -249,7 +253,11 @@ async function confirmUpdateNote() {
       noteTextUpdate.value = '';
       noteUuidUpdate.value = '';
     }
-  } catch (err) {
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      window.location.href = window.location.href;
+      return;
+    }
     $q.notify({
       classes: 'q-px-lg',
       position: 'top-right',
@@ -292,7 +300,11 @@ async function deleteNote(noteDtoWithUuid: NoteDtoWithUuid) {
         infiniteScroll.value.trigger();
       }
     }
-  } catch (err) {
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      window.location.href = window.location.href;
+      return;
+    }
     $q.notify({
       classes: 'q-px-lg',
       position: 'top-right',
@@ -326,7 +338,11 @@ function onLoad(index: number, done: () => void) {
         infiniteScroll.value.stop();
       }
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.response?.status === 401) {
+        window.location.href = window.location.href;
+        return;
+      }
       $q.notify({
         classes: 'q-px-lg',
         position: 'top-right',

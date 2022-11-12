@@ -106,9 +106,17 @@ interface Info {
   email: string;
 }
 onMounted(() => {
-  api.get('/appusers/info').then((res: AxiosResponse<Info>) => {
-    fullName.value = res.data.fullName;
-    email.value = res.data.email;
-  });
+  api
+    .get('/appusers/info')
+    .then((res: AxiosResponse<Info>) => {
+      fullName.value = res.data.fullName;
+      email.value = res.data.email;
+    })
+    .catch((err) => {
+      if (err.response?.status === 401) {
+        window.location.href = window.location.href;
+        return;
+      }
+    });
 });
 </script>
