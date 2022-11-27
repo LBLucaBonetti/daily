@@ -57,6 +57,6 @@ jobs:
       - name: Install Railway
         run: npm i -g @railway/cli
       - name: Deploy to production
-        run: railway up
+        run: railway up --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
