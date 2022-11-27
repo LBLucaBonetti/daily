@@ -5,8 +5,8 @@ on:
     branches: [ main ]
 
 jobs:
-  sonarcloud_test_and_build:
-    name: SonarCloud, test and build
+  sonarcloud_test_build_and_deploy:
+    name: SonarCloud, test, build and deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,7 +23,7 @@ jobs:
             -Dsonar.projectKey=LBLucaBonetti_daily_fe
             -Dsonar.projectName=daily-frontend
             -Dsonar.organization=lblucabonetti
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
@@ -50,3 +50,13 @@ jobs:
           OKTA_OAUTH2_CLIENT_SECRET: ${{ secrets.OKTA_OAUTH2_CLIENT_SECRET }}
           OKTA_OAUTH2_POSTLOGOUTREDIRECTURI: ${{ secrets.OKTA_OAUTH2_POSTLOGOUTREDIRECTURI }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=LBLucaBonetti_daily_be -Dsonar.projectName=daily-backend
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install Railway
+        run: npm i -g @railway/cli
+      - name: Deploy to production
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
