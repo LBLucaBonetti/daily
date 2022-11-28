@@ -13,7 +13,7 @@
   "dependencies": {
     "@quasar/extras": "^1.15.6",
     "axios": "^1.2.0",
-    "pinia": "^2.0.26",
+    "pinia": "^2.0.27",
     "quasar": "^2.10.2",
     "quasar-extras-svg-icons": "^1.25.3",
     "vue": "^3.2.45",
