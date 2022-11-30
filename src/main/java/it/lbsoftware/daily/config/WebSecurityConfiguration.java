@@ -35,11 +35,6 @@ public class WebSecurityConfiguration {
         .defaultAuthenticationEntryPointFor(
             new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
             new AntPathRequestMatcher("/api/**"));
-    // Heroku-specific HTTPS settings
-    // (https://devcenter.heroku.com/articles/preparing-a-spring-boot-app-for-production-on-heroku)
-    http.requiresChannel()
-        .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
-        .requiresSecure();
     return http.build();
   }
 }
