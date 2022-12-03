@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-1 text-1" padding>
+  <q-page class="text-1 w-sm-50" padding>
     <q-dialog v-model="updateNoteDialog"
       ><q-card>
         <q-card-section>
