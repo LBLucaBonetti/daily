@@ -6,11 +6,11 @@
 }
 
 .bg-1 {
-  background: #fff7ed !important;
+  background: #fafafa !important;
 }
 
 .text-2 {
-  color: #fff7ed !important;
+  color: #fafafa !important;
 }
 
 .bg-2 {
@@ -65,4 +65,11 @@
 // Utils
 .break-all {
   word-break: break-all;
+}
+
+.w-sm-50 {
+  @media (min-width: 600px) {
+    max-width: 50rem;
+    margin: auto;
+  }
 }
