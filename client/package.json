@@ -11,11 +11,11 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.15.6",
+    "@quasar/extras": "^1.15.7",
     "axios": "^1.2.0",
     "pinia": "^2.0.27",
     "quasar": "^2.10.2",
-    "quasar-extras-svg-icons": "^1.25.3",
+    "quasar-extras-svg-icons": "^1.25.4",
     "vue": "^3.2.45",
     "vue-i18n": "^9.0.0",
     "vue-router": "^4.1.6"
@@ -27,7 +27,7 @@
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "autoprefixer": "^10.4.13",
-    "eslint": "^8.28.0",
+    "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^9.8.0",
     "prettier": "^2.8.0",
