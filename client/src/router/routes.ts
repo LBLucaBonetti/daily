@@ -6,14 +6,14 @@ const routes: RouteRecordRaw[] = [
     component: () =>
       import('layouts/MainLayout.vue')
         .then((mainLayout) => mainLayout)
-        .catch(() => (window.location.href = window.location.href)),
+        .catch(() => (window.location.href = '/')),
     children: [
       {
         path: '',
         component: () =>
           import('pages/IndexPage.vue')
             .then((indexPage) => indexPage)
-            .catch(() => (window.location.href = window.location.href)),
+            .catch(() => (window.location.href = '/')),
       },
     ],
   },
@@ -25,7 +25,7 @@ const routes: RouteRecordRaw[] = [
     component: () =>
       import('pages/ErrorNotFound.vue')
         .then((errorNotFound) => errorNotFound)
-        .catch(() => (window.location.href = window.location.href)),
+        .catch(() => (window.location.href = '/')),
   },
 ];
 

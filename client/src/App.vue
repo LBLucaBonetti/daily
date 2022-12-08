@@ -19,7 +19,7 @@ export default defineComponent({
     onFocus() {
       api.get('/appusers/info').catch((err) => {
         if (err.response?.status === 401) {
-          window.location.href = window.location.href;
+          window.location.href = '/';
           return;
         }
       });

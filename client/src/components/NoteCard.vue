@@ -71,7 +71,6 @@ import { AxiosResponse } from 'axios';
 import {
   QCard,
   QCardSection,
-  QSeparator,
   QCardActions,
   QBtn,
   QInput,
@@ -125,7 +124,7 @@ async function deleteNote(noteDtoWithUuid: NoteDto) {
     }
   } catch (err: any) {
     if (err.response?.status === 401) {
-      window.location.href = window.location.href;
+      window.location.href = '/';
       return;
     }
     $q.notify({
@@ -179,7 +178,7 @@ async function confirmUpdateNote() {
     }
   } catch (err: any) {
     if (err.response?.status === 401) {
-      window.location.href = window.location.href;
+      window.location.href = '/';
       return;
     }
     $q.notify({

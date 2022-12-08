@@ -8,7 +8,6 @@
       input-class="text-1"
       v-model="note"
       placeholder="Write something here, then save it"
-      min-height="15rem"
       counter
       maxlength="255"
       :rules="[noteValidation]"
@@ -91,10 +90,12 @@ async function saveNote() {
       reloadNotes();
       // Reset note text
       note.value = '';
+      // Set focus back to input
+      noteInput.value.focus();
     }
   } catch (err: any) {
     if (err.response?.status === 401) {
-      window.location.href = window.location.href;
+      window.location.href = '/';
       return;
     }
     $q.notify({
@@ -132,7 +133,7 @@ function onLoad(index: number, done: () => void) {
     })
     .catch((err) => {
       if (err.response?.status === 401) {
-        window.location.href = window.location.href;
+        window.location.href = '/';
         return;
       }
       $q.notify({
