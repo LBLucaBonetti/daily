@@ -56,6 +56,7 @@ import { heroOutline24Bars3 } from 'quasar-extras-svg-icons/hero-icons-v2';
 import { api } from 'src/boot/axios';
 import { AxiosResponse } from 'axios';
 import LogoutButton from 'components/LogoutButton.vue';
+import { InfoDto } from 'src/interfaces/InfoDto';
 
 const leftDrawerOpen = ref(false);
 
@@ -66,14 +67,10 @@ function toggleLeftDrawer() {
 const fullName = ref('');
 const email = ref('');
 
-interface Info {
-  fullName: string;
-  email: string;
-}
 onMounted(() => {
   api
     .get('/appusers/info')
-    .then((res: AxiosResponse<Info>) => {
+    .then((res: AxiosResponse<InfoDto>) => {
       fullName.value = res.data.fullName;
       email.value = res.data.email;
     })
