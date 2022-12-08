@@ -1,48 +1,5 @@
 <template>
   <q-page class="text-1 w-sm-50" padding>
-    <q-dialog v-model="updateNoteDialog"
-      ><q-card>
-        <q-card-section>
-          <div class="text-h6">Update note</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <q-input
-            outlined
-            autogrow
-            autofocus
-            clearable
-            input-class="text-1"
-            v-model="noteTextUpdate"
-            min-height="15rem"
-            counter
-            maxlength="255"
-            :rules="[noteValidation]"
-            lazy-rules="ondemand"
-            ref="noteUpdateInput"
-          >
-          </q-input>
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn
-            class="bg-1 text-1"
-            flat
-            label="Cancel"
-            @click="cancelUpdateNote"
-            aria-label="Cancel"
-          />
-          <q-btn
-            class="bg-1 text-1"
-            flat
-            :loading="noteUpdateBtnLoading"
-            label="Confirm"
-            @click="confirmUpdateNote"
-            aria-label="Confirm"
-          />
-        </q-card-actions> </q-card
-    ></q-dialog>
-
     <q-input
       outlined
       autogrow
@@ -73,30 +30,12 @@
     </div>
 
     <q-infinite-scroll @load="onLoad" ref="infiniteScroll">
-      <q-card
+      <note-card
         v-for="note in notes"
         :key="note.uuid"
-        class="q-mt-md bg-1 text-1"
-        flat
-        bordered
-      >
-        <q-card-section class="break-all">
-          {{ note.text }}
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn flat label="Edit" @click="updateNote(note)"></q-btn>
-          <q-btn
-            flat
-            :loading="noteDeleteBtnLoading"
-            label="Delete"
-            @click="deleteNote(note)"
-            aria-label="Delete"
-          ></q-btn>
-        </q-card-actions>
-      </q-card>
+        @reload-notes="reloadNotes"
+        :note="note"
+      />
 
       <template v-slot:loading>
         <div class="column q-pa-lg justify-center items-center content-center">
@@ -112,38 +51,18 @@ import { AxiosResponse } from 'axios';
 import { QBtn, QInfiniteScroll, QInput, useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
 import { ref } from 'vue';
+import NoteCard from '../components/NoteCard.vue';
+import { NoteDto } from 'src/interfaces/NoteDto';
+import { noteValidation } from 'src/validators/NoteValidator';
+import { PageDto } from 'src/interfaces/PageDto';
 
 const note = ref('');
 const noteInput = ref<QInput | null>(null);
-const noteUpdateInput = ref<QInput | null>(null);
-const noteTextUpdate = ref('');
-const noteUuidUpdate = ref('');
 const noteSaveBtn = ref<QBtn | null>(null);
 const noteSaveBtnLoading = ref(false);
-const noteUpdateBtnLoading = ref(false);
-const noteDeleteBtnLoading = ref(false);
-const updateNoteDialog = ref(false);
 const $q = useQuasar();
-const notes = ref<NoteDtoWithUuid[]>([]);
+const notes = ref<NoteDto[]>([]);
 const infiniteScroll = ref<QInfiniteScroll | null>(null);
-
-interface NoteDto {
-  uuid: string | null;
-  text: string;
-}
-
-interface NoteDtoWithUuid {
-  uuid: string;
-  text: string;
-}
-
-interface PageDto<T> {
-  content: T[];
-  totalPages: number;
-  totalElements: number;
-  last: boolean;
-  numberOfElements: number;
-}
 
 async function saveNote() {
   // Validate first
@@ -152,7 +71,7 @@ async function saveNote() {
   noteSaveBtnLoading.value = true;
   try {
     const noteDto: NoteDto = {
-      uuid: null,
+      uuid: '',
       text: note.value,
     };
     const res: AxiosResponse<NoteDto> = await api.post('/notes', noteDto);
@@ -169,12 +88,7 @@ async function saveNote() {
         iconSize: '20px',
       });
       // Reload notes
-      if (infiniteScroll.value !== null) {
-        infiniteScroll.value.reset();
-        notes.value = [];
-        infiniteScroll.value.resume();
-        infiniteScroll.value.trigger();
-      }
+      reloadNotes();
       // Reset note text
       note.value = '';
     }
@@ -199,128 +113,6 @@ async function saveNote() {
   }
 }
 
-function updateNote(noteDtoWithUuid: NoteDtoWithUuid) {
-  const noteToUpdate = notes.value.find(
-    (note) => note.uuid === noteDtoWithUuid.uuid
-  );
-  if (!noteToUpdate) return;
-  noteTextUpdate.value = noteToUpdate.text;
-  noteUuidUpdate.value = noteToUpdate.uuid;
-  updateNoteDialog.value = true;
-}
-
-function cancelUpdateNote() {
-  updateNoteDialog.value = false;
-  noteTextUpdate.value = '';
-  noteUuidUpdate.value = '';
-}
-
-async function confirmUpdateNote() {
-  // Validate first
-  if (!noteUpdateInput.value || noteUpdateInput.value.validate() !== true)
-    return;
-  // Set loading and do stuff
-  noteUpdateBtnLoading.value = true;
-  try {
-    const updateNoteDto: NoteDtoWithUuid = {
-      text: noteTextUpdate.value,
-      uuid: noteUuidUpdate.value,
-    };
-    const res: AxiosResponse<NoteDto> = await api.put(
-      '/notes/' + updateNoteDto.uuid,
-      updateNoteDto
-    );
-    if (res.status === 204) {
-      $q.notify({
-        classes: 'q-px-lg',
-        position: 'top-right',
-        progress: true,
-        message: 'Note correctly saved',
-        color: 'white',
-        textColor: 'info',
-        icon: 'img:icons/success.svg',
-        iconColor: 'primary',
-        iconSize: '20px',
-      });
-      // Reload notes
-      if (infiniteScroll.value !== null) {
-        infiniteScroll.value.reset();
-        notes.value = [];
-        infiniteScroll.value.resume();
-        infiniteScroll.value.trigger();
-      }
-      updateNoteDialog.value = false;
-      noteTextUpdate.value = '';
-      noteUuidUpdate.value = '';
-    }
-  } catch (err: any) {
-    if (err.response?.status === 401) {
-      window.location.href = window.location.href;
-      return;
-    }
-    $q.notify({
-      classes: 'q-px-lg',
-      position: 'top-right',
-      progress: true,
-      message: 'Error saving note',
-      color: 'white',
-      textColor: 'info',
-      icon: 'img:icons/error.svg',
-      iconColor: 'primary',
-      iconSize: '20px',
-    });
-  } finally {
-    noteUpdateBtnLoading.value = false;
-  }
-}
-
-async function deleteNote(noteDtoWithUuid: NoteDtoWithUuid) {
-  noteDeleteBtnLoading.value = true;
-  try {
-    const res: AxiosResponse<NoteDto> = await api.delete(
-      '/notes/' + noteDtoWithUuid.uuid
-    );
-    if (res.status === 204) {
-      $q.notify({
-        classes: 'q-px-lg',
-        position: 'top-right',
-        progress: true,
-        message: 'Note correctly deleted',
-        color: 'white',
-        textColor: 'info',
-        icon: 'img:icons/success.svg',
-        iconColor: 'primary',
-        iconSize: '20px',
-      });
-      // Reload notes
-      if (infiniteScroll.value !== null) {
-        infiniteScroll.value.reset();
-        notes.value = [];
-        infiniteScroll.value.resume();
-        infiniteScroll.value.trigger();
-      }
-    }
-  } catch (err: any) {
-    if (err.response?.status === 401) {
-      window.location.href = window.location.href;
-      return;
-    }
-    $q.notify({
-      classes: 'q-px-lg',
-      position: 'top-right',
-      progress: true,
-      message: 'Error deleting note',
-      color: 'white',
-      textColor: 'info',
-      icon: 'img:icons/error.svg',
-      iconColor: 'primary',
-      iconSize: '20px',
-    });
-  } finally {
-    noteDeleteBtnLoading.value = false;
-  }
-}
-
 function onLoad(index: number, done: () => void) {
   api
     .get('/notes', {
@@ -330,7 +122,7 @@ function onLoad(index: number, done: () => void) {
         page: index - 1,
       },
     })
-    .then((res: AxiosResponse<PageDto<NoteDtoWithUuid>>) => {
+    .then((res: AxiosResponse<PageDto<NoteDto>>) => {
       notes.value.push(...res.data.content);
       done();
       if (res.data.last && infiniteScroll.value !== null) {
@@ -357,8 +149,14 @@ function onLoad(index: number, done: () => void) {
     });
 }
 
-const noteValidation = (note: string) =>
-  !note || note === '' || note.replaceAll(' ', '').replaceAll('\n', '') === ''
-    ? 'The note cannot be empty'
-    : true;
+function reloadNotes() {
+  if (infiniteScroll.value === null) {
+    return;
+  }
+
+  infiniteScroll.value.reset();
+  notes.value = [];
+  infiniteScroll.value.resume();
+  infiniteScroll.value.trigger();
+}
 </script>
