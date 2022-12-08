@@ -9,8 +9,6 @@
         {{ note.text }}
       </q-card-section>
 
-      <q-separator />
-
       <q-card-actions align="right">
         <q-btn flat label="Edit" @click="updateNote(note)"></q-btn>
         <q-btn
