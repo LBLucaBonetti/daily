@@ -17,6 +17,7 @@
           label="Delete"
           @click="deleteNote(note)"
           aria-label="Delete"
+          color="negative"
         ></q-btn>
       </q-card-actions>
     </q-card>
