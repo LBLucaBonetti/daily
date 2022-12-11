@@ -1,3 +1,4 @@
+import { refreshPage } from 'src/utils/refresh-page';
 import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
@@ -6,14 +7,14 @@ const routes: RouteRecordRaw[] = [
     component: () =>
       import('layouts/MainLayout.vue')
         .then((mainLayout) => mainLayout)
-        .catch(() => (window.location.href = '/')),
+        .catch(refreshPage),
     children: [
       {
         path: '',
         component: () =>
           import('pages/IndexPage.vue')
             .then((indexPage) => indexPage)
-            .catch(() => (window.location.href = '/')),
+            .catch(refreshPage),
       },
     ],
   },
@@ -25,7 +26,7 @@ const routes: RouteRecordRaw[] = [
     component: () =>
       import('pages/ErrorNotFound.vue')
         .then((errorNotFound) => errorNotFound)
-        .catch(() => (window.location.href = '/')),
+        .catch(refreshPage),
   },
 ];
 
