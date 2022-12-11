@@ -1,4 +1,4 @@
-export interface InfoDto {
+export default interface InfoDto {
   fullName: string;
   email: string;
 }

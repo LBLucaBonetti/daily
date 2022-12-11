@@ -12,8 +12,8 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () =>
-          import('pages/IndexPage.vue')
-            .then((indexPage) => indexPage)
+          import('src/pages/NotesPage.vue')
+            .then((notesPage) => notesPage)
             .catch(refreshPage),
       },
     ],

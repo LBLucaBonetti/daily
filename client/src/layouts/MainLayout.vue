@@ -56,7 +56,7 @@ import { heroOutline24Bars3 } from 'quasar-extras-svg-icons/hero-icons-v2';
 import { api } from 'src/boot/axios';
 import { AxiosResponse } from 'axios';
 import LogoutButton from 'components/LogoutButton.vue';
-import { InfoDto } from 'src/interfaces/InfoDto';
+import InfoDto from 'src/interfaces/InfoDto';
 import { refreshPage } from 'src/utils/refresh-page';
 
 const leftDrawerOpen = ref(false);

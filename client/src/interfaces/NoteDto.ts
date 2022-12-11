@@ -1,4 +1,4 @@
-export interface NoteDto {
+export default interface NoteDto {
   uuid: string;
   text: string;
 }

@@ -51,9 +51,9 @@ import { QBtn, QInfiniteScroll, QInput, useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
 import { ref } from 'vue';
 import NoteCard from '../components/NoteCard.vue';
-import { NoteDto } from 'src/interfaces/NoteDto';
+import NoteDto from 'src/interfaces/NoteDto';
 import { validateNote } from 'src/validators/note-validator';
-import { PageDto } from 'src/interfaces/PageDto';
+import PageDto from 'src/interfaces/PageDto';
 import { refreshPage } from 'src/utils/refresh-page';
 
 const note = ref('');

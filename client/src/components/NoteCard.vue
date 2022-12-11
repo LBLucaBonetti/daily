@@ -77,7 +77,7 @@ import {
   useQuasar,
 } from 'quasar';
 import { api } from 'src/boot/axios';
-import { NoteDto } from 'src/interfaces/NoteDto';
+import NoteDto from 'src/interfaces/NoteDto';
 import { PropType, ref } from 'vue';
 import { validateNote } from 'src/validators/note-validator';
 import { refreshPage } from 'src/utils/refresh-page';
