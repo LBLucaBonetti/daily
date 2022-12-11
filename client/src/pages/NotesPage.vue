@@ -46,8 +46,15 @@
 </template>
 
 <script setup lang="ts">
-import { AxiosResponse } from 'axios';
-import { QBtn, QInfiniteScroll, QInput, useQuasar } from 'quasar';
+import { AxiosError, AxiosResponse } from 'axios';
+import {
+  QBtn,
+  QInfiniteScroll,
+  QInput,
+  QPage,
+  QSpinner,
+  useQuasar,
+} from 'quasar';
 import { api } from 'src/boot/axios';
 import { ref } from 'vue';
 import NoteCard from '../components/NoteCard.vue';
@@ -55,6 +62,7 @@ import NoteDto from 'src/interfaces/NoteDto';
 import { validateNote } from 'src/validators/note-validator';
 import PageDto from 'src/interfaces/PageDto';
 import { refreshPage } from 'src/utils/refresh-page';
+import { isAxios401 } from 'src/utils/is-axios-401';
 
 const note = ref('');
 const noteInput = ref<QInput | null>(null);
@@ -94,8 +102,8 @@ async function saveNote() {
       // Set focus back to input
       noteInput.value.focus();
     }
-  } catch (err: any) {
-    if (err.response?.status === 401) {
+  } catch (err) {
+    if (isAxios401(err)) {
       refreshPage();
       return;
     }
@@ -132,8 +140,8 @@ function onLoad(index: number, done: () => void) {
         infiniteScroll.value.stop();
       }
     })
-    .catch((err) => {
-      if (err.response?.status === 401) {
+    .catch((err: Error | AxiosError) => {
+      if (isAxios401(err)) {
         refreshPage();
         return;
       }

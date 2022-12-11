@@ -58,6 +58,20 @@ import { AxiosResponse } from 'axios';
 import LogoutButton from 'components/LogoutButton.vue';
 import InfoDto from 'src/interfaces/InfoDto';
 import { refreshPage } from 'src/utils/refresh-page';
+import {
+  QLayout,
+  QHeader,
+  QToolbar,
+  QBtn,
+  QToolbarTitle,
+  QDrawer,
+  QList,
+  QItemLabel,
+  QItem,
+  QPageContainer,
+} from 'quasar';
+import { isAxios401 } from 'src/utils/is-axios-401';
+import { RouterView } from 'vue-router';
 
 const leftDrawerOpen = ref(false);
 
@@ -76,9 +90,8 @@ onMounted(() => {
       email.value = res.data.email;
     })
     .catch((err) => {
-      if (err.response?.status === 401) {
+      if (isAxios401(err)) {
         refreshPage();
-        return;
       }
     });
 });

@@ -81,6 +81,7 @@ import NoteDto from 'src/interfaces/NoteDto';
 import { PropType, ref } from 'vue';
 import { validateNote } from 'src/validators/note-validator';
 import { refreshPage } from 'src/utils/refresh-page';
+import { isAxios401 } from 'src/utils/is-axios-401';
 
 const $q = useQuasar();
 const noteDeleteBtnLoading = ref(false);
@@ -123,8 +124,8 @@ async function deleteNote(noteDtoWithUuid: NoteDto) {
       // Reload notes
       emit('reloadNotes');
     }
-  } catch (err: any) {
-    if (err.response?.status === 401) {
+  } catch (err) {
+    if (isAxios401(err)) {
       refreshPage();
       return;
     }
@@ -177,8 +178,8 @@ async function confirmUpdateNote() {
       noteTextUpdate.value = '';
       noteUuidUpdate.value = '';
     }
-  } catch (err: any) {
-    if (err.response?.status === 401) {
+  } catch (err) {
+    if (isAxios401(err)) {
       refreshPage();
       return;
     }

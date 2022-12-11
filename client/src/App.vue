@@ -5,6 +5,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { api } from './boot/axios';
+import { isAxios401 } from './utils/is-axios-401';
+import { refreshPage } from './utils/refresh-page';
 
 export default defineComponent({
   name: 'App',
@@ -18,9 +20,8 @@ export default defineComponent({
   methods: {
     onFocus() {
       api.get('/appusers/info').catch((err) => {
-        if (err.response?.status === 401) {
-          window.location.href = '/';
-          return;
+        if (isAxios401(err)) {
+          refreshPage();
         }
       });
     },
