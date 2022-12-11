@@ -10,7 +10,7 @@
       placeholder="Write something here, then save it"
       counter
       maxlength="255"
-      :rules="[noteValidation]"
+      :rules="[validateNote]"
       lazy-rules="ondemand"
       ref="noteInput"
     >
@@ -52,8 +52,9 @@ import { api } from 'src/boot/axios';
 import { ref } from 'vue';
 import NoteCard from '../components/NoteCard.vue';
 import { NoteDto } from 'src/interfaces/NoteDto';
-import { noteValidation } from 'src/validators/NoteValidator';
+import { validateNote } from 'src/validators/note-validator';
 import { PageDto } from 'src/interfaces/PageDto';
+import { refreshPage } from 'src/utils/refresh-page';
 
 const note = ref('');
 const noteInput = ref<QInput | null>(null);
@@ -95,7 +96,7 @@ async function saveNote() {
     }
   } catch (err: any) {
     if (err.response?.status === 401) {
-      window.location.href = '/';
+      refreshPage();
       return;
     }
     $q.notify({
@@ -133,7 +134,7 @@ function onLoad(index: number, done: () => void) {
     })
     .catch((err) => {
       if (err.response?.status === 401) {
-        window.location.href = '/';
+        refreshPage();
         return;
       }
       $q.notify({

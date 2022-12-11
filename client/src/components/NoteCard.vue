@@ -39,7 +39,7 @@
           min-height="15rem"
           counter
           maxlength="255"
-          :rules="[noteValidation]"
+          :rules="[validateNote]"
           lazy-rules="ondemand"
           ref="noteUpdateInput"
         >
@@ -79,7 +79,8 @@ import {
 import { api } from 'src/boot/axios';
 import { NoteDto } from 'src/interfaces/NoteDto';
 import { PropType, ref } from 'vue';
-import { noteValidation } from 'src/validators/NoteValidator';
+import { validateNote } from 'src/validators/note-validator';
+import { refreshPage } from 'src/utils/refresh-page';
 
 const $q = useQuasar();
 const noteDeleteBtnLoading = ref(false);
@@ -124,7 +125,7 @@ async function deleteNote(noteDtoWithUuid: NoteDto) {
     }
   } catch (err: any) {
     if (err.response?.status === 401) {
-      window.location.href = '/';
+      refreshPage();
       return;
     }
     $q.notify({
@@ -178,7 +179,7 @@ async function confirmUpdateNote() {
     }
   } catch (err: any) {
     if (err.response?.status === 401) {
-      window.location.href = '/';
+      refreshPage();
       return;
     }
     $q.notify({

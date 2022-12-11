@@ -57,6 +57,7 @@ import { api } from 'src/boot/axios';
 import { AxiosResponse } from 'axios';
 import LogoutButton from 'components/LogoutButton.vue';
 import { InfoDto } from 'src/interfaces/InfoDto';
+import { refreshPage } from 'src/utils/refresh-page';
 
 const leftDrawerOpen = ref(false);
 
@@ -76,7 +77,7 @@ onMounted(() => {
     })
     .catch((err) => {
       if (err.response?.status === 401) {
-        window.location.href = '/';
+        refreshPage();
         return;
       }
     });

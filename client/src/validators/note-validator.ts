@@ -1,4 +1,4 @@
-export function noteValidation(note: string) {
+export function validateNote(note: string) {
   return !note ||
     note === '' ||
     note.replaceAll(' ', '').replaceAll('\n', '') === ''
