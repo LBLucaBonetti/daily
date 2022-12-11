@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh Lpr lfr">
+  <q-layout view="hHh Lpr lfr" class="bg-1">
     <q-header bordered class="bg-1">
       <q-toolbar>
         <q-btn
@@ -38,19 +38,7 @@
             }}</q-item-label>
           </div>
           <div>
-            <q-btn
-              flat
-              dense
-              :ripple="false"
-              @click="logout()"
-              :icon="heroOutline24ArrowRightOnRectangle"
-            ></q-btn>
-            <form
-              hidden
-              :id="logoutFormId"
-              method="post"
-              action="/logout"
-            ></form>
+            <logout-button />
           </div>
         </q-item>
       </q-list>
@@ -64,58 +52,46 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import {
-  heroOutline24Bars3,
-  heroOutline24ArrowRightOnRectangle,
-} from 'quasar-extras-svg-icons/hero-icons-v2';
-import { Cookies } from 'quasar';
+import { heroOutline24Bars3 } from 'quasar-extras-svg-icons/hero-icons-v2';
 import { api } from 'src/boot/axios';
 import { AxiosResponse } from 'axios';
+import LogoutButton from 'components/LogoutButton.vue';
+import InfoDto from 'src/interfaces/InfoDto';
+import { refreshPage } from 'src/utils/refresh-page';
+import {
+  QLayout,
+  QHeader,
+  QToolbar,
+  QBtn,
+  QToolbarTitle,
+  QDrawer,
+  QList,
+  QItemLabel,
+  QItem,
+  QPageContainer,
+} from 'quasar';
+import { isAxios401 } from 'src/utils/is-axios-401';
+import { RouterView } from 'vue-router';
 
 const leftDrawerOpen = ref(false);
-const logoutFormId = 'logout-form';
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 
-function logout() {
-  // Get the hidden form
-  const form = document.getElementById(logoutFormId) as HTMLFormElement;
-  // Add the CSRF token
-  const csrf = document.createElement('input');
-  csrf.setAttribute('id', 'csrf-token');
-  csrf.setAttribute('type', 'hidden');
-  csrf.setAttribute('name', '_csrf');
-  // Append it to the form
-  form.appendChild(csrf);
-
-  const cookieCsrf = Cookies.get('XSRF-TOKEN');
-  if (cookieCsrf) {
-    csrf.setAttribute('value', cookieCsrf);
-  }
-  // Submit the form, effectively logout
-  form.submit();
-}
-
 const fullName = ref('');
 const email = ref('');
 
-interface Info {
-  fullName: string;
-  email: string;
-}
 onMounted(() => {
   api
     .get('/appusers/info')
-    .then((res: AxiosResponse<Info>) => {
+    .then((res: AxiosResponse<InfoDto>) => {
       fullName.value = res.data.fullName;
       email.value = res.data.email;
     })
     .catch((err) => {
-      if (err.response?.status === 401) {
-        window.location.href = window.location.href;
-        return;
+      if (isAxios401(err)) {
+        refreshPage();
       }
     });
 });
