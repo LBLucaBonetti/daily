@@ -47,8 +47,8 @@ jobs:
           TEST_SPRING_DATASOURCE_URL: ${{ secrets.TEST_SPRING_DATASOURCE_URL }}
           TEST_SPRING_DATASOURCE_USERNAME: ${{ secrets.TEST_SPRING_DATASOURCE_USERNAME }}
           TEST_SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_SPRING_DATASOURCE_PASSWORD }}
-          OKTA_OAUTH2_CLIENT_SECRET: ${{ secrets.OKTA_OAUTH2_CLIENT_SECRET }}
-          OKTA_OAUTH2_POSTLOGOUTREDIRECTURI: ${{ secrets.OKTA_OAUTH2_POSTLOGOUTREDIRECTURI }}
+          GOOGLE_OAUTH2_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}
+          GOOGLE_OAUTH2_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=LBLucaBonetti_daily_be -Dsonar.projectName=daily-backend
       - name: Set up Node
         uses: actions/setup-node@v3
