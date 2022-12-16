@@ -15,6 +15,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
 
+  private static final String LOGIN_PAGE = "/oauth2/authorization/google";
+  private static final String LOGOUT_SUCCESS_URL = "https://www.google.com";
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // CSRF configuration
@@ -30,10 +33,10 @@ public class WebSecurityConfiguration {
         // display index.html due to the ErrorConfiguration controller handling the requests. Making
         // a GET to /oauth2/authorization/{oauth2-provider-name} by entering the URL in the browser
         // will simply do a new "authorization dance"
-        .loginPage("/oauth2/authorization/google")
+        .loginPage(LOGIN_PAGE)
         .and()
         .logout()
-        .logoutSuccessUrl("https://www.google.com");
+        .logoutSuccessUrl(LOGOUT_SUCCESS_URL);
     http.exceptionHandling()
         .defaultAuthenticationEntryPointFor(
             new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
