@@ -23,6 +23,7 @@
     <org.jacoco.version>0.8.8</org.jacoco.version>
     <com.github.eirslett.version>1.12.1</com.github.eirslett.version>
     <testcontainers.version>1.17.6</testcontainers.version>
+    <spring-security.version>5.8.0</spring-security.version>
   </properties>
   <dependencies>
     <dependency>
