@@ -1,15 +1,16 @@
 package it.lbsoftware.daily.bases;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,8 +21,16 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 public abstract class BaseEntity {
 
+  private static final String HIBERNATE_SEQUENCE =
+      "hibernate_sequence"; // Matches the sequence name specified in the initial migration
+
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = HIBERNATE_SEQUENCE)
+  @SequenceGenerator(
+      name = HIBERNATE_SEQUENCE,
+      initialValue = 1,
+      sequenceName = HIBERNATE_SEQUENCE,
+      allocationSize = 50)
   protected Long id;
 
   @Column(updatable = false, nullable = false, unique = true)
@@ -48,8 +57,7 @@ public abstract class BaseEntity {
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;
-    if (!(obj instanceof BaseEntity)) return false;
-    BaseEntity that = (BaseEntity) obj;
+    if (!(obj instanceof BaseEntity that)) return false;
     return getId() != null && Objects.equals(getId(), that.getId());
   }
 }

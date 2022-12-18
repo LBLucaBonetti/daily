@@ -2,9 +2,9 @@ package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
+import jakarta.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

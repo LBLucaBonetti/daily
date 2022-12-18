@@ -30,7 +30,8 @@ public class WebSecurityConfiguration {
             csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(requestHandler));
     // Authorization & authentication
-    http.authorizeHttpRequests(authz -> authz.anyRequest().authenticated());
+    http.authorizeHttpRequests(
+        authorizeHttpRequests -> authorizeHttpRequests.anyRequest().authenticated());
     // OAuth2 login
     http.oauth2Login()
         .successHandler(new SimpleUrlAuthenticationSuccessHandler("/"))
