@@ -11,7 +11,7 @@ class DailyApplicationIntegrationTests extends DailyAbstractIntegrationTests {
   @Test
   @DisplayName("Should not throw when the application starts")
   void test1() {
-    DailyApplication.main(new String[] {"--spring.profiles.active=test,okta"});
+    DailyApplication.main(new String[] {"--spring.profiles.active=test,oauth2"});
     assertTrue(true);
   }
 }

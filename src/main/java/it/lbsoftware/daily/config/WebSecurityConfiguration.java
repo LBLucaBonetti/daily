@@ -9,28 +9,42 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
 
+  private static final String LOGIN_PAGE = "/oauth2/authorization/google";
+  private static final String LOGOUT_SUCCESS_URL = "https://www.google.com";
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // CSRF configuration
-    http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+    CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+    // Set the name of the attribute the CsrfToken will be populated on
+    requestHandler.setCsrfRequestAttributeName(null);
+    http.csrf(
+        csrf ->
+            csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(requestHandler));
     // Authorization & authentication
-    http.authorizeRequests().anyRequest().authenticated();
+    http.authorizeHttpRequests(
+        authorizeHttpRequests -> authorizeHttpRequests.anyRequest().authenticated());
     // OAuth2 login
     http.oauth2Login()
         .successHandler(new SimpleUrlAuthenticationSuccessHandler("/"))
         // Overriding the login page avoids the automatically generated Spring Security login page
-        // rendered to the /login endpoint which would show the Okta link to authenticate; the
-        // /login, the /logout and the /login?logout endpoints will silently display index.html due
-        // to the ErrorConfiguration controller handling the requests. Making a GET to
-        // /oauth2/authorization/okta by entering the URL in the browser will simply do a new
-        // "authorization dance"
-        .loginPage("/oauth2/authorization/okta");
+        // rendered to the /login endpoint which would show the OAuth2 provider link to
+        // authenticate; the /login, the /logout and the /login?logout endpoints will silently
+        // display index.html due to the ErrorConfiguration controller handling the requests. Making
+        // a GET to /oauth2/authorization/{oauth2-provider-name} by entering the URL in the browser
+        // will simply do a new "authorization dance"
+        .loginPage(LOGIN_PAGE)
+        .and()
+        .logout()
+        .logoutSuccessUrl(LOGOUT_SUCCESS_URL);
     http.exceptionHandling()
         .defaultAuthenticationEntryPointFor(
             new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),

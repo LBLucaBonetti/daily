@@ -4,7 +4,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles({"test", "okta"})
+@ActiveProfiles({"test", "oauth2"})
 @TestMethodOrder(MethodOrderer.Random.class)
 public sealed class DailyAbstractTests
     permits DailyAbstractIntegrationTests, DailyAbstractUnitTests {}
