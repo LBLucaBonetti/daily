@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.bases.BaseEntity;
+import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.notes.Note;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,7 +32,7 @@ import lombok.Setter;
 @Builder
 public class Tag extends BaseEntity {
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = Constants.TAG_NAME_MAX)
   @NotBlank
   /*
    Display name for this tag
