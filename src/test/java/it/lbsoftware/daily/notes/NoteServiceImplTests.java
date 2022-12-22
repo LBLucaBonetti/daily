@@ -13,6 +13,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagService;
 import java.util.Collections;
@@ -489,5 +491,33 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should throw when read note tags with null argument")
   void test25(UUID uuid, String appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.readNoteTags(uuid, appUser));
+  }
+
+  @Test
+  @DisplayName("Should not add tag to note because of note tag limits and throw")
+  void test26() {
+    // Given
+    Note note = createNote(TEXT, new HashSet<>(), APP_USER);
+    Optional<Note> noteOptional = Optional.of(note);
+    Optional<Tag> tagOptional = Optional.of(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    UUID uuid = UUID.randomUUID();
+    UUID tagUuid = UUID.randomUUID();
+    given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
+    given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
+    createTag("name1", "#123456", new HashSet<>(), APP_USER).addToNote(note);
+    createTag("name2", "#234567", new HashSet<>(), APP_USER).addToNote(note);
+    createTag("name3", "#345678", new HashSet<>(), APP_USER).addToNote(note);
+    createTag("name4", "#456789", new HashSet<>(), APP_USER).addToNote(note);
+    createTag("name5", "#567890", new HashSet<>(), APP_USER).addToNote(note);
+
+    // When
+    DailyException res =
+        assertThrows(DailyException.class, () -> noteService.addTagToNote(uuid, tagUuid, APP_USER));
+
+    // Then
+    verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
+    verify(noteRepository, times(0)).save(any());
+    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getMessage());
   }
 }
