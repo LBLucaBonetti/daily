@@ -15,6 +15,8 @@ import static org.mockito.Mockito.verify;
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
@@ -338,9 +340,8 @@ class NoteControllerTests extends DailyAbstractUnitTests {
       "Should not read notes because of wrong note field name as sort parameter and return bad request")
   void test15() {
     // Given
-    ResponseStatusException responseStatusException =
-        new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    given(noteService.readNotes(pageable, APP_USER)).willThrow(responseStatusException);
+    RuntimeException runtimeException = new RuntimeException();
+    given(noteService.readNotes(pageable, APP_USER)).willThrow(runtimeException);
 
     // When
     ResponseStatusException res =
@@ -349,5 +350,27 @@ class NoteControllerTests extends DailyAbstractUnitTests {
 
     // Then
     assertNotNull(res);
+    assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+  }
+
+  @Test
+  @DisplayName("Should not add tag to note because of note tag limits and return conflict")
+  void test16() {
+    // Given
+    UUID uuid = UUID.randomUUID();
+    UUID tagUuid = UUID.randomUUID();
+    DailyException dailyException = new DailyException(Constants.ERROR_NOTE_TAGS_MAX);
+    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willThrow(dailyException);
+
+    // When
+    ResponseStatusException res =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> noteController.addTagToNote(uuid, tagUuid, appUser));
+
+    // Then
+    assertNotNull(res);
+    assertEquals(HttpStatus.CONFLICT, res.getStatusCode());
+    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getReason());
   }
 }

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.bases.PageDto;
+import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
@@ -1003,7 +1004,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
     // When
 
-    Exception res =
+    var res =
         mockMvc
             .perform(
                 get(BASE_URL)
@@ -1011,11 +1012,49 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                     .param("sort", nonexistentField)
                     .with(loginOf(APP_USER)))
             .andExpect(status().isBadRequest())
+            .andReturn();
+
+    // Then
+    assertTrue(res.getResolvedException() instanceof ResponseStatusException);
+  }
+
+  @Test
+  @DisplayName("Should not add tag to note because of note tag limits and return conflict")
+  void test56() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
+    UUID uuid = note.getUuid();
+    UUID tagUuid =
+        tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER)).getUuid();
+    // Reach the max number of tags for this note
+    for (Tag tag :
+        List.of(
+            tagRepository.save(createTag("name1", "#123456", new HashSet<>(), APP_USER)),
+            tagRepository.save(createTag("name2", "#234567", new HashSet<>(), APP_USER)),
+            tagRepository.save(createTag("name3", "#345678", new HashSet<>(), APP_USER)),
+            tagRepository.save(createTag("name4", "#456789", new HashSet<>(), APP_USER)),
+            tagRepository.save(createTag("name5", "#567890", new HashSet<>(), APP_USER)))) {
+      mockMvc.perform(
+          put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tag.getUuid())
+              .contentType(MediaType.APPLICATION_JSON)
+              .with(csrf())
+              .with(loginOf(APP_USER)));
+    }
+
+    // When
+    var res =
+        mockMvc
+            .perform(
+                put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(csrf())
+                    .with(loginOf(APP_USER)))
+            .andExpect(status().isConflict())
             .andReturn()
             .getResolvedException();
 
     // Then
     assertTrue(res instanceof ResponseStatusException);
-    assertNull(((ResponseStatusException) res).getReason());
+    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, ((ResponseStatusException) res).getReason());
   }
 }
