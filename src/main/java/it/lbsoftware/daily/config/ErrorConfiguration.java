@@ -17,9 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("${server.error.path}")
 class ErrorConfiguration implements ErrorController {
 
-  private static final String ERROR_KEY = "error";
-  private static final String ERROR_DEFAULT = "error.default";
-
   @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
   public String handleError(HttpServletResponse httpServletResponse) {
     // Change response status code to avoid having the error popping up in the browser console.
@@ -33,7 +30,7 @@ class ErrorConfiguration implements ErrorController {
     HttpStatus status = getStatus(request);
     String error = getError(request);
 
-    return new ResponseEntity<>(Map.of(ERROR_KEY, error), status);
+    return new ResponseEntity<>(Map.of(Constants.ERROR_KEY, error), status);
   }
 
   private HttpStatus getStatus(HttpServletRequest request) {
@@ -53,6 +50,6 @@ class ErrorConfiguration implements ErrorController {
         .filter(String.class::isInstance)
         .map(String.class::cast)
         .filter(StringUtils::isNotBlank)
-        .orElse(ERROR_DEFAULT);
+        .orElse(Constants.ERROR_DEFAULT);
   }
 }
