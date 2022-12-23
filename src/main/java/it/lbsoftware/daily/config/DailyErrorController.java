@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("${server.error.path}")
-class ErrorConfiguration implements ErrorController {
+class DailyErrorController implements ErrorController {
 
   @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
   public String handleError(HttpServletResponse httpServletResponse) {

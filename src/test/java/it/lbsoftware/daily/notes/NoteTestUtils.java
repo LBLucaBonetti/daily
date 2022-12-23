@@ -28,11 +28,11 @@ public final class NoteTestUtils {
    * Note generator; the created instance is not persisted
    *
    * @param text
-   * @param tagSet
+   * @param tags
    * @param appUser
    * @return The created Note
    */
-  public static Note createNote(final String text, final Set<Tag> tagSet, final String appUser) {
-    return Note.builder().text(text).tagSet(tagSet).appUser(appUser).build();
+  public static Note createNote(final String text, final Set<Tag> tags, final String appUser) {
+    return Note.builder().text(text).tags(tags).appUser(appUser).build();
   }
 }

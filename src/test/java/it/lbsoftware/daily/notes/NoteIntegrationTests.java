@@ -497,15 +497,15 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   }
 
   @Test
-  @DisplayName("Should not delete tag and should remove note from tag noteSet when delete note")
+  @DisplayName("Should not delete tag and should remove note from tag notes when delete note")
   void test29() throws Exception {
     // Given
     Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
     Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
     tag.addToNote(note);
     noteRepository.save(note);
-    assertTrue(note.getTagSet().contains(tag));
-    assertTrue(tag.getNoteSet().contains(note));
+    assertTrue(note.getTags().contains(tag));
+    assertTrue(tag.getNotes().contains(note));
 
     // When
     mockMvc
@@ -523,7 +523,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         tagRepository
             .findByUuidAndAppUserFetchNotes(tag.getUuid(), APP_USER)
             .get()
-            .getNoteSet()
+            .getNotes()
             .isEmpty());
   }
 
@@ -685,10 +685,10 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     Note note = noteRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER).get();
     Tag tag = tagRepository.findByUuidAndAppUserFetchNotes(tagUuid, APP_USER).get();
-    assertEquals(1, note.getTagSet().size());
-    assertTrue(note.getTagSet().contains(tag));
-    assertEquals(1, tag.getNoteSet().size());
-    assertTrue(tag.getNoteSet().contains(note));
+    assertEquals(1, note.getTags().size());
+    assertTrue(note.getTags().contains(tag));
+    assertEquals(1, tag.getNotes().size());
+    assertTrue(tag.getNotes().contains(note));
   }
 
   @Test
@@ -818,8 +818,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
     tag.addToNote(note);
     noteRepository.save(note);
-    assertTrue(note.getTagSet().contains(tag));
-    assertTrue(tag.getNoteSet().contains(note));
+    assertTrue(note.getTags().contains(tag));
+    assertTrue(tag.getNotes().contains(note));
 
     // When
     mockMvc
@@ -833,10 +833,10 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     note = noteRepository.findByUuidAndAppUserFetchTags(note.getUuid(), APP_USER).get();
     tag = tagRepository.findByUuidAndAppUserFetchNotes(tag.getUuid(), APP_USER).get();
-    assertEquals(0, note.getTagSet().size());
-    assertFalse(note.getTagSet().contains(tag));
-    assertEquals(0, tag.getNoteSet().size());
-    assertFalse(tag.getNoteSet().contains(note));
+    assertEquals(0, note.getTags().size());
+    assertFalse(note.getTags().contains(tag));
+    assertEquals(0, tag.getNotes().size());
+    assertFalse(tag.getNotes().contains(note));
   }
 
   @Test

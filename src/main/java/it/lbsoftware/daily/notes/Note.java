@@ -49,7 +49,7 @@ public class Note extends BaseEntity {
   /*
    Tags set for this note
   */
-  private Set<Tag> tagSet = new HashSet<>();
+  private Set<Tag> tags = new HashSet<>();
 
   @Column(name = "app_user", nullable = false)
   @NotBlank
