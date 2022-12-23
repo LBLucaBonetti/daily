@@ -21,16 +21,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-@DisplayName("ErrorConfiguration unit tests")
-class ErrorConfigurationTests extends DailyAbstractUnitTests {
+@DisplayName("DailyErrorController unit tests")
+class DailyErrorControllerTests extends DailyAbstractUnitTests {
 
   private static final String ERROR_KEY = "error";
   private static final String ERROR_DEFAULT = "error.default";
-  private ErrorConfiguration errorConfiguration;
+  private DailyErrorController dailyErrorController;
 
   @BeforeEach
   void beforeEach() {
-    errorConfiguration = new ErrorConfiguration();
+    dailyErrorController = new DailyErrorController();
   }
 
   @Test
@@ -40,7 +40,7 @@ class ErrorConfigurationTests extends DailyAbstractUnitTests {
     HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
 
     // When
-    String res = errorConfiguration.handleError(httpServletResponse);
+    String res = dailyErrorController.handleError(httpServletResponse);
 
     // Then
     verify(httpServletResponse, times(1)).setStatus(HttpServletResponse.SC_OK);
@@ -57,7 +57,7 @@ class ErrorConfigurationTests extends DailyAbstractUnitTests {
         .willReturn(HttpStatus.BAD_REQUEST.value());
 
     // When
-    ResponseEntity<Map<String, Object>> res = errorConfiguration.handleError(httpServletRequest);
+    ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
 
     // Then
     assertNotNull(res);
@@ -74,7 +74,7 @@ class ErrorConfigurationTests extends DailyAbstractUnitTests {
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).willReturn(null);
 
     // When
-    ResponseEntity<Map<String, Object>> res = errorConfiguration.handleError(httpServletRequest);
+    ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
 
     // Then
     assertNotNull(res);
@@ -91,7 +91,7 @@ class ErrorConfigurationTests extends DailyAbstractUnitTests {
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).willReturn(-1);
 
     // When
-    ResponseEntity<Map<String, Object>> res = errorConfiguration.handleError(httpServletRequest);
+    ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
 
     // Then
     assertNotNull(res);
@@ -112,7 +112,7 @@ class ErrorConfigurationTests extends DailyAbstractUnitTests {
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_MESSAGE)).willReturn(error);
 
     // When
-    ResponseEntity<Map<String, Object>> res = errorConfiguration.handleError(httpServletRequest);
+    ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
 
     // Then
     assertNotNull(res);
@@ -132,7 +132,7 @@ class ErrorConfigurationTests extends DailyAbstractUnitTests {
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_MESSAGE)).willReturn(error);
 
     // When
-    ResponseEntity<Map<String, Object>> res = errorConfiguration.handleError(httpServletRequest);
+    ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
 
     // Then
     assertNotNull(res);
@@ -152,7 +152,7 @@ class ErrorConfigurationTests extends DailyAbstractUnitTests {
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_MESSAGE)).willReturn(errorKey);
 
     // When
-    ResponseEntity<Map<String, Object>> res = errorConfiguration.handleError(httpServletRequest);
+    ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
 
     // Then
     assertNotNull(res);

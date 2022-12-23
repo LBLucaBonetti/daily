@@ -38,9 +38,9 @@ public class WebSecurityConfiguration {
         // Overriding the login page avoids the automatically generated Spring Security login page
         // rendered to the /login endpoint which would show the OAuth2 provider link to
         // authenticate; the /login, the /logout and the /login?logout endpoints will silently
-        // display index.html due to the ErrorConfiguration controller handling the requests. Making
-        // a GET to /oauth2/authorization/{oauth2-provider-name} by entering the URL in the browser
-        // will simply do a new "authorization dance"
+        // display index.html due to the DailyErrorController handling the requests. Making a GET to
+        // /oauth2/authorization/{oauth2-provider-name} by entering the URL in the browser will
+        // simply do a new "authorization dance"
         .loginPage(LOGIN_PAGE)
         .and()
         .logout()
