@@ -55,8 +55,8 @@ public class TagServiceImpl implements TagService {
       return false;
     }
     Tag tag = tagOptional.get();
-    for (Note note : tag.getNoteSet()) {
-      note.getTagSet().remove(tag);
+    for (Note note : tag.getNotes()) {
+      note.getTags().remove(tag);
     }
     tagRepository.delete(tag);
 

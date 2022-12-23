@@ -36,7 +36,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
    * @return Found note or empty value
    */
   @Query(
-      "select n from Note n left join fetch n.tagSet where n.uuid = :uuid and n.appUser = :appUser")
+      "select n from Note n left join fetch n.tags where n.uuid = :uuid and n.appUser = :appUser")
   Optional<Note> findByUuidAndAppUserFetchTags(
       @Param("uuid") UUID uuid, @Param("appUser") String appUser);
 }

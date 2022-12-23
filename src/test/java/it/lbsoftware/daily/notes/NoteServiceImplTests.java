@@ -331,8 +331,8 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagService, times(1)).readTag(tagUuid, APP_USER);
     verify(noteRepository, times(1)).save(note);
-    assertTrue(note.getTagSet().contains(tag));
-    assertTrue(tag.getNoteSet().contains(note));
+    assertTrue(note.getTags().contains(tag));
+    assertTrue(tag.getNotes().contains(note));
     assertEquals(Boolean.TRUE, res);
   }
 
@@ -396,8 +396,8 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagService, times(1)).readTag(tagUuid, APP_USER);
     verify(noteRepository, times(1)).save(note);
-    assertFalse(note.getTagSet().contains(tag));
-    assertFalse(tag.getNoteSet().contains(note));
+    assertFalse(note.getTags().contains(tag));
+    assertFalse(tag.getNotes().contains(note));
     assertEquals(Boolean.TRUE, res);
   }
 
@@ -421,8 +421,8 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should read note tags and return tag set optional")
   void test17() {
     // Given
-    Set<Tag> tagSet = Set.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
-    Optional<Note> noteOptional = Optional.of(createNote(TEXT, tagSet, APP_USER));
+    Set<Tag> tags = Set.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    Optional<Note> noteOptional = Optional.of(createNote(TEXT, tags, APP_USER));
     UUID uuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER)).willReturn(noteOptional);
 
@@ -431,7 +431,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUserFetchTags(uuid, APP_USER);
-    assertEquals(Optional.of(tagSet), res);
+    assertEquals(Optional.of(tags), res);
   }
 
   @ParameterizedTest

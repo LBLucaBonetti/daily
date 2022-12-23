@@ -78,7 +78,7 @@ public class NoteServiceImpl implements NoteService {
     }
     Note note = noteOptional.get();
     Tag tag = tagOptional.get();
-    if (note.getTagSet().size() >= Constants.NOTE_TAGS_MAX) {
+    if (note.getTags().size() >= Constants.NOTE_TAGS_MAX) {
       throw new DailyException(Constants.ERROR_NOTE_TAGS_MAX);
     }
     tag.addToNote(note);
@@ -115,6 +115,6 @@ public class NoteServiceImpl implements NoteService {
     }
     Note note = noteOptional.get();
 
-    return Optional.of(note.getTagSet());
+    return Optional.of(note.getTags());
   }
 }

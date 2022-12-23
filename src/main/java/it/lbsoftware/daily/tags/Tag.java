@@ -47,12 +47,12 @@ public class Tag extends BaseEntity {
   */
   private String colorHex;
 
-  @ManyToMany(mappedBy = "tagSet")
+  @ManyToMany(mappedBy = "tags")
   @Builder.Default
   /*
    Notes set with this tag
   */
-  private Set<Note> noteSet = new HashSet<>();
+  private Set<Note> notes = new HashSet<>();
 
   @Column(name = "app_user", nullable = false)
   @NotBlank
@@ -67,8 +67,8 @@ public class Tag extends BaseEntity {
    * @param note Note object to link
    */
   public void addToNote(Note note) {
-    note.getTagSet().add(this);
-    this.getNoteSet().add(note);
+    note.getTags().add(this);
+    this.getNotes().add(note);
   }
 
   /**
@@ -77,7 +77,7 @@ public class Tag extends BaseEntity {
    * @param note Note object to unlink
    */
   public void removeFromNote(Note note) {
-    note.getTagSet().remove(this);
-    this.getNoteSet().remove(note);
+    note.getTags().remove(this);
+    this.getNotes().remove(note);
   }
 }

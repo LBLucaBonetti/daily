@@ -528,15 +528,15 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   }
 
   @Test
-  @DisplayName("Should not delete note and should remove tag from note tagSet when delete tag")
+  @DisplayName("Should not delete note and should remove tag from note tags when delete tag")
   void test26() throws Exception {
     // Given
     Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
     Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
     tag.addToNote(note);
     noteRepository.save(note);
-    assertTrue(tag.getNoteSet().contains(note));
-    assertTrue(note.getTagSet().contains(tag));
+    assertTrue(tag.getNotes().contains(note));
+    assertTrue(note.getTags().contains(tag));
 
     // When
     mockMvc
@@ -554,7 +554,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
         noteRepository
             .findByUuidAndAppUserFetchTags(note.getUuid(), APP_USER)
             .get()
-            .getTagSet()
+            .getTags()
             .isEmpty());
   }
 
