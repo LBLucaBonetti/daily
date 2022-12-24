@@ -1,0 +1,5 @@
+FROM amazoncorretto:17-alpine
+RUN addgroup -S daily && adduser -S daily -G daily
+USER daily:daily
+COPY target/daily-*.jar daily.jar
+ENTRYPOINT ["java","-jar","/daily.jar"]
