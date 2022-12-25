@@ -19,7 +19,7 @@
           name="img:img/logo.svg"
           size="2rem"
         ></q-icon>
-        <q-toolbar-title class="poppins-regular text-1">
+        <q-toolbar-title class="poppins-regular text-1 non-selectable">
           daily
         </q-toolbar-title>
       </q-toolbar>
