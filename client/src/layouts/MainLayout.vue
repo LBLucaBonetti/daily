@@ -12,6 +12,13 @@
           @click="toggleLeftDrawer"
         />
 
+        <q-icon
+          class="logo"
+          tag="span"
+          right
+          name="img:img/logo.svg"
+          size="2rem"
+        ></q-icon>
         <q-toolbar-title class="poppins-regular text-1">
           daily
         </q-toolbar-title>
