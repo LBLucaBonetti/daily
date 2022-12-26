@@ -1,6 +1,6 @@
 # daily
 
-[daily](https://daily.up.railway.app/) is an app for organizing everyday life.
+[daily](https://trydaily.click) is an app for organizing everyday life.
 <br>
 Technically speaking, this is a "monorepo" with a Spring Boot backend and a Quasar (Vue.js)
 frontend.
