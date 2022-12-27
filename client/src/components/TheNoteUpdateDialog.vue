@@ -61,6 +61,7 @@ import { api } from 'src/boot/axios';
 import NoteDto from 'src/interfaces/NoteDto';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { refreshPage } from 'src/utils/refresh-page';
+import { notifyPosition } from 'src/utils/notify-position';
 
 const props = defineProps({
   note: { type: Object as PropType<NoteDto>, required: true },
@@ -98,7 +99,7 @@ async function onConfirmClick() {
     if (res.status === 204) {
       $q.notify({
         classes: 'q-px-lg',
-        position: 'top-right',
+        position: notifyPosition($q),
         progress: true,
         message: 'Note correctly saved',
         color: 'white',
@@ -117,7 +118,7 @@ async function onConfirmClick() {
     }
     $q.notify({
       classes: 'q-px-lg',
-      position: 'top-right',
+      position: notifyPosition($q),
       progress: true,
       message: 'Error saving note',
       color: 'white',

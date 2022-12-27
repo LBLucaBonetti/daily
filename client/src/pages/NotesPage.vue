@@ -63,6 +63,7 @@ import { validateNote } from 'src/validators/note-validator';
 import PageDto from 'src/interfaces/PageDto';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
+import { notifyPosition } from 'src/utils/notify-position';
 
 const note = ref('');
 const noteInput = ref<QInput | null>(null);
@@ -86,7 +87,7 @@ async function saveNote() {
     if (res.status === 201) {
       $q.notify({
         classes: 'q-px-lg',
-        position: 'top-right',
+        position: notifyPosition($q),
         progress: true,
         message: 'Note correctly saved',
         color: 'white',
@@ -109,7 +110,7 @@ async function saveNote() {
     }
     $q.notify({
       classes: 'q-px-lg',
-      position: 'top-right',
+      position: notifyPosition($q),
       progress: true,
       message: 'Error saving note',
       color: 'white',
@@ -147,7 +148,7 @@ function onLoad(index: number, done: () => void) {
       }
       $q.notify({
         classes: 'q-px-lg',
-        position: 'top-right',
+        position: notifyPosition($q),
         progress: true,
         message: 'Error loading notes',
         color: 'white',
