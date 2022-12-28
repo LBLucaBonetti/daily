@@ -37,9 +37,16 @@
       />
 
       <template v-slot:loading>
-        <div class="column q-pa-lg justify-center items-center content-center">
-          <q-spinner color="primary" size="3em" :thickness="2" />
-        </div>
+        <q-card class="q-mt-md bg-1 text-1" flat bordered>
+          <q-card-section class="q-pa-sm">
+            <q-skeleton type="text" class="note-skeleton-text"></q-skeleton>
+          </q-card-section>
+
+          <q-card-actions class="q-pa-sm" align="right">
+            <q-skeleton type="QBtn"></q-skeleton>
+            <q-skeleton type="QBtn" class="q-ml-sm"></q-skeleton>
+          </q-card-actions>
+        </q-card>
       </template>
     </q-infinite-scroll>
   </q-page>
@@ -52,7 +59,7 @@ import {
   QInfiniteScroll,
   QInput,
   QPage,
-  QSpinner,
+  QSkeleton,
   useQuasar,
 } from 'quasar';
 import { api } from 'src/boot/axios';
@@ -171,3 +178,9 @@ function reloadNotes() {
   infiniteScroll.value.trigger();
 }
 </script>
+
+<style>
+.note-skeleton-text {
+  min-height: 2.5rem;
+}
+</style>
