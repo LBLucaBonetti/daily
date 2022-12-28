@@ -37,9 +37,16 @@
       />
 
       <template v-slot:loading>
-        <div class="column q-pa-lg justify-center items-center content-center">
-          <q-spinner color="primary" size="3em" :thickness="2" />
-        </div>
+        <q-card class="q-mt-md bg-1 text-1" flat bordered>
+          <q-card-section class="q-pa-sm">
+            <q-skeleton type="text" class="note-skeleton-text"></q-skeleton>
+          </q-card-section>
+
+          <q-card-actions class="q-pa-sm" align="right">
+            <q-skeleton type="QBtn"></q-skeleton>
+            <q-skeleton type="QBtn" class="q-ml-sm"></q-skeleton>
+          </q-card-actions>
+        </q-card>
       </template>
     </q-infinite-scroll>
   </q-page>
@@ -52,7 +59,7 @@ import {
   QInfiniteScroll,
   QInput,
   QPage,
-  QSpinner,
+  QSkeleton,
   useQuasar,
 } from 'quasar';
 import { api } from 'src/boot/axios';
@@ -63,6 +70,7 @@ import { validateNote } from 'src/validators/note-validator';
 import PageDto from 'src/interfaces/PageDto';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
+import { notifyPosition } from 'src/utils/notify-position';
 
 const note = ref('');
 const noteInput = ref<QInput | null>(null);
@@ -86,7 +94,7 @@ async function saveNote() {
     if (res.status === 201) {
       $q.notify({
         classes: 'q-px-lg',
-        position: 'top-right',
+        position: notifyPosition($q),
         progress: true,
         message: 'Note correctly saved',
         color: 'white',
@@ -109,7 +117,7 @@ async function saveNote() {
     }
     $q.notify({
       classes: 'q-px-lg',
-      position: 'top-right',
+      position: notifyPosition($q),
       progress: true,
       message: 'Error saving note',
       color: 'white',
@@ -147,7 +155,7 @@ function onLoad(index: number, done: () => void) {
       }
       $q.notify({
         classes: 'q-px-lg',
-        position: 'top-right',
+        position: notifyPosition($q),
         progress: true,
         message: 'Error loading notes',
         color: 'white',
@@ -170,3 +178,9 @@ function reloadNotes() {
   infiniteScroll.value.trigger();
 }
 </script>
+
+<style>
+.note-skeleton-text {
+  min-height: 2.5rem;
+}
+</style>

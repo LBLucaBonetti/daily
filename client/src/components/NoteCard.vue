@@ -33,6 +33,7 @@ import { PropType, ref } from 'vue';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import TheNoteUpdateDialog from './TheNoteUpdateDialog.vue';
+import { notifyPosition } from 'src/utils/notify-position';
 
 const $q = useQuasar();
 const noteDeleteBtnLoading = ref(false);
@@ -62,7 +63,7 @@ async function deleteNote() {
     if (res.status === 204) {
       $q.notify({
         classes: 'q-px-lg',
-        position: 'top-right',
+        position: notifyPosition($q),
         progress: true,
         message: 'Note correctly deleted',
         color: 'white',
@@ -81,7 +82,7 @@ async function deleteNote() {
     }
     $q.notify({
       classes: 'q-px-lg',
-      position: 'top-right',
+      position: notifyPosition($q),
       progress: true,
       message: 'Error deleting note',
       color: 'white',

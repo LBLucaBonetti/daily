@@ -31,7 +31,6 @@
       side="left"
       overlay
       bordered
-      behavior="mobile"
     >
       <q-list>
         <q-item-label class="poppins-regular" header> daily </q-item-label>
