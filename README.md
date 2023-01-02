@@ -15,26 +15,19 @@ In order to build and run the app, you will need:
 - Java 17+
 - Maven
 - Docker
-- A Google account
 
 Follow these instructions:
 
-- Use your Google account to follow the tutorial at https://support.google.com/cloud/answer/6158849;
-  the important field you need to fill is the ```Authorized redirect URI```:
-  put http://localhost:8080/login/oauth2/code/google in and save
-- Open the ```daily-docker-compose.yml``` file and replace the ```<google-client-id>```
-  and ```<google-client-secret>``` placeholders with the client id and secret Google created for
-  your client; save the file
-- From the root of the project, run ```mvn clean package -DskipTests``` and wait for the build
-  process to complete
-- From the root of the project, run ```docker-compose -f daily-docker-compose.yml up``` to
-  build/download the Docker images and
-  run the app
-- When you see the Spring Boot application has correctly started (take a look at the logs),
-  open http://localhost:8080 and you should be redirected to your Google client login page; log in
-  and you should be redirected back to the app
+- From the root of the project, run ```docker-compose -f daily-docker-compose.yml up --build```
+  to download and build the required environment
+- When Postgres is ready to accept connections and Keycloak has started, run the following Maven
+  command to start the
+  app: ```mvn clean spring-boot:run "-Dspring-boot.run.jvmArguments=-DGOOGLE_OAUTH2_CLIENT_SECRET=nz754EdKFuBI8kJFF9fYqucW91q6mJV1 -DGOOGLE_OAUTH2_CLIENT_ID=daily -Dspring.security.oauth2.client.registration.google.scope=openid,profile,email -Dspring.security.oauth2.client.provider.google.issuer-uri=http://localhost:8081/realms/daily -Dspring.datasource.url=jdbc:postgresql://localhost:5433/daily_develop"```
+- Visit http://localhost:8080 and try daily! Just remember the changes will not be persisted to the
+  Postgres instance unless you modify the ```daily-docker-compose.yml``` file to mount an auxiliary
+  volume
 - Hit ```CTRL+C``` to stop the app from running; you can optionally
-  run ```docker-compose -f daily-docker-compose.yml down``` to remove the leftovers
+  run ```docker-compose -f daily-docker-compose.yml down -v --rmi all``` to remove the leftovers
 
 ## Authors
 

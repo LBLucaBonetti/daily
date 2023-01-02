@@ -1,18 +1,4 @@
 services:
-  daily:
-    image: 'daily:latest'
-    container_name: daily
-    build:
-      context: .
-      dockerfile: dockerfile/daily-Dockerfile
-    depends_on:
-      - db
-    environment:
-      - GOOGLE_OAUTH2_CLIENT_ID=<google-client-id>
-      - GOOGLE_OAUTH2_CLIENT_SECRET=<google-client-secret>
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/daily_develop
-    ports:
-      - "8080:8080"
   db:
     image: 'postgres:latest'
     container_name: db
@@ -20,3 +6,18 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=daily_develop
+    ports:
+      - "5433:5432"
+  keycloak:
+    image: 'quay.io/keycloak/keycloak:20.0.2'
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./keycloak/daily-realm.json:/opt/keycloak/data/import/daily-realm.json
+    ports:
+      - "8081:8080"
