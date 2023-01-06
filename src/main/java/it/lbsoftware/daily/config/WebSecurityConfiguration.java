@@ -1,6 +1,5 @@
 package it.lbsoftware.daily.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -13,11 +12,15 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
-@RequiredArgsConstructor
 public class WebSecurityConfiguration {
 
   private static final String LOGIN_PAGE = "/oauth2/authorization/google";
   private static final String LOGOUT_SUCCESS_URL = "https://www.google.com";
+  private final CookieCsrfTokenRepository cookieCsrfTokenRepository;
+
+  public WebSecurityConfiguration(final CookieCsrfTokenRepository cookieCsrfTokenRepository) {
+    this.cookieCsrfTokenRepository = cookieCsrfTokenRepository;
+  }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -27,7 +30,7 @@ public class WebSecurityConfiguration {
     requestHandler.setCsrfRequestAttributeName(null);
     http.csrf(
         csrf ->
-            csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            csrf.csrfTokenRepository(cookieCsrfTokenRepository)
                 .csrfTokenRequestHandler(requestHandler));
     // Authorization & authentication
     http.authorizeHttpRequests(
