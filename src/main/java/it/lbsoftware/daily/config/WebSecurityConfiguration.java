@@ -1,5 +1,7 @@
 package it.lbsoftware.daily.config;
 
+import static it.lbsoftware.daily.config.Constants.PERMISSIONS_POLICY;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -36,8 +38,10 @@ public class WebSecurityConfiguration {
     // Security headers
     http.headers(
         headers ->
-            headers.referrerPolicy(
-                referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)));
+            headers
+                .referrerPolicy(
+                    referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                .permissionsPolicy(permissions -> permissions.policy(PERMISSIONS_POLICY)));
     // Authorization & authentication
     http.authorizeHttpRequests(
         authorizeHttpRequests -> authorizeHttpRequests.anyRequest().authenticated());
