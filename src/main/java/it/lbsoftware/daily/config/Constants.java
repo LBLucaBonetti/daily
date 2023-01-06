@@ -3,7 +3,9 @@ package it.lbsoftware.daily.config;
 public final class Constants {
 
   public static final String COOKIE_CSRF_TOKEN_REPOSITORY_BEAN_NAME = "cookieCsrfTokenRepository";
+  public static final String CSRF_TOKEN_NAME = "XSRF-TOKEN";
   public static final String DAILY_COOKIE_CSRF_SECURE_KEY = "daily.cookie.csrf.secure";
+  public static final String DAILY_COOKIE_CSRF_SAME_SITE_KEY = "daily.cookie.csrf.same-site";
   public static final String ERROR_KEY = "error";
   public static final String ERROR_DEFAULT = "error.default";
   public static final int NOTE_TEXT_MAX = 255;
