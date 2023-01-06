@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.config;
 
+import static it.lbsoftware.daily.config.Constants.CONTENT_SECURITY_POLICY;
 import static it.lbsoftware.daily.config.Constants.PERMISSIONS_POLICY;
 
 import org.springframework.context.annotation.Bean;
@@ -39,6 +40,7 @@ public class WebSecurityConfiguration {
     http.headers(
         headers ->
             headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
                 .referrerPolicy(
                     referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                 .permissionsPolicy(permissions -> permissions.policy(PERMISSIONS_POLICY)));
