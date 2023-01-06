@@ -9,6 +9,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -32,6 +33,11 @@ public class WebSecurityConfiguration {
         csrf ->
             csrf.csrfTokenRepository(cookieCsrfTokenRepository)
                 .csrfTokenRequestHandler(requestHandler));
+    // Security headers
+    http.headers(
+        headers ->
+            headers.referrerPolicy(
+                referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)));
     // Authorization & authentication
     http.authorizeHttpRequests(
         authorizeHttpRequests -> authorizeHttpRequests.anyRequest().authenticated());
