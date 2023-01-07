@@ -16,8 +16,11 @@ public class SameSiteConfiguration {
   @Bean
   @ConditionalOnProperty(name = DAILY_COOKIE_CSRF_SAME_SITE_KEY, havingValue = "STRICT")
   public CookieSameSiteSupplier applicationCookieSameSiteSupplier() {
+    final CookieSameSiteSupplier cookieSameSiteSupplier =
+        CookieSameSiteSupplier.ofStrict().whenHasName(CSRF_TOKEN_NAME);
     log.info(
-        "Built a CookieSameSiteSupplier bean to apply STRICT to cookies named " + CSRF_TOKEN_NAME);
-    return CookieSameSiteSupplier.ofStrict().whenHasName(CSRF_TOKEN_NAME);
+        "Building a CookieSameSiteSupplier bean to apply STRICT to cookies named "
+            + CSRF_TOKEN_NAME);
+    return cookieSameSiteSupplier;
   }
 }

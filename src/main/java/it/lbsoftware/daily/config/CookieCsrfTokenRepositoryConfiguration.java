@@ -21,7 +21,7 @@ public class CookieCsrfTokenRepositoryConfiguration {
   public CookieCsrfTokenRepository cookieCsrfTokenRepositoryWithHttpOnlyFalse() {
     final CookieCsrfTokenRepository cookieCsrfTokenRepository =
         CookieCsrfTokenRepository.withHttpOnlyFalse();
-    log.info("Built a CookieCsrfTokenRepository bean with HttpOnly set to false");
+    log.info("Building a CookieCsrfTokenRepository bean with HttpOnly set to false");
     return cookieCsrfTokenRepository;
   }
 
@@ -32,7 +32,7 @@ public class CookieCsrfTokenRepositoryConfiguration {
         CookieCsrfTokenRepository.withHttpOnlyFalse();
     cookieCsrfTokenRepository.setSecure(true);
     log.info(
-        "Built a CookieCsrfTokenRepository bean with HttpOnly set to false and Secure set to true");
+        "Building a CookieCsrfTokenRepository bean with HttpOnly set to false and Secure set to true");
     return cookieCsrfTokenRepository;
   }
 }
