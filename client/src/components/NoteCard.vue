@@ -59,6 +59,7 @@ function askConfirmationToDeleteNote() {
     title: 'Confirm',
     message: 'Do you really want to delete the note?',
     persistent: true,
+    class: 'bg-1 text-1',
     ok: {
       flat: true,
       color: 'negative',
