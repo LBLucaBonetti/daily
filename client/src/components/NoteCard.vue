@@ -15,7 +15,7 @@
           flat
           :loading="noteDeleteBtnLoading"
           label="Delete"
-          @click="deleteNote"
+          @click="askConfirmationToDeleteNote"
           aria-label="Delete"
           color="negative"
         ></q-btn>
@@ -51,6 +51,26 @@ function updateNote() {
   }).onOk(() => {
     //Reload notes
     emit('reloadNotes');
+  });
+}
+
+function askConfirmationToDeleteNote() {
+  $q.dialog({
+    title: 'Confirm',
+    message: 'Do you really want to delete the note?',
+    persistent: true,
+    class: 'bg-1 text-1',
+    ok: {
+      flat: true,
+      color: 'negative',
+    },
+    cancel: {
+      flat: true,
+      class: 'bg-1 text-1',
+    },
+    focus: 'cancel',
+  }).onOk(() => {
+    deleteNote();
   });
 }
 

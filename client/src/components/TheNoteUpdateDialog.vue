@@ -1,6 +1,6 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide"
-    ><q-card>
+    ><q-card class="bg-1 text-1">
       <q-card-section>
         <div class="text-h6">Update note</div>
       </q-card-section>
