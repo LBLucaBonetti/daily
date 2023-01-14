@@ -44,14 +44,13 @@ public class NoteServiceImpl implements NoteService {
   @Transactional
   public Optional<Note> updateNote(
       @NonNull UUID uuid, @NonNull Note note, @NonNull String appUser) {
-    Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
-    if (noteOptional.isEmpty()) {
-      return Optional.empty();
-    }
-    Note prevNote = noteOptional.get();
-    prevNote.setText(note.getText());
-
-    return Optional.of(noteRepository.save(prevNote));
+    return noteRepository
+        .findByUuidAndAppUser(uuid, appUser)
+        .map(
+            prevNote -> {
+              prevNote.setText(note.getText());
+              return noteRepository.save(prevNote);
+            });
   }
 
   @Override
@@ -112,12 +111,6 @@ public class NoteServiceImpl implements NoteService {
   @Override
   @Transactional(readOnly = true)
   public Optional<Set<Tag>> readNoteTags(@NonNull UUID uuid, @NonNull String appUser) {
-    Optional<Note> noteOptional = noteRepository.findByUuidAndAppUserFetchTags(uuid, appUser);
-    if (noteOptional.isEmpty()) {
-      return Optional.empty();
-    }
-    Note note = noteOptional.get();
-
-    return Optional.of(note.getTags());
+    return noteRepository.findByUuidAndAppUserFetchTags(uuid, appUser).map(Note::getTags);
   }
 }

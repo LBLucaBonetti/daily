@@ -3,7 +3,6 @@ package it.lbsoftware.daily.tags;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import jakarta.validation.Valid;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,13 +43,10 @@ class TagController {
   @GetMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> readTag(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
-    Optional<Tag> readTag = tagService.readTag(uuid, appUserService.getUid(appUser));
-    if (readTag.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    TagDto readTagDto = tagDtoMapper.convertToDto(readTag.get());
-
-    return ResponseEntity.ok(readTagDto);
+    return tagService
+        .readTag(uuid, appUserService.getUid(appUser))
+        .map(readTag -> ResponseEntity.ok(tagDtoMapper.convertToDto(readTag)))
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @GetMapping
@@ -73,12 +69,11 @@ class TagController {
       @Valid @RequestBody TagDto tagDto,
       @AuthenticationPrincipal OidcUser appUser) {
     Tag tag = tagDtoMapper.convertToEntity(tagDto);
-    Optional<Tag> updatedTag = tagService.updateTag(uuid, tag, appUserService.getUid(appUser));
-    if (updatedTag.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
 
-    return ResponseEntity.noContent().build();
+    return tagService
+        .updateTag(uuid, tag, appUserService.getUid(appUser))
+        .<ResponseEntity<TagDto>>map(updatedTag -> ResponseEntity.noContent().build())
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @DeleteMapping(value = "/{uuid}")

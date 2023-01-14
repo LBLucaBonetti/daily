@@ -38,15 +38,14 @@ public class TagServiceImpl implements TagService {
   @Override
   @Transactional
   public Optional<Tag> updateTag(@NonNull UUID uuid, @NonNull Tag tag, @NonNull String appUser) {
-    Optional<Tag> tagOptional = tagRepository.findByUuidAndAppUser(uuid, appUser);
-    if (tagOptional.isEmpty()) {
-      return Optional.empty();
-    }
-    Tag prevTag = tagOptional.get();
-    prevTag.setName(tag.getName());
-    prevTag.setColorHex(tag.getColorHex());
-
-    return Optional.of(tagRepository.save(prevTag));
+    return tagRepository
+        .findByUuidAndAppUser(uuid, appUser)
+        .map(
+            prevTag -> {
+              prevTag.setName(tag.getName());
+              prevTag.setColorHex(tag.getColorHex());
+              return tagRepository.save(prevTag);
+            });
   }
 
   @Override
