@@ -29,11 +29,13 @@ public class NoteServiceImpl implements NoteService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<Note> readNote(@NonNull UUID uuid, @NonNull String appUser) {
     return noteRepository.findByUuidAndAppUser(uuid, appUser);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<Note> readNotes(Pageable pageable, @NonNull String appUser) {
     return noteRepository.findByAppUser(pageable, appUser);
   }
@@ -108,6 +110,7 @@ public class NoteServiceImpl implements NoteService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<Set<Tag>> readNoteTags(@NonNull UUID uuid, @NonNull String appUser) {
     Optional<Note> noteOptional = noteRepository.findByUuidAndAppUserFetchTags(uuid, appUser);
     if (noteOptional.isEmpty()) {

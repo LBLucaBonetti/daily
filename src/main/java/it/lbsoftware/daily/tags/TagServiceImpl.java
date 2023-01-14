@@ -24,11 +24,13 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<Tag> readTag(@NonNull UUID uuid, @NonNull String appUser) {
     return tagRepository.findByUuidAndAppUser(uuid, appUser);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<Tag> readTags(Pageable pageable, @NonNull String appUser) {
     return tagRepository.findByAppUser(pageable, appUser);
   }
