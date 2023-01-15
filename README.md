@@ -10,7 +10,7 @@ of APIs under a specific context.
 
 #### Build & run with Docker
 
-In order to build and run the app, you will need:
+In order to build and run the app, the following requirements are needed:
 
 - Java 17+
 - Maven
@@ -38,16 +38,17 @@ Follow these instructions:
 
 ## Badges
 
-#### Backend & frontend
+#### Whole project
 
 [![GitHub license](https://img.shields.io/github/license/LBLucaBonetti/daily)](https://github.com/LBLucaBonetti/daily/blob/main/LICENSE)
 [![CodeFactor](https://www.codefactor.io/repository/github/lblucabonetti/daily/badge)](https://www.codefactor.io/repository/github/lblucabonetti/daily)
 [![Daily production deploy](https://github.com/LBLucaBonetti/daily/actions/workflows/daily-production-deploy.yml/badge.svg?branch=main)](https://github.com/LBLucaBonetti/daily/actions/workflows/daily-production-deploy.yml)
+![Security Headers](https://img.shields.io/security-headers?url=https%3A%2F%2Fwww.trydaily.click)
 
-#### Frontend only
+#### Frontend
 
 [![Quality gate status (frontend)](https://sonarcloud.io/api/project_badges/measure?project=LBLucaBonetti_daily_fe&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=LBLucaBonetti_daily_fe)
 
-#### Backend only
+#### Backend
 
 [![Quality gate status (backend)](https://sonarcloud.io/api/project_badges/measure?project=LBLucaBonetti_daily_be&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=LBLucaBonetti_daily_be)
