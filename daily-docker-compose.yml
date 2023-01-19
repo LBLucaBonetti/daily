@@ -21,3 +21,8 @@ services:
       - ./keycloak/daily-realm.json:/opt/keycloak/data/import/daily-realm.json
     ports:
       - "8081:8080"
+  redis:
+    image: 'redis:latest'
+    container_name: redis
+    ports:
+      - "6379:6379"
