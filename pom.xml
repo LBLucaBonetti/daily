@@ -242,7 +242,7 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <groupId>org.springframework.boot</groupId>
     <relativePath/>
-    <version>3.0.1</version> <!-- lookup parent from repository -->
+    <version>3.0.2</version> <!-- lookup parent from repository -->
   </parent>
   <properties>
     <apache-commons-lang3.version>3.12.0</apache-commons-lang3.version>

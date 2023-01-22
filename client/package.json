@@ -11,11 +11,11 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.15.9",
+    "@quasar/extras": "^1.15.10",
     "axios": "^1.2.3",
     "pinia": "^2.0.29",
     "quasar": "^2.11.5",
-    "quasar-extras-svg-icons": "^1.26.1",
+    "quasar-extras-svg-icons": "^1.27.0",
     "vue": "^3.2.45",
     "vue-i18n": "^9.0.0",
     "vue-router": "^4.1.6"
