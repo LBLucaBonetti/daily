@@ -33,8 +33,8 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<Note> readNote(@NonNull UUID uuid, @NonNull String appUser) {
-    return noteRepository.findByUuidAndAppUser(uuid, appUser);
+  public Optional<NoteDto> readNote(@NonNull UUID uuid, @NonNull String appUser) {
+    return noteRepository.findByUuidAndAppUser(uuid, appUser).map(noteDtoMapper::convertToDto);
   }
 
   @Override

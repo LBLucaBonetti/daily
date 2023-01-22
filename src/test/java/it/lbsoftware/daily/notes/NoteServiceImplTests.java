@@ -155,27 +155,31 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(note);
 
     // When
-    Optional<Note> res = noteService.readNote(uuid, APP_USER);
+    Optional<NoteDto> res = noteService.readNote(uuid, APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    assertEquals(note, res);
+    verify(noteDtoMapper, times(0)).convertToDto((Note) any());
+    assertEquals(Optional.empty(), res);
   }
 
   @Test
   @DisplayName("Should read note and return note optional")
   void test3() {
     // Given
-    Optional<Note> note = Optional.of(createNote(TEXT, Collections.emptySet(), APP_USER));
+    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
     UUID uuid = UUID.randomUUID();
-    given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(note);
+    NoteDto noteDto = createNoteDto(uuid, TEXT);
+    given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(Optional.of(note));
+    given(noteDtoMapper.convertToDto(note)).willReturn(noteDto);
 
     // When
-    Optional<Note> res = noteService.readNote(uuid, APP_USER);
+    Optional<NoteDto> res = noteService.readNote(uuid, APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    assertEquals(note, res);
+    verify(noteDtoMapper, times(1)).convertToDto(note);
+    assertEquals(Optional.of(noteDto), res);
   }
 
   @Test

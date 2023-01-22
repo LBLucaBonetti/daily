@@ -47,7 +47,7 @@ class NoteController {
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
     return noteService
         .readNote(uuid, appUserService.getUid(appUser))
-        .map(readNote -> ResponseEntity.ok(noteDtoMapper.convertToDto(readNote)))
+        .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 

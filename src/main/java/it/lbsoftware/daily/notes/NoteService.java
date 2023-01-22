@@ -25,7 +25,7 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Read note or empty value
    */
-  Optional<Note> readNote(UUID uuid, String appUser);
+  Optional<NoteDto> readNote(UUID uuid, String appUser);
 
   /**
    * Reads notes

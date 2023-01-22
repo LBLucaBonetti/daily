@@ -80,7 +80,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not read note and return not found")
   void test2() {
     // Given
-    Optional<Note> readNote = Optional.empty();
+    Optional<NoteDto> readNote = Optional.empty();
     UUID uuid = UUID.randomUUID();
     given(noteService.readNote(uuid, APP_USER)).willReturn(readNote);
 
@@ -98,11 +98,9 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read note and return ok")
   void test3() {
     // Given
-    Optional<Note> readNote = Optional.of(createNote(TEXT, Collections.emptySet(), APP_USER));
     UUID uuid = UUID.randomUUID();
-    NoteDto readNoteDto = createNoteDto(uuid, TEXT);
+    Optional<NoteDto> readNote = Optional.of(createNoteDto(uuid, TEXT));
     given(noteService.readNote(uuid, APP_USER)).willReturn(readNote);
-    given(noteDtoMapper.convertToDto(readNote.get())).willReturn(readNoteDto);
 
     // When
     ResponseEntity<NoteDto> res = noteController.readNote(uuid, appUser);
@@ -110,9 +108,8 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).readNote(uuid, APP_USER);
-    verify(noteDtoMapper, times(1)).convertToDto(readNote.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
-    assertEquals(readNoteDto, res.getBody());
+    assertEquals(readNote.get(), res.getBody());
   }
 
   @Test
