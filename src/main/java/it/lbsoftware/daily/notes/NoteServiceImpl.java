@@ -20,12 +20,15 @@ public class NoteServiceImpl implements NoteService {
 
   private final NoteRepository noteRepository;
   private final TagService tagService;
+  private final NoteDtoMapper noteDtoMapper;
 
   @Override
-  public Note createNote(@NonNull Note note, @NonNull String appUser) {
-    note.setAppUser(appUser);
+  public NoteDto createNote(@NonNull NoteDto note, @NonNull String appUser) {
+    Note noteEntity = noteDtoMapper.convertToEntity(note);
+    noteEntity.setAppUser(appUser);
+    Note savedNoteEntity = noteRepository.save(noteEntity);
 
-    return noteRepository.save(note);
+    return noteDtoMapper.convertToDto(savedNoteEntity);
   }
 
   @Override

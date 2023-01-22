@@ -37,9 +37,7 @@ class NoteController {
   @PostMapping
   public ResponseEntity<NoteDto> createNote(
       @Valid @RequestBody NoteDto noteDto, @AuthenticationPrincipal OidcUser appUser) {
-    Note note = noteDtoMapper.convertToEntity(noteDto);
-    Note createdNote = noteService.createNote(note, appUserService.getUid(appUser));
-    NoteDto createdNoteDto = noteDtoMapper.convertToDto(createdNote);
+    NoteDto createdNoteDto = noteService.createNote(noteDto, appUserService.getUid(appUser));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdNoteDto);
   }

@@ -63,21 +63,15 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   void test1() {
     // Given
     NoteDto noteDto = createNoteDto(null, TEXT);
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
-    Note createdNote = createNote(TEXT, Collections.emptySet(), APP_USER);
     NoteDto createdNoteDto = createNoteDto(UUID.randomUUID(), TEXT);
-    given(noteDtoMapper.convertToEntity(noteDto)).willReturn(note);
-    given(noteService.createNote(note, APP_USER)).willReturn(createdNote);
-    given(noteDtoMapper.convertToDto(createdNote)).willReturn(createdNoteDto);
+    given(noteService.createNote(noteDto, APP_USER)).willReturn(createdNoteDto);
 
     // When
     ResponseEntity<NoteDto> res = noteController.createNote(noteDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
-    verify(noteService, times(1)).createNote(note, APP_USER);
-    verify(noteDtoMapper, times(1)).convertToDto(createdNote);
+    verify(noteService, times(1)).createNote(noteDto, APP_USER);
     assertEquals(HttpStatus.CREATED, res.getStatusCode());
     assertEquals(createdNoteDto, res.getBody());
   }

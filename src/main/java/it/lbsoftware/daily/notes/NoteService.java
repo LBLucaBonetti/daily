@@ -16,7 +16,7 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Created note
    */
-  Note createNote(Note note, String appUser);
+  NoteDto createNote(NoteDto note, String appUser);
 
   /**
    * Reads a note

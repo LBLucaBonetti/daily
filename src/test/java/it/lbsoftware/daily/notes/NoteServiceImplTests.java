@@ -1,9 +1,11 @@
 package it.lbsoftware.daily.notes;
 
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
+import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -47,11 +49,12 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @Mock private NoteRepository noteRepository;
   @Mock private TagService tagService;
   @Mock private Pageable pageable;
+  @Mock private NoteDtoMapper noteDtoMapper;
   private NoteServiceImpl noteService;
 
   private static Stream<Arguments> test18() {
     // Note, appUser
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    NoteDto note = createNoteDto(null, TEXT);
     return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(note, null));
   }
 
@@ -117,23 +120,30 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    noteService = new NoteServiceImpl(noteRepository, tagService);
+    noteService = new NoteServiceImpl(noteRepository, tagService, noteDtoMapper);
   }
 
   @Test
   @DisplayName("Should create note and return note")
   void test1() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), null);
-    Note createdNote = createNote(TEXT, Collections.emptySet(), APP_USER);
-    given(noteRepository.save(note)).willReturn(createdNote);
+    NoteDto note = createNoteDto(null, TEXT);
+    Note noteEntity = createNote(TEXT, Collections.emptySet(), null);
+    Note savedNoteEntity = createNote(TEXT, Collections.emptySet(), APP_USER);
+    NoteDto noteDto = createNoteDto(UUID.randomUUID(), TEXT);
+    given(noteDtoMapper.convertToEntity(note)).willReturn(noteEntity);
+    given(noteRepository.save(noteEntity)).willReturn(savedNoteEntity);
+    given(noteDtoMapper.convertToDto(savedNoteEntity)).willReturn(noteDto);
 
     // When
-    Note res = noteService.createNote(note, APP_USER);
+    NoteDto res = noteService.createNote(note, APP_USER);
 
     // Then
-    verify(noteRepository, times(1)).save(note);
-    assertEquals(APP_USER, res.getAppUser());
+    verify(noteDtoMapper, times(1)).convertToEntity(note);
+    verify(noteRepository, times(1)).save(noteEntity);
+    verify(noteDtoMapper, times(1)).convertToDto(savedNoteEntity);
+    assertEquals(TEXT, res.getText());
+    assertNotNull(res.getUuid());
   }
 
   @Test
@@ -437,7 +447,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when create note with null argument")
-  void test18(Note note, String appUser) {
+  void test18(NoteDto note, String appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.createNote(note, appUser));
   }
 
