@@ -52,21 +52,15 @@ class TagControllerTests extends DailyAbstractUnitTests {
   void test1() {
     // Given
     TagDto tagDto = createTagDto(null, NAME, COLOR_HEX);
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
-    Tag createdTag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     TagDto createdTagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
-    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
-    given(tagService.createTag(tag, APP_USER)).willReturn(createdTag);
-    given(tagDtoMapper.convertToDto(createdTag)).willReturn(createdTagDto);
+    given(tagService.createTag(tagDto, APP_USER)).willReturn(createdTagDto);
 
     // When
     ResponseEntity<TagDto> res = tagController.createTag(tagDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
-    verify(tagService, times(1)).createTag(tag, APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(createdTag);
+    verify(tagService, times(1)).createTag(tagDto, APP_USER);
     assertEquals(HttpStatus.CREATED, res.getStatusCode());
     assertEquals(createdTagDto, res.getBody());
   }

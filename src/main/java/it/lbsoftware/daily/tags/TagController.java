@@ -33,9 +33,7 @@ class TagController {
   @PostMapping
   public ResponseEntity<TagDto> createTag(
       @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal OidcUser appUser) {
-    Tag tag = tagDtoMapper.convertToEntity(tagDto);
-    Tag createdTag = tagService.createTag(tag, appUserService.getUid(appUser));
-    TagDto createdTagDto = tagDtoMapper.convertToDto(createdTag);
+    TagDto createdTagDto = tagService.createTag(tagDto, appUserService.getUid(appUser));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdTagDto);
   }

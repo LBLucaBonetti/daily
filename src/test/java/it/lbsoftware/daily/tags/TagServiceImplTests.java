@@ -1,7 +1,9 @@
 package it.lbsoftware.daily.tags;
 
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,11 +38,12 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   private static final String OTHER_COLOR_HEX = "#654321";
   @Mock private TagRepository tagRepository;
   @Mock private Pageable pageable;
+  @Mock private TagDtoMapper tagDtoMapper;
   private TagServiceImpl tagService;
 
   private static Stream<Arguments> test10() {
     // Tag, appUser
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto tag = createTagDto(null, NAME, COLOR_HEX);
     return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(tag, null));
   }
 
@@ -72,23 +75,31 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    tagService = new TagServiceImpl(tagRepository);
+    tagService = new TagServiceImpl(tagRepository, tagDtoMapper);
   }
 
   @Test
   @DisplayName("Should create tag and return tag")
   void test1() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), null);
-    Tag createdTag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
-    given(tagRepository.save(tag)).willReturn(createdTag);
+    TagDto tag = createTagDto(null, NAME, COLOR_HEX);
+    Tag tagEntity = createTag(NAME, COLOR_HEX, Collections.emptySet(), null);
+    Tag savedTagEntity = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
+    given(tagDtoMapper.convertToEntity(tag)).willReturn(tagEntity);
+    given(tagRepository.save(tagEntity)).willReturn(savedTagEntity);
+    given(tagDtoMapper.convertToDto(savedTagEntity)).willReturn(tagDto);
 
     // When
-    Tag res = tagService.createTag(tag, APP_USER);
+    TagDto res = tagService.createTag(tag, APP_USER);
 
     // Then
-    verify(tagRepository, times(1)).save(tag);
-    assertEquals(APP_USER, res.getAppUser());
+    verify(tagDtoMapper, times(1)).convertToEntity(tag);
+    verify(tagRepository, times(1)).save(tagEntity);
+    verify(tagDtoMapper, times(1)).convertToDto(savedTagEntity);
+    assertEquals(NAME, res.getName());
+    assertEquals(COLOR_HEX, res.getColorHex());
+    assertNotNull(res.getUuid());
   }
 
   @Test
@@ -234,7 +245,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when create tag with null argument")
-  void test10(Tag tag, String appUser) {
+  void test10(TagDto tag, String appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.createTag(tag, appUser));
   }
 

@@ -14,7 +14,7 @@ public interface TagService {
    * @param appUser Unique id of the appUser
    * @return Created tag
    */
-  Tag createTag(Tag tag, String appUser);
+  TagDto createTag(TagDto tag, String appUser);
 
   /**
    * Reads a tag

@@ -15,12 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class TagServiceImpl implements TagService {
 
   private final TagRepository tagRepository;
+  private final TagDtoMapper tagDtoMapper;
 
   @Override
-  public Tag createTag(@NonNull Tag tag, @NonNull String appUser) {
-    tag.setAppUser(appUser);
+  public TagDto createTag(@NonNull TagDto tag, @NonNull String appUser) {
+    Tag tagEntity = tagDtoMapper.convertToEntity(tag);
+    tagEntity.setAppUser(appUser);
+    Tag savedTagEntity = tagRepository.save(tagEntity);
 
-    return tagRepository.save(tag);
+    return tagDtoMapper.convertToDto(savedTagEntity);
   }
 
   @Override
