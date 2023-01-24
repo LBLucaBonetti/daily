@@ -44,7 +44,7 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Updated note or empty value
    */
-  Optional<Note> updateNote(UUID uuid, Note note, String appUser);
+  Optional<NoteDto> updateNote(UUID uuid, NoteDto note, String appUser);
 
   /**
    * Deletes a note

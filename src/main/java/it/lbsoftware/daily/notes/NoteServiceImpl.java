@@ -45,15 +45,16 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional
-  public Optional<Note> updateNote(
-      @NonNull UUID uuid, @NonNull Note note, @NonNull String appUser) {
+  public Optional<NoteDto> updateNote(
+      @NonNull UUID uuid, @NonNull NoteDto note, @NonNull String appUser) {
     return noteRepository
         .findByUuidAndAppUser(uuid, appUser)
         .map(
             prevNote -> {
               prevNote.setText(note.getText());
               return noteRepository.save(prevNote);
-            });
+            })
+        .map(noteDtoMapper::convertToDto);
   }
 
   @Override

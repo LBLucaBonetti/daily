@@ -30,7 +30,6 @@ import org.springframework.web.server.ResponseStatusException;
 class NoteController {
 
   private final NoteService noteService;
-  private final NoteDtoMapper noteDtoMapper;
   private final TagDtoMapper tagDtoMapper;
   private final AppUserService appUserService;
 
@@ -70,10 +69,8 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @Valid @RequestBody NoteDto noteDto,
       @AuthenticationPrincipal OidcUser appUser) {
-    Note note = noteDtoMapper.convertToEntity(noteDto);
-
     return noteService
-        .updateNote(uuid, note, appUserService.getUid(appUser))
+        .updateNote(uuid, noteDto, appUserService.getUid(appUser))
         .<ResponseEntity<NoteDto>>map(updatedNote -> ResponseEntity.noContent().build())
         .orElseGet(() -> ResponseEntity.notFound().build());
   }

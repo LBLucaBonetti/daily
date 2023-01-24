@@ -1,6 +1,5 @@
 package it.lbsoftware.daily.notes;
 
-import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
@@ -54,7 +53,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    noteController = new NoteController(noteService, noteDtoMapper, tagDtoMapper, appUserService);
+    noteController = new NoteController(noteService, tagDtoMapper, appUserService);
     given(appUserService.getUid(appUser)).willReturn(APP_USER);
   }
 
@@ -137,20 +136,17 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not update note and return not found")
   void test5() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
-    Optional<Note> updatedNote = Optional.empty();
     UUID uuid = UUID.randomUUID();
     NoteDto noteDto = createNoteDto(uuid, TEXT);
-    given(noteDtoMapper.convertToEntity(noteDto)).willReturn(note);
-    given(noteService.updateNote(uuid, note, APP_USER)).willReturn(updatedNote);
+    Optional<NoteDto> updatedNoteDto = Optional.empty();
+    given(noteService.updateNote(uuid, noteDto, APP_USER)).willReturn(updatedNoteDto);
 
     // When
     ResponseEntity<NoteDto> res = noteController.updateNote(uuid, noteDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
-    verify(noteService, times(1)).updateNote(uuid, note, APP_USER);
+    verify(noteService, times(1)).updateNote(uuid, noteDto, APP_USER);
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -159,20 +155,17 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should update note and return no content")
   void test6() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
-    Optional<Note> updatedNote = Optional.of(note);
     UUID uuid = UUID.randomUUID();
     NoteDto noteDto = createNoteDto(uuid, TEXT);
-    given(noteDtoMapper.convertToEntity(noteDto)).willReturn(note);
-    given(noteService.updateNote(uuid, note, APP_USER)).willReturn(updatedNote);
+    Optional<NoteDto> updatedNote = Optional.of(noteDto);
+    given(noteService.updateNote(uuid, noteDto, APP_USER)).willReturn(updatedNote);
 
     // When
     ResponseEntity<NoteDto> res = noteController.updateNote(uuid, noteDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
-    verify(noteService, times(1)).updateNote(uuid, note, APP_USER);
+    verify(noteService, times(1)).updateNote(uuid, noteDto, APP_USER);
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }

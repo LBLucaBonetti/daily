@@ -67,7 +67,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   private static Stream<Arguments> test21() {
     // Uuid, note, appUser
     UUID uuid = UUID.randomUUID();
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    NoteDto note = createNoteDto(uuid, TEXT);
     return Stream.of(
         arguments(null, null, null),
         arguments(null, null, APP_USER),
@@ -226,8 +226,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
 
     // When
-    Optional<Note> res =
-        noteService.updateNote(uuid, createNote(TEXT, Collections.emptySet(), APP_USER), APP_USER);
+    Optional<NoteDto> res = noteService.updateNote(uuid, createNoteDto(uuid, TEXT), APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
@@ -242,18 +241,18 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     Note prevNote = createNote(TEXT, Collections.emptySet(), APP_USER);
     Note updatedNote = createNote(OTHER_TEXT, Collections.emptySet(), APP_USER);
     UUID uuid = UUID.randomUUID();
+    NoteDto updatedNoteDto = createNoteDto(uuid, OTHER_TEXT);
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(Optional.of(prevNote));
     given(noteRepository.save(prevNote)).willReturn(updatedNote);
+    given(noteDtoMapper.convertToDto(updatedNote)).willReturn(updatedNoteDto);
 
     // When
-    Optional<Note> res =
-        noteService.updateNote(
-            uuid, createNote(OTHER_TEXT, Collections.emptySet(), null), APP_USER);
+    Optional<NoteDto> res = noteService.updateNote(uuid, updatedNoteDto, APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(noteRepository, times(1)).save(prevNote);
-    assertEquals(res, Optional.of(updatedNote));
+    assertEquals(res, Optional.of(updatedNoteDto));
     assertEquals(OTHER_TEXT, res.get().getText());
   }
 
@@ -477,7 +476,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when update note with null argument")
-  void test21(UUID uuid, Note note, String appUser) {
+  void test21(UUID uuid, NoteDto note, String appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(uuid, note, appUser));
   }
 
