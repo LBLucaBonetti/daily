@@ -34,7 +34,7 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Read notes or empty page
    */
-  Page<Note> readNotes(Pageable pageable, String appUser);
+  Page<NoteDto> readNotes(Pageable pageable, String appUser);
 
   /**
    * Updates a note

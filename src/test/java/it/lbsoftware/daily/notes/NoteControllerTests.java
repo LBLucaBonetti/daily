@@ -116,11 +116,9 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read notes and return ok")
   void test4() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
     NoteDto noteDto = createNoteDto(UUID.randomUUID(), TEXT);
-    Page<Note> readNotes = new PageImpl<>(List.of(note));
+    Page<NoteDto> readNotes = new PageImpl<>(List.of(noteDto));
     given(noteService.readNotes(pageable, APP_USER)).willReturn(readNotes);
-    given(noteDtoMapper.convertToDto(note)).willReturn(noteDto);
 
     // When
     ResponseEntity<PageDto<NoteDto>> res = noteController.readNotes(pageable, appUser);
@@ -128,7 +126,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).readNotes(pageable, APP_USER);
-    verify(noteDtoMapper, times(1)).convertToDto(note);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertNotNull(res.getBody());
     assertNotNull(res.getBody().getContent());

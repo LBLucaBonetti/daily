@@ -190,26 +190,31 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(noteRepository.findByAppUser(pageable, APP_USER)).willReturn(notes);
 
     // When
-    Page<Note> res = noteService.readNotes(pageable, APP_USER);
+    Page<NoteDto> res = noteService.readNotes(pageable, APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByAppUser(pageable, APP_USER);
-    assertEquals(notes, res);
+    verify(noteDtoMapper, times(0)).convertToDto((Note) any());
+    assertEquals(Page.empty(), res);
   }
 
   @Test
   @DisplayName("Should read notes and return note list")
   void test5() {
     // Given
-    Page<Note> notes = new PageImpl<>(List.of(createNote(TEXT, Collections.emptySet(), APP_USER)));
+    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    NoteDto noteDto = createNoteDto(UUID.randomUUID(), TEXT);
+    Page<Note> notes = new PageImpl<>(List.of(note));
     given(noteRepository.findByAppUser(pageable, APP_USER)).willReturn(notes);
+    given(noteDtoMapper.convertToDto(note)).willReturn(noteDto);
 
     // When
-    Page<Note> res = noteService.readNotes(pageable, APP_USER);
+    Page<NoteDto> res = noteService.readNotes(pageable, APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByAppUser(pageable, APP_USER);
-    assertEquals(notes, res);
+    verify(noteDtoMapper, times(1)).convertToDto(note);
+    assertEquals(noteDto, res.get().findFirst().get());
   }
 
   @Test

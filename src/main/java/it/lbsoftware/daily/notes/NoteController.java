@@ -54,13 +54,13 @@ class NoteController {
   @GetMapping
   public ResponseEntity<PageDto<NoteDto>> readNotes(
       Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
-    Page<Note> readNotes;
+    Page<NoteDto> readNotes;
     try {
       readNotes = noteService.readNotes(pageable, appUserService.getUid(appUser));
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
     }
-    PageDto<NoteDto> readNoteDtos = new PageDto<>(readNotes.map(noteDtoMapper::convertToDto));
+    PageDto<NoteDto> readNoteDtos = new PageDto<>(readNotes);
 
     return ResponseEntity.ok(readNoteDtos);
   }

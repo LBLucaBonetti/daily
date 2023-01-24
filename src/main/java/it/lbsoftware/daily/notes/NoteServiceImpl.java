@@ -39,8 +39,8 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<Note> readNotes(Pageable pageable, @NonNull String appUser) {
-    return noteRepository.findByAppUser(pageable, appUser);
+  public Page<NoteDto> readNotes(Pageable pageable, @NonNull String appUser) {
+    return noteRepository.findByAppUser(pageable, appUser).map(noteDtoMapper::convertToDto);
   }
 
   @Override
