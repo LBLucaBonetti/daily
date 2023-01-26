@@ -5,7 +5,8 @@
 Technically speaking, this is a "monorepo" with a Spring Boot backend and a Quasar (Vue.js)
 frontend.
 <br>
-The backend exposes both the frontend assets, by serving the index file for each request, and a set
+The backend exposes both the frontend assets, routed by serving the index file for each request, and
+a set
 of APIs under a specific context.
 
 #### Build & run with Docker
