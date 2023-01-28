@@ -1,10 +1,12 @@
 package it.lbsoftware.daily.config;
 
+import it.lbsoftware.daily.exception.DailyExceptionHandler;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("${server.error.path}")
+@RequiredArgsConstructor
 class DailyErrorController implements ErrorController {
+
+  private final DailyExceptionHandler dailyExceptionHandler;
 
   @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
   public String handleError(HttpServletResponse httpServletResponse) {
@@ -30,7 +35,7 @@ class DailyErrorController implements ErrorController {
     HttpStatus status = getStatus(request);
     String error = getError(request);
 
-    return new ResponseEntity<>(Map.of(Constants.ERROR_KEY, error), status);
+    return new ResponseEntity<>(dailyExceptionHandler.getExceptionBody(error), status);
   }
 
   private HttpStatus getStatus(HttpServletRequest request) {

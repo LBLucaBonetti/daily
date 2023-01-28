@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -15,7 +17,8 @@ import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyException;
+import it.lbsoftware.daily.exception.DailyConflictException;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
@@ -171,20 +174,22 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not delete note and return not found")
+  @DisplayName("Should not delete note and throw not found")
   void test7() {
     // Given
     UUID uuid = UUID.randomUUID();
-    given(noteService.deleteNote(uuid, APP_USER)).willReturn(Boolean.FALSE);
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(noteService)
+        .deleteNote(uuid, APP_USER);
 
     // When
-    ResponseEntity<NoteDto> res = noteController.deleteNote(uuid, appUser);
+    DailyNotFoundException res =
+        assertThrows(DailyNotFoundException.class, () -> noteController.deleteNote(uuid, appUser));
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).deleteNote(uuid, APP_USER);
-    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -192,7 +197,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   void test8() {
     // Given
     UUID uuid = UUID.randomUUID();
-    given(noteService.deleteNote(uuid, APP_USER)).willReturn(Boolean.TRUE);
+    doNothing().when(noteService).deleteNote(uuid, APP_USER);
 
     // When
     ResponseEntity<NoteDto> res = noteController.deleteNote(uuid, appUser);
@@ -340,8 +345,9 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    DailyException dailyException = new DailyException(Constants.ERROR_NOTE_TAGS_MAX);
-    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willThrow(dailyException);
+    DailyConflictException dailyConflictException =
+        new DailyConflictException(Constants.ERROR_NOTE_TAGS_MAX);
+    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willThrow(dailyConflictException);
 
     // When
     ResponseStatusException res =

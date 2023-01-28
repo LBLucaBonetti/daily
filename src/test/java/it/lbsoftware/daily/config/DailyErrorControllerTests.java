@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.exception.DailyExceptionHandler;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -27,10 +29,11 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
   private static final String ERROR_KEY = "error";
   private static final String ERROR_DEFAULT = "error.default";
   private DailyErrorController dailyErrorController;
+  @Mock private DailyExceptionHandler dailyExceptionHandler;
 
   @BeforeEach
   void beforeEach() {
-    dailyErrorController = new DailyErrorController();
+    dailyErrorController = new DailyErrorController(dailyExceptionHandler);
   }
 
   @Test
@@ -55,6 +58,8 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
     HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
         .willReturn(HttpStatus.BAD_REQUEST.value());
+    given(dailyExceptionHandler.getExceptionBody(ERROR_DEFAULT))
+        .willReturn(Map.of(ERROR_KEY, ERROR_DEFAULT));
 
     // When
     ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
@@ -72,6 +77,8 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
     // Given
     HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).willReturn(null);
+    given(dailyExceptionHandler.getExceptionBody(ERROR_DEFAULT))
+        .willReturn(Map.of(ERROR_KEY, ERROR_DEFAULT));
 
     // When
     ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
@@ -89,6 +96,8 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
     // Given
     HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).willReturn(-1);
+    given(dailyExceptionHandler.getExceptionBody(ERROR_DEFAULT))
+        .willReturn(Map.of(ERROR_KEY, ERROR_DEFAULT));
 
     // When
     ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
@@ -110,6 +119,8 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
         .willReturn(HttpStatus.BAD_REQUEST.value());
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_MESSAGE)).willReturn(error);
+    given(dailyExceptionHandler.getExceptionBody(ERROR_DEFAULT))
+        .willReturn(Map.of(ERROR_KEY, ERROR_DEFAULT));
 
     // When
     ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
@@ -130,6 +141,8 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
         .willReturn(HttpStatus.BAD_REQUEST.value());
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_MESSAGE)).willReturn(error);
+    given(dailyExceptionHandler.getExceptionBody(ERROR_DEFAULT))
+        .willReturn(Map.of(ERROR_KEY, ERROR_DEFAULT));
 
     // When
     ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);
@@ -150,6 +163,7 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
         .willReturn(HttpStatus.BAD_REQUEST.value());
     given(httpServletRequest.getAttribute(RequestDispatcher.ERROR_MESSAGE)).willReturn(errorKey);
+    given(dailyExceptionHandler.getExceptionBody(errorKey)).willReturn(Map.of(ERROR_KEY, errorKey));
 
     // When
     ResponseEntity<Map<String, Object>> res = dailyErrorController.handleError(httpServletRequest);

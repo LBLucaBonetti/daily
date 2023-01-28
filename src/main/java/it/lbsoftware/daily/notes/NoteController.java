@@ -78,9 +78,7 @@ class NoteController {
   @DeleteMapping(value = "/{uuid}")
   public ResponseEntity<NoteDto> deleteNote(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
-    if (!Boolean.TRUE.equals(noteService.deleteNote(uuid, appUserService.getUid(appUser)))) {
-      return ResponseEntity.notFound().build();
-    }
+    noteService.deleteNote(uuid, appUserService.getUid(appUser));
 
     return ResponseEntity.noContent().build();
   }

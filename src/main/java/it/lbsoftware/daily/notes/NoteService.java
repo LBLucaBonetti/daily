@@ -51,9 +51,8 @@ public interface NoteService {
    *
    * @param uuid Note uuid
    * @param appUser Unique id of the appUser
-   * @return True if the note is deleted, false otherwise
    */
-  Boolean deleteNote(UUID uuid, String appUser);
+  void deleteNote(UUID uuid, String appUser);
 
   /**
    * Adds a tag to a note

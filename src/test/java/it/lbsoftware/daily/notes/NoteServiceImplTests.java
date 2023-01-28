@@ -3,6 +3,7 @@ package it.lbsoftware.daily.notes;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,7 +17,8 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyException;
+import it.lbsoftware.daily.exception.DailyConflictException;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagService;
 import java.util.Collections;
@@ -257,7 +259,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not delete note and return false")
+  @DisplayName("Should not delete note and throw")
   void test8() {
     // Given
     Optional<Note> noteOptional = Optional.empty();
@@ -265,16 +267,17 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
 
     // When
-    Boolean res = noteService.deleteNote(uuid, APP_USER);
+    DailyNotFoundException res =
+        assertThrows(DailyNotFoundException.class, () -> noteService.deleteNote(uuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(noteRepository, times(0)).delete(any());
-    assertEquals(Boolean.FALSE, res);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
-  @DisplayName("Should delete note and return true")
+  @DisplayName("Should delete note")
   void test9() {
     // Given
     Optional<Note> noteOptional = Optional.of(createNote(TEXT, Collections.emptySet(), APP_USER));
@@ -282,12 +285,11 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
 
     // When
-    Boolean res = noteService.deleteNote(uuid, APP_USER);
+    assertDoesNotThrow(() -> noteService.deleteNote(uuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(noteRepository, times(1)).delete(noteOptional.get());
-    assertEquals(Boolean.TRUE, res);
   }
 
   @Test
@@ -529,8 +531,9 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     createTag("name5", "#567890", new HashSet<>(), APP_USER).addToNote(note);
 
     // When
-    DailyException res =
-        assertThrows(DailyException.class, () -> noteService.addTagToNote(uuid, tagUuid, APP_USER));
+    DailyConflictException res =
+        assertThrows(
+            DailyConflictException.class, () -> noteService.addTagToNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);

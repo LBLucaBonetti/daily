@@ -1,7 +1,8 @@
 package it.lbsoftware.daily.notes;
 
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyException;
+import it.lbsoftware.daily.exception.DailyConflictException;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagService;
 import java.util.Optional;
@@ -59,15 +60,12 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional
-  public Boolean deleteNote(@NonNull UUID uuid, @NonNull String appUser) {
-    Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
-    if (noteOptional.isEmpty()) {
-      return false;
-    }
-    Note note = noteOptional.get();
+  public void deleteNote(@NonNull UUID uuid, @NonNull String appUser) {
+    Note note =
+        noteRepository
+            .findByUuidAndAppUser(uuid, appUser)
+            .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     noteRepository.delete(note);
-
-    return true;
   }
 
   @Override
@@ -84,7 +82,7 @@ public class NoteServiceImpl implements NoteService {
     Note note = noteOptional.get();
     Tag tag = tagOptional.get();
     if (note.getTags().size() >= Constants.NOTE_TAGS_MAX) {
-      throw new DailyException(Constants.ERROR_NOTE_TAGS_MAX);
+      throw new DailyConflictException(Constants.ERROR_NOTE_TAGS_MAX);
     }
     tag.addToNote(note);
     noteRepository.save(note);

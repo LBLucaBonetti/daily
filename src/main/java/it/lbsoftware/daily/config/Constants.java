@@ -18,6 +18,7 @@ public final class Constants {
   public static final int TAG_NAME_MAX = 31;
   public static final int NOTE_TAGS_MAX = 5;
   public static final String ERROR_NOTE_TAGS_MAX = "error.note.tags.max";
+  public static final String ERROR_NOT_FOUND = "error.not.found";
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
