@@ -69,9 +69,8 @@ public interface NoteService {
    * @param uuid Note uuid
    * @param tagUuid Tag uuid
    * @param appUser Unique id of the appUser
-   * @return True if the tag is correctly removed from the note, false otherwise
    */
-  Boolean removeTagFromNote(UUID uuid, UUID tagUuid, String appUser);
+  void removeTagFromNote(UUID uuid, UUID tagUuid, String appUser);
 
   /**
    * Reads note tags

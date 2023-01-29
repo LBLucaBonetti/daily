@@ -98,10 +98,7 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @PathVariable("tagUuid") UUID tagUuid,
       @AuthenticationPrincipal OidcUser appUser) {
-    if (!Boolean.TRUE.equals(
-        noteService.removeTagFromNote(uuid, tagUuid, appUserService.getUid(appUser)))) {
-      return ResponseEntity.notFound().build();
-    }
+    noteService.removeTagFromNote(uuid, tagUuid, appUserService.getUid(appUser));
 
     return ResponseEntity.noContent().build();
   }

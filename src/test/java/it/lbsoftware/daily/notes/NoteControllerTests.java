@@ -47,7 +47,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
   @Mock private NoteService noteService;
-  @Mock private NoteDtoMapper noteDtoMapper;
   @Mock private TagDtoMapper tagDtoMapper;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
@@ -255,16 +254,20 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    given(noteService.removeTagFromNote(uuid, tagUuid, APP_USER)).willReturn(Boolean.FALSE);
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(noteService)
+        .removeTagFromNote(uuid, tagUuid, APP_USER);
 
     // When
-    ResponseEntity<TagDto> res = noteController.removeTagFromNote(uuid, tagUuid, appUser);
+    DailyNotFoundException res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> noteController.removeTagFromNote(uuid, tagUuid, appUser));
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).removeTagFromNote(uuid, tagUuid, APP_USER);
-    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -273,7 +276,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    given(noteService.removeTagFromNote(uuid, tagUuid, APP_USER)).willReturn(Boolean.TRUE);
+    doNothing().when(noteService).removeTagFromNote(uuid, tagUuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = noteController.removeTagFromNote(uuid, tagUuid, appUser);

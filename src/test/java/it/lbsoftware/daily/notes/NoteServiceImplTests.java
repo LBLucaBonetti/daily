@@ -293,7 +293,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not add tag to note because of note not found and return false")
+  @DisplayName("Should not add tag to note because of note not found")
   void test10() {
     // Given
     Optional<Note> noteOptional = Optional.empty();
@@ -314,7 +314,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not add tag to note because of tag not found and return false")
+  @DisplayName("Should not add tag to note because of tag not found")
   void test11() {
     // Given
     Optional<Note> noteOptional = Optional.of(createNote(TEXT, Collections.emptySet(), APP_USER));
@@ -337,7 +337,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should add tag to note and return true")
+  @DisplayName("Should add tag to note")
   void test12() {
     // Given
     Note note = createNote(TEXT, new HashSet<>(), APP_USER);
@@ -361,25 +361,29 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not remove tag from note because of note not found and return false")
+  @DisplayName("Should not remove tag from note because of note not found")
   void test13() {
     // Given
     Optional<Note> noteOptional = Optional.empty();
     UUID uuid = UUID.randomUUID();
+    UUID tagUuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
 
     // When
-    Boolean res = noteService.removeTagFromNote(uuid, UUID.randomUUID(), APP_USER);
+    var res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> noteService.removeTagFromNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagService, times(0)).readTag(any(), any());
     verify(noteRepository, times(0)).save(any());
-    assertEquals(Boolean.FALSE, res);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
-  @DisplayName("Should not remove tag from note because of tag not found and return false")
+  @DisplayName("Should not remove tag from note because of tag not found")
   void test14() {
     // Given
     Optional<Note> noteOptional = Optional.of(createNote(TEXT, Collections.emptySet(), APP_USER));
@@ -390,17 +394,20 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Boolean res = noteService.removeTagFromNote(uuid, tagUuid, APP_USER);
+    var res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> noteService.removeTagFromNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagService, times(1)).readTag(tagUuid, APP_USER);
     verify(noteRepository, times(0)).save(any());
-    assertEquals(Boolean.FALSE, res);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
-  @DisplayName("Should remove tag from note and return true")
+  @DisplayName("Should remove tag from note")
   void test15() {
     // Given
     Note note = createNote(TEXT, new HashSet<>(), APP_USER);
@@ -414,7 +421,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Boolean res = noteService.removeTagFromNote(uuid, tagUuid, APP_USER);
+    assertDoesNotThrow(() -> noteService.removeTagFromNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
@@ -422,7 +429,6 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     verify(noteRepository, times(1)).save(note);
     assertFalse(note.getTags().contains(tag));
     assertFalse(tag.getNotes().contains(note));
-    assertEquals(Boolean.TRUE, res);
   }
 
   @Test

@@ -88,22 +88,18 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional
-  public Boolean removeTagFromNote(
+  public void removeTagFromNote(
       @NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull String appUser) {
-    Optional<Note> noteOptional = noteRepository.findByUuidAndAppUser(uuid, appUser);
-    if (noteOptional.isEmpty()) {
-      return false;
-    }
-    Optional<Tag> tagOptional = tagService.readTag(tagUuid, appUser);
-    if (tagOptional.isEmpty()) {
-      return false;
-    }
-    Note note = noteOptional.get();
-    Tag tag = tagOptional.get();
+    Note note =
+        noteRepository
+            .findByUuidAndAppUser(uuid, appUser)
+            .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
+    Tag tag =
+        tagService
+            .readTag(tagUuid, appUser)
+            .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     tag.removeFromNote(note);
     noteRepository.save(note);
-
-    return true;
   }
 
   @Override
