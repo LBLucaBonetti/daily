@@ -210,21 +210,25 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not add tag to note and return not found")
+  @DisplayName("Should not add tag to note and throw not found")
   void test9() {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willReturn(Boolean.FALSE);
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(noteService)
+        .addTagToNote(uuid, tagUuid, APP_USER);
 
     // When
-    ResponseEntity<TagDto> res = noteController.addTagToNote(uuid, tagUuid, appUser);
+    DailyNotFoundException res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> noteController.addTagToNote(uuid, tagUuid, appUser));
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).addTagToNote(uuid, tagUuid, APP_USER);
-    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -233,7 +237,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willReturn(Boolean.TRUE);
+    doNothing().when(noteService).addTagToNote(uuid, tagUuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = noteController.addTagToNote(uuid, tagUuid, appUser);
@@ -345,19 +349,18 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    DailyConflictException dailyConflictException =
-        new DailyConflictException(Constants.ERROR_NOTE_TAGS_MAX);
-    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willThrow(dailyConflictException);
+    doThrow(new DailyConflictException(Constants.ERROR_NOTE_TAGS_MAX))
+        .when(noteService)
+        .addTagToNote(uuid, tagUuid, APP_USER);
 
     // When
-    ResponseStatusException res =
+    DailyConflictException res =
         assertThrows(
-            ResponseStatusException.class,
+            DailyConflictException.class,
             () -> noteController.addTagToNote(uuid, tagUuid, appUser));
 
     // Then
     assertNotNull(res);
-    assertEquals(HttpStatus.CONFLICT, res.getStatusCode());
-    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getReason());
+    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getMessage());
   }
 }

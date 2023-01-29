@@ -60,9 +60,8 @@ public interface NoteService {
    * @param uuid Note uuid
    * @param tagUuid Tag uuid
    * @param appUser Unique id of the appUser
-   * @return True if the tag is correctly added to the note, false otherwise
    */
-  Boolean addTagToNote(UUID uuid, UUID tagUuid, String appUser);
+  void addTagToNote(UUID uuid, UUID tagUuid, String appUser);
 
   /**
    * Removes a tag from a note

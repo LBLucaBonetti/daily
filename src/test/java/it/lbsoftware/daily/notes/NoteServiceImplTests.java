@@ -298,16 +298,19 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     // Given
     Optional<Note> noteOptional = Optional.empty();
     UUID uuid = UUID.randomUUID();
+    UUID tagUuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
 
     // When
-    Boolean res = noteService.addTagToNote(uuid, UUID.randomUUID(), APP_USER);
+    var res =
+        assertThrows(
+            DailyNotFoundException.class, () -> noteService.addTagToNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagService, times(0)).readTag(any(), any());
     verify(noteRepository, times(0)).save(any());
-    assertEquals(Boolean.FALSE, res);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -322,13 +325,15 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Boolean res = noteService.addTagToNote(uuid, tagUuid, APP_USER);
+    var res =
+        assertThrows(
+            DailyNotFoundException.class, () -> noteService.addTagToNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagService, times(1)).readTag(tagUuid, APP_USER);
     verify(noteRepository, times(0)).save(any());
-    assertEquals(Boolean.FALSE, res);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -345,7 +350,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Boolean res = noteService.addTagToNote(uuid, tagUuid, APP_USER);
+    assertDoesNotThrow(() -> noteService.addTagToNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
@@ -353,7 +358,6 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     verify(noteRepository, times(1)).save(note);
     assertTrue(note.getTags().contains(tag));
     assertTrue(tag.getNotes().contains(note));
-    assertEquals(Boolean.TRUE, res);
   }
 
   @Test

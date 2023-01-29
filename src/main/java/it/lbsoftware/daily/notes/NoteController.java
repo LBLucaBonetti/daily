@@ -88,14 +88,7 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @PathVariable("tagUuid") UUID tagUuid,
       @AuthenticationPrincipal OidcUser appUser) {
-    try {
-      if (!Boolean.TRUE.equals(
-          noteService.addTagToNote(uuid, tagUuid, appUserService.getUid(appUser)))) {
-        return ResponseEntity.notFound().build();
-      }
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
-    }
+    noteService.addTagToNote(uuid, tagUuid, appUserService.getUid(appUser));
 
     return ResponseEntity.noContent().build();
   }
