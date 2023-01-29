@@ -1,7 +1,6 @@
 package it.lbsoftware.daily.notes;
 
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
-import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,10 +18,7 @@ import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyConflictException;
 import it.lbsoftware.daily.exception.DailyNotFoundException;
-import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
-import it.lbsoftware.daily.tags.TagDtoMapper;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -47,7 +43,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
   @Mock private NoteService noteService;
-  @Mock private TagDtoMapper tagDtoMapper;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
   @Mock private Pageable pageable;
@@ -55,7 +50,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    noteController = new NoteController(noteService, tagDtoMapper, appUserService);
+    noteController = new NoteController(noteService, appUserService);
     given(appUserService.getUid(appUser)).willReturn(APP_USER);
   }
 
@@ -292,7 +287,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not read note tags and return not found")
   void test13() {
     // Given
-    Optional<Set<Tag>> readNoteTags = Optional.empty();
+    Optional<Set<TagDto>> readNoteTags = Optional.empty();
     UUID uuid = UUID.randomUUID();
     given(noteService.readNoteTags(uuid, APP_USER)).willReturn(readNoteTags);
 
@@ -310,12 +305,9 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read note tags and return ok")
   void test14() {
     // Given
-    Optional<Set<Tag>> readNoteTags =
-        Optional.of(Set.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER)));
     UUID uuid = UUID.randomUUID();
     Set<TagDto> readNoteTagDtos = Set.of(createTagDto(uuid, NAME, COLOR_HEX));
-    given(noteService.readNoteTags(uuid, APP_USER)).willReturn(readNoteTags);
-    given(tagDtoMapper.convertToDto(readNoteTags.get())).willReturn(readNoteTagDtos);
+    given(noteService.readNoteTags(uuid, APP_USER)).willReturn(Optional.of(readNoteTagDtos));
 
     // When
     ResponseEntity<Set<TagDto>> res = noteController.readNoteTags(uuid, appUser);
@@ -323,7 +315,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).readNoteTags(uuid, APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(readNoteTags.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readNoteTagDtos, res.getBody());
   }

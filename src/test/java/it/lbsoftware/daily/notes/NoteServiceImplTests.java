@@ -3,6 +3,7 @@ package it.lbsoftware.daily.notes;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,6 +21,8 @@ import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyConflictException;
 import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDto;
+import it.lbsoftware.daily.tags.TagDtoMapper;
 import it.lbsoftware.daily.tags.TagService;
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,6 +55,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @Mock private TagService tagService;
   @Mock private Pageable pageable;
   @Mock private NoteDtoMapper noteDtoMapper;
+  @Mock private TagDtoMapper tagDtoMapper;
   private NoteServiceImpl noteService;
 
   private static Stream<Arguments> test18() {
@@ -122,7 +126,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    noteService = new NoteServiceImpl(noteRepository, tagService, noteDtoMapper);
+    noteService = new NoteServiceImpl(noteRepository, tagService, noteDtoMapper, tagDtoMapper);
   }
 
   @Test
@@ -440,7 +444,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     given(noteRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER)).willReturn(noteOptional);
 
     // When
-    Optional<Set<Tag>> res = noteService.readNoteTags(uuid, APP_USER);
+    Optional<Set<TagDto>> res = noteService.readNoteTags(uuid, APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUserFetchTags(uuid, APP_USER);
@@ -452,16 +456,18 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   void test17() {
     // Given
     Set<Tag> tags = Set.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
     Optional<Note> noteOptional = Optional.of(createNote(TEXT, tags, APP_USER));
     UUID uuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER)).willReturn(noteOptional);
+    given(tagDtoMapper.convertToDto(tags)).willReturn(Set.of(tagDto));
 
     // When
-    Optional<Set<Tag>> res = noteService.readNoteTags(uuid, APP_USER);
+    Optional<Set<TagDto>> res = noteService.readNoteTags(uuid, APP_USER);
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUserFetchTags(uuid, APP_USER);
-    assertEquals(Optional.of(tags), res);
+    assertEquals(Optional.of(Set.of(tagDto)), res);
   }
 
   @ParameterizedTest

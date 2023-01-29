@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.notes;
 
-import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDto;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -79,5 +79,5 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Read note tags or empty value if the note does not exist
    */
-  Optional<Set<Tag>> readNoteTags(UUID uuid, String appUser);
+  Optional<Set<TagDto>> readNoteTags(UUID uuid, String appUser);
 }

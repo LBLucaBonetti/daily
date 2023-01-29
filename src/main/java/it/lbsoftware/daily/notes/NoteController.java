@@ -3,7 +3,6 @@ package it.lbsoftware.daily.notes;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.tags.TagDto;
-import it.lbsoftware.daily.tags.TagDtoMapper;
 import jakarta.validation.Valid;
 import java.util.Set;
 import java.util.UUID;
@@ -30,7 +29,6 @@ import org.springframework.web.server.ResponseStatusException;
 class NoteController {
 
   private final NoteService noteService;
-  private final TagDtoMapper tagDtoMapper;
   private final AppUserService appUserService;
 
   @PostMapping
@@ -108,7 +106,7 @@ class NoteController {
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
     return noteService
         .readNoteTags(uuid, appUserService.getUid(appUser))
-        .map(readNoteTags -> ResponseEntity.ok(tagDtoMapper.convertToDto(readNoteTags)))
+        .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 }

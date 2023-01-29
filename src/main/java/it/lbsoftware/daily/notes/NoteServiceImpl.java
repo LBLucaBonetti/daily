@@ -4,6 +4,8 @@ import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyConflictException;
 import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDto;
+import it.lbsoftware.daily.tags.TagDtoMapper;
 import it.lbsoftware.daily.tags.TagService;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +24,7 @@ public class NoteServiceImpl implements NoteService {
   private final NoteRepository noteRepository;
   private final TagService tagService;
   private final NoteDtoMapper noteDtoMapper;
+  private final TagDtoMapper tagDtoMapper;
 
   @Override
   public NoteDto createNote(@NonNull NoteDto note, @NonNull String appUser) {
@@ -104,7 +107,10 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<Set<Tag>> readNoteTags(@NonNull UUID uuid, @NonNull String appUser) {
-    return noteRepository.findByUuidAndAppUserFetchTags(uuid, appUser).map(Note::getTags);
+  public Optional<Set<TagDto>> readNoteTags(@NonNull UUID uuid, @NonNull String appUser) {
+    return noteRepository
+        .findByUuidAndAppUserFetchTags(uuid, appUser)
+        .map(Note::getTags)
+        .map(tagDtoMapper::convertToDto);
   }
 }
