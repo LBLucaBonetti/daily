@@ -66,10 +66,8 @@ class TagController {
       @PathVariable("uuid") UUID uuid,
       @Valid @RequestBody TagDto tagDto,
       @AuthenticationPrincipal OidcUser appUser) {
-    Tag tag = tagDtoMapper.convertToEntity(tagDto);
-
     return tagService
-        .updateTag(uuid, tag, appUserService.getUid(appUser))
+        .updateTag(uuid, tagDto, appUserService.getUid(appUser))
         .<ResponseEntity<TagDto>>map(updatedTag -> ResponseEntity.noContent().build())
         .orElseGet(() -> ResponseEntity.notFound().build());
   }

@@ -130,20 +130,17 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not update tag and return not found")
   void test5() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
-    Optional<Tag> updatedTag = Optional.empty();
     UUID uuid = UUID.randomUUID();
     TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
-    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
-    given(tagService.updateTag(uuid, tag, APP_USER)).willReturn(updatedTag);
+    Optional<TagDto> updatedTagDto = Optional.empty();
+    given(tagService.updateTag(uuid, tagDto, APP_USER)).willReturn(updatedTagDto);
 
     // When
     ResponseEntity<TagDto> res = tagController.updateTag(uuid, tagDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
-    verify(tagService, times(1)).updateTag(uuid, tag, APP_USER);
+    verify(tagService, times(1)).updateTag(uuid, tagDto, APP_USER);
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -152,20 +149,17 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should update tag and return no content")
   void test6() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
-    Optional<Tag> updatedTag = Optional.of(tag);
     UUID uuid = UUID.randomUUID();
     TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
-    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
-    given(tagService.updateTag(uuid, tag, APP_USER)).willReturn(updatedTag);
+    Optional<TagDto> updatedTag = Optional.of(tagDto);
+    given(tagService.updateTag(uuid, tagDto, APP_USER)).willReturn(updatedTag);
 
     // When
     ResponseEntity<TagDto> res = tagController.updateTag(uuid, tagDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
-    verify(tagService, times(1)).updateTag(uuid, tag, APP_USER);
+    verify(tagService, times(1)).updateTag(uuid, tagDto, APP_USER);
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }

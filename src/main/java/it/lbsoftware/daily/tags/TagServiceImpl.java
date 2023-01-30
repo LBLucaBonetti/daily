@@ -40,7 +40,8 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional
-  public Optional<Tag> updateTag(@NonNull UUID uuid, @NonNull Tag tag, @NonNull String appUser) {
+  public Optional<TagDto> updateTag(
+      @NonNull UUID uuid, @NonNull TagDto tag, @NonNull String appUser) {
     return tagRepository
         .findByUuidAndAppUser(uuid, appUser)
         .map(
@@ -48,7 +49,8 @@ public class TagServiceImpl implements TagService {
               prevTag.setName(tag.getName());
               prevTag.setColorHex(tag.getColorHex());
               return tagRepository.save(prevTag);
-            });
+            })
+        .map(tagDtoMapper::convertToDto);
   }
 
   @Override

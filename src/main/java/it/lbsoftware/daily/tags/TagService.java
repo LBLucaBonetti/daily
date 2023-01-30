@@ -42,7 +42,7 @@ public interface TagService {
    * @param appUser Unique id of the appUser
    * @return Updated tag or empty value
    */
-  Optional<Tag> updateTag(UUID uuid, Tag tag, String appUser);
+  Optional<TagDto> updateTag(UUID uuid, TagDto tag, String appUser);
 
   /**
    * Deletes a tag
