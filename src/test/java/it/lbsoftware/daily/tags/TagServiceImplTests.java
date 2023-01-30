@@ -142,27 +142,30 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByAppUser(pageable, APP_USER)).willReturn(tags);
 
     // When
-    Page<Tag> res = tagService.readTags(pageable, APP_USER);
+    Page<TagDto> res = tagService.readTags(pageable, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByAppUser(pageable, APP_USER);
-    assertEquals(tags, res);
+    assertEquals(Page.empty(), res);
   }
 
   @Test
   @DisplayName("Should read tags and return tag list")
   void test5() {
     // Given
-    Page<Tag> tags =
-        new PageImpl<>(List.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER)));
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
+    Page<Tag> tags = new PageImpl<>(List.of(tag));
     given(tagRepository.findByAppUser(pageable, APP_USER)).willReturn(tags);
+    given(tagDtoMapper.convertToDto(tag)).willReturn(tagDto);
 
     // When
-    Page<Tag> res = tagService.readTags(pageable, APP_USER);
+    Page<TagDto> res = tagService.readTags(pageable, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByAppUser(pageable, APP_USER);
-    assertEquals(tags, res);
+    verify(tagDtoMapper, times(1)).convertToDto(tag);
+    assertEquals(tagDto, res.get().findFirst().get());
   }
 
   @Test

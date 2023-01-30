@@ -109,11 +109,9 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read tags and return ok")
   void test4() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
-    Page<Tag> readTags = new PageImpl<>(List.of(tag));
+    Page<TagDto> readTags = new PageImpl<>(List.of(tagDto));
     given(tagService.readTags(pageable, APP_USER)).willReturn(readTags);
-    given(tagDtoMapper.convertToDto(tag)).willReturn(tagDto);
 
     // When
     ResponseEntity<PageDto<TagDto>> res = tagController.readTags(pageable, appUser);
@@ -121,7 +119,6 @@ class TagControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(tagService, times(1)).readTags(pageable, APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(tag);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertNotNull(res.getBody());
     assertNotNull(res.getBody().getContent());

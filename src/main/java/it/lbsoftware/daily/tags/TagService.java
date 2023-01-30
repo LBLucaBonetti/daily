@@ -32,7 +32,7 @@ public interface TagService {
    * @param appUser Unique id of the appUser
    * @return Read tags or empty list
    */
-  Page<Tag> readTags(Pageable pageable, String appUser);
+  Page<TagDto> readTags(Pageable pageable, String appUser);
 
   /**
    * Updates a tag

@@ -34,8 +34,8 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<Tag> readTags(Pageable pageable, @NonNull String appUser) {
-    return tagRepository.findByAppUser(pageable, appUser);
+  public Page<TagDto> readTags(Pageable pageable, @NonNull String appUser) {
+    return tagRepository.findByAppUser(pageable, appUser).map(tagDtoMapper::convertToDto);
   }
 
   @Override

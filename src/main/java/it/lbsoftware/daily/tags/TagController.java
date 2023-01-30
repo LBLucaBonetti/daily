@@ -50,13 +50,13 @@ class TagController {
   @GetMapping
   public ResponseEntity<PageDto<TagDto>> readTags(
       Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
-    Page<Tag> readTags;
+    Page<TagDto> readTags;
     try {
       readTags = tagService.readTags(pageable, appUserService.getUid(appUser));
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
     }
-    PageDto<TagDto> readTagDtos = new PageDto<>(readTags.map(tagDtoMapper::convertToDto));
+    PageDto<TagDto> readTagDtos = new PageDto<>(readTags);
 
     return ResponseEntity.ok(readTagDtos);
   }
