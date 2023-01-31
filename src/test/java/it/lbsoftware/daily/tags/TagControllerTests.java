@@ -1,6 +1,5 @@
 package it.lbsoftware.daily.tags;
 
-import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +16,6 @@ import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyNotFoundException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,7 +37,6 @@ class TagControllerTests extends DailyAbstractUnitTests {
   private static final String COLOR_HEX = "#123456";
   private static final String APP_USER = "appUser";
   @Mock private TagService tagService;
-  @Mock private TagDtoMapper tagDtoMapper;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
   @Mock private Pageable pageable;
@@ -47,7 +44,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    tagController = new TagController(tagService, tagDtoMapper, appUserService);
+    tagController = new TagController(tagService, appUserService);
     given(appUserService.getUid(appUser)).willReturn(APP_USER);
   }
 
@@ -73,7 +70,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not read tag and return not found")
   void test2() {
     // Given
-    Optional<Tag> readTag = Optional.empty();
+    Optional<TagDto> readTag = Optional.empty();
     UUID uuid = UUID.randomUUID();
     given(tagService.readTag(uuid, APP_USER)).willReturn(readTag);
 
@@ -91,12 +88,9 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read tag and return ok")
   void test3() {
     // Given
-    Optional<Tag> readTag =
-        Optional.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
     UUID uuid = UUID.randomUUID();
-    TagDto readTagDto = createTagDto(uuid, NAME, COLOR_HEX);
+    Optional<TagDto> readTag = Optional.of(createTagDto(uuid, NAME, COLOR_HEX));
     given(tagService.readTag(uuid, APP_USER)).willReturn(readTag);
-    given(tagDtoMapper.convertToDto(readTag.get())).willReturn(readTagDto);
 
     // When
     ResponseEntity<TagDto> res = tagController.readTag(uuid, appUser);
@@ -104,9 +98,8 @@ class TagControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(tagService, times(1)).readTag(uuid, APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(readTag.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
-    assertEquals(readTagDto, res.getBody());
+    assertEquals(readTag.get(), res.getBody());
   }
 
   @Test

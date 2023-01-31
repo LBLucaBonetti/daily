@@ -114,27 +114,31 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tag);
 
     // When
-    Optional<Tag> res = tagService.readTag(uuid, APP_USER);
+    Optional<TagDto> res = tagService.readTag(uuid, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    assertEquals(tag, res);
+    verify(tagDtoMapper, times(0)).convertToDto((Tag) any());
+    assertEquals(Optional.empty(), res);
   }
 
   @Test
   @DisplayName("Should read tag and return tag optional")
   void test3() {
     // Given
-    Optional<Tag> tag = Optional.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     UUID uuid = UUID.randomUUID();
-    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tag);
+    TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
+    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(Optional.of(tag));
+    given(tagDtoMapper.convertToDto(tag)).willReturn(tagDto);
 
     // When
-    Optional<Tag> res = tagService.readTag(uuid, APP_USER);
+    Optional<TagDto> res = tagService.readTag(uuid, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    assertEquals(tag, res);
+    verify(tagDtoMapper, times(1)).convertToDto(tag);
+    assertEquals(Optional.of(tagDto), res);
   }
 
   @Test

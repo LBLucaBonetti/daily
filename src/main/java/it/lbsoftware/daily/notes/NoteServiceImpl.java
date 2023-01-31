@@ -6,7 +6,7 @@ import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
-import it.lbsoftware.daily.tags.TagService;
+import it.lbsoftware.daily.tags.TagRepository;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoteServiceImpl implements NoteService {
 
   private final NoteRepository noteRepository;
-  private final TagService tagService;
+  private final TagRepository tagRepository;
   private final NoteDtoMapper noteDtoMapper;
   private final TagDtoMapper tagDtoMapper;
 
@@ -79,8 +79,8 @@ public class NoteServiceImpl implements NoteService {
             .findByUuidAndAppUser(uuid, appUser)
             .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     Tag tag =
-        tagService
-            .readTag(tagUuid, appUser)
+        tagRepository
+            .findByUuidAndAppUser(tagUuid, appUser)
             .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     if (note.getTags().size() >= Constants.NOTE_TAGS_MAX) {
       throw new DailyConflictException(Constants.ERROR_NOTE_TAGS_MAX);
@@ -98,8 +98,8 @@ public class NoteServiceImpl implements NoteService {
             .findByUuidAndAppUser(uuid, appUser)
             .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     Tag tag =
-        tagService
-            .readTag(tagUuid, appUser)
+        tagRepository
+            .findByUuidAndAppUser(tagUuid, appUser)
             .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     tag.removeFromNote(note);
     noteRepository.save(note);

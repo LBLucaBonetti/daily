@@ -30,8 +30,8 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<Tag> readTag(@NonNull UUID uuid, @NonNull String appUser) {
-    return tagRepository.findByUuidAndAppUser(uuid, appUser);
+  public Optional<TagDto> readTag(@NonNull UUID uuid, @NonNull String appUser) {
+    return tagRepository.findByUuidAndAppUser(uuid, appUser).map(tagDtoMapper::convertToDto);
   }
 
   @Override

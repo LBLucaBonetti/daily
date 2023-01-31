@@ -27,7 +27,6 @@ import org.springframework.web.server.ResponseStatusException;
 class TagController {
 
   private final TagService tagService;
-  private final TagDtoMapper tagDtoMapper;
   private final AppUserService appUserService;
 
   @PostMapping
@@ -43,7 +42,7 @@ class TagController {
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
     return tagService
         .readTag(uuid, appUserService.getUid(appUser))
-        .map(readTag -> ResponseEntity.ok(tagDtoMapper.convertToDto(readTag)))
+        .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 

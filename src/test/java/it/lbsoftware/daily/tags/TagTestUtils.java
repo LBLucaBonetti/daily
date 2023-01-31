@@ -13,9 +13,9 @@ public final class TagTestUtils {
   /**
    * TagDto generator
    *
-   * @param uuid
-   * @param name
-   * @param colorHex
+   * @param uuid Unique identifier
+   * @param name Name content
+   * @param colorHex Color hex content
    * @return The created TagDto
    */
   public static TagDto createTagDto(final UUID uuid, final String name, final String colorHex) {
@@ -29,10 +29,10 @@ public final class TagTestUtils {
   /**
    * Tag generator; the created instance is not persisted
    *
-   * @param name
-   * @param colorHex
-   * @param notes
-   * @param appUser
+   * @param name Name content
+   * @param colorHex Color hex content
+   * @param notes Notes set
+   * @param appUser The creator
    * @return The created Tag
    */
   public static Tag createTag(

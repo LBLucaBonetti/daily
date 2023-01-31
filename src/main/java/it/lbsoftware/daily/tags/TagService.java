@@ -23,7 +23,7 @@ public interface TagService {
    * @param appUser Unique id of the appUser
    * @return Read tag or empty value
    */
-  Optional<Tag> readTag(UUID uuid, String appUser);
+  Optional<TagDto> readTag(UUID uuid, String appUser);
 
   /**
    * Reads tags

@@ -23,7 +23,7 @@ import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
-import it.lbsoftware.daily.tags.TagService;
+import it.lbsoftware.daily.tags.TagRepository;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -52,7 +52,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
   @Mock private NoteRepository noteRepository;
-  @Mock private TagService tagService;
+  @Mock private TagRepository tagRepository;
   @Mock private Pageable pageable;
   @Mock private NoteDtoMapper noteDtoMapper;
   @Mock private TagDtoMapper tagDtoMapper;
@@ -126,7 +126,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    noteService = new NoteServiceImpl(noteRepository, tagService, noteDtoMapper, tagDtoMapper);
+    noteService = new NoteServiceImpl(noteRepository, tagRepository, noteDtoMapper, tagDtoMapper);
   }
 
   @Test
@@ -312,7 +312,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService, times(0)).readTag(any(), any());
+    verify(tagRepository, times(0)).findByUuidAndAppUser(any(), any());
     verify(noteRepository, times(0)).save(any());
     assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
@@ -326,7 +326,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
-    given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
 
     // When
     var res =
@@ -335,7 +335,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
     verify(noteRepository, times(0)).save(any());
     assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
@@ -351,14 +351,14 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
-    given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
 
     // When
     assertDoesNotThrow(() -> noteService.addTagToNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
     verify(noteRepository, times(1)).save(note);
     assertTrue(note.getTags().contains(tag));
     assertTrue(tag.getNotes().contains(note));
@@ -381,7 +381,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService, times(0)).readTag(any(), any());
+    verify(tagRepository, times(0)).findByUuidAndAppUser(any(), any());
     verify(noteRepository, times(0)).save(any());
     assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
@@ -395,7 +395,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
-    given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
 
     // When
     var res =
@@ -405,7 +405,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
     verify(noteRepository, times(0)).save(any());
     assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
@@ -422,14 +422,14 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
-    given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
 
     // When
     assertDoesNotThrow(() -> noteService.removeTagFromNote(uuid, tagUuid, APP_USER));
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
     verify(noteRepository, times(1)).save(note);
     assertFalse(note.getTags().contains(tag));
     assertFalse(tag.getNotes().contains(note));
@@ -539,7 +539,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
     given(noteRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(noteOptional);
-    given(tagService.readTag(tagUuid, APP_USER)).willReturn(tagOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
     createTag("name1", "#123456", new HashSet<>(), APP_USER).addToNote(note);
     createTag("name2", "#234567", new HashSet<>(), APP_USER).addToNote(note);
     createTag("name3", "#345678", new HashSet<>(), APP_USER).addToNote(note);
@@ -553,7 +553,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagService, times(1)).readTag(tagUuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
     verify(noteRepository, times(0)).save(any());
     assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getMessage());
   }

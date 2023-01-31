@@ -13,8 +13,8 @@ public final class NoteTestUtils {
   /**
    * NoteDto generator
    *
-   * @param uuid
-   * @param text
+   * @param uuid Unique identifier
+   * @param text Text content
    * @return The created NoteDto
    */
   public static NoteDto createNoteDto(final UUID uuid, final String text) {
@@ -27,9 +27,9 @@ public final class NoteTestUtils {
   /**
    * Note generator; the created instance is not persisted
    *
-   * @param text
-   * @param tags
-   * @param appUser
+   * @param text Text content
+   * @param tags Tags set
+   * @param appUser The creator
    * @return The created Note
    */
   public static Note createNote(final String text, final Set<Tag> tags, final String appUser) {
