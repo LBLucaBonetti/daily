@@ -2,6 +2,7 @@ package it.lbsoftware.daily.tags;
 
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,6 +13,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -210,7 +213,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not delete tag and return false")
+  @DisplayName("Should not delete tag and throw")
   void test8() {
     // Given
     Optional<Tag> tagOptional = Optional.empty();
@@ -218,16 +221,17 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Boolean res = tagService.deleteTag(uuid, APP_USER);
+    DailyNotFoundException res =
+        assertThrows(DailyNotFoundException.class, () -> tagService.deleteTag(uuid, APP_USER));
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagRepository, times(0)).delete(any());
-    assertEquals(Boolean.FALSE, res);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
-  @DisplayName("Should delete tag and return true")
+  @DisplayName("Should delete tag")
   void test9() {
     // Given
     Optional<Tag> tagOptional =
@@ -236,12 +240,11 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Boolean res = tagService.deleteTag(uuid, APP_USER);
+    assertDoesNotThrow(() -> tagService.deleteTag(uuid, APP_USER));
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagRepository, times(1)).delete(tagOptional.get());
-    assertEquals(Boolean.TRUE, res);
   }
 
   @ParameterizedTest

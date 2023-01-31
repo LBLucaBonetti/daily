@@ -7,12 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -169,16 +173,18 @@ class TagControllerTests extends DailyAbstractUnitTests {
   void test7() {
     // Given
     UUID uuid = UUID.randomUUID();
-    given(tagService.deleteTag(uuid, APP_USER)).willReturn(Boolean.FALSE);
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(tagService)
+        .deleteTag(uuid, APP_USER);
 
     // When
-    ResponseEntity<TagDto> res = tagController.deleteTag(uuid, appUser);
+    DailyNotFoundException res =
+        assertThrows(DailyNotFoundException.class, () -> tagController.deleteTag(uuid, appUser));
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(tagService, times(1)).deleteTag(uuid, APP_USER);
-    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -186,7 +192,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
   void test8() {
     // Given
     UUID uuid = UUID.randomUUID();
-    given(tagService.deleteTag(uuid, APP_USER)).willReturn(Boolean.TRUE);
+    doNothing().when(tagService).deleteTag(uuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = tagController.deleteTag(uuid, appUser);

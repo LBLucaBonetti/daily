@@ -49,7 +49,6 @@ public interface TagService {
    *
    * @param uuid Tag uuid
    * @param appUser Unique id of the appUser
-   * @return True if the tag is deleted, false otherwise
    */
-  Boolean deleteTag(UUID uuid, String appUser);
+  void deleteTag(UUID uuid, String appUser);
 }

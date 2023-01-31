@@ -75,9 +75,7 @@ class TagController {
   @DeleteMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> deleteTag(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
-    if (!Boolean.TRUE.equals(tagService.deleteTag(uuid, appUserService.getUid(appUser)))) {
-      return ResponseEntity.notFound().build();
-    }
+    tagService.deleteTag(uuid, appUserService.getUid(appUser));
 
     return ResponseEntity.noContent().build();
   }

@@ -1,5 +1,7 @@
 package it.lbsoftware.daily.tags;
 
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.notes.Note;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,17 +57,14 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional
-  public Boolean deleteTag(@NonNull UUID uuid, @NonNull String appUser) {
-    Optional<Tag> tagOptional = tagRepository.findByUuidAndAppUser(uuid, appUser);
-    if (tagOptional.isEmpty()) {
-      return false;
-    }
-    Tag tag = tagOptional.get();
+  public void deleteTag(@NonNull UUID uuid, @NonNull String appUser) {
+    Tag tag =
+        tagRepository
+            .findByUuidAndAppUser(uuid, appUser)
+            .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     for (Note note : tag.getNotes()) {
       note.getTags().remove(tag);
     }
     tagRepository.delete(tag);
-
-    return true;
   }
 }
