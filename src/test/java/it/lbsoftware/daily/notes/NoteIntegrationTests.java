@@ -1004,7 +1004,6 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     String nonexistentField = "nonexistent-field";
 
     // When
-
     var res =
         mockMvc
             .perform(
