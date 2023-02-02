@@ -1,5 +1,9 @@
 package it.lbsoftware.daily.notes;
 
+import static it.lbsoftware.daily.config.Constants.DO_NOT_STORE_NULL_SPEL;
+import static it.lbsoftware.daily.config.Constants.NOTE_CACHE;
+import static it.lbsoftware.daily.config.Constants.NOTE_TAGS_CACHE_KEY_SPEL;
+
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyConflictException;
 import it.lbsoftware.daily.exception.DailyNotFoundException;
@@ -12,6 +16,9 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = NOTE_CACHE)
 public class NoteServiceImpl implements NoteService {
 
   private final NoteRepository noteRepository;
@@ -63,6 +71,7 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional
+  @CacheEvict(key = NOTE_TAGS_CACHE_KEY_SPEL)
   public void deleteNote(@NonNull UUID uuid, @NonNull String appUser) {
     Note note =
         noteRepository
@@ -73,6 +82,7 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional
+  @CacheEvict(key = NOTE_TAGS_CACHE_KEY_SPEL)
   public void addTagToNote(@NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull String appUser) {
     Note note =
         noteRepository
@@ -91,6 +101,7 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional
+  @CacheEvict(key = NOTE_TAGS_CACHE_KEY_SPEL)
   public void removeTagFromNote(
       @NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull String appUser) {
     Note note =
@@ -107,6 +118,7 @@ public class NoteServiceImpl implements NoteService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(key = NOTE_TAGS_CACHE_KEY_SPEL, unless = DO_NOT_STORE_NULL_SPEL)
   public Optional<Set<TagDto>> readNoteTags(@NonNull UUID uuid, @NonNull String appUser) {
     return noteRepository
         .findByUuidAndAppUserFetchTags(uuid, appUser)

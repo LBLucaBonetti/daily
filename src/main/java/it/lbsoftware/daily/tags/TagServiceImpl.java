@@ -1,5 +1,10 @@
 package it.lbsoftware.daily.tags;
 
+import static it.lbsoftware.daily.config.Constants.BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL;
+import static it.lbsoftware.daily.config.Constants.DO_NOT_STORE_NULL_SPEL;
+import static it.lbsoftware.daily.config.Constants.NOTE_CACHE;
+import static it.lbsoftware.daily.config.Constants.TAG_CACHE;
+
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.notes.Note;
@@ -7,6 +12,10 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +39,10 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(
+      cacheNames = TAG_CACHE,
+      key = BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL,
+      unless = DO_NOT_STORE_NULL_SPEL)
   public Optional<TagDto> readTag(@NonNull UUID uuid, @NonNull String appUser) {
     return tagRepository.findByUuidAndAppUser(uuid, appUser).map(tagDtoMapper::convertToDto);
   }
@@ -42,6 +55,14 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional
+  @Caching(
+      put = {
+        @CachePut(
+            cacheNames = TAG_CACHE,
+            key = BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL,
+            unless = DO_NOT_STORE_NULL_SPEL)
+      },
+      evict = {@CacheEvict(cacheNames = NOTE_CACHE, allEntries = true)})
   public Optional<TagDto> updateTag(
       @NonNull UUID uuid, @NonNull TagDto tag, @NonNull String appUser) {
     return tagRepository
@@ -57,6 +78,11 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional
+  @Caching(
+      evict = {
+        @CacheEvict(cacheNames = TAG_CACHE, key = BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL),
+        @CacheEvict(cacheNames = NOTE_CACHE, allEntries = true)
+      })
   public void deleteTag(@NonNull UUID uuid, @NonNull String appUser) {
     Tag tag =
         tagRepository
