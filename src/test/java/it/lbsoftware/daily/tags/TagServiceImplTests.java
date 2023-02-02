@@ -1,7 +1,10 @@
 package it.lbsoftware.daily.tags;
 
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,6 +13,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +41,12 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   private static final String OTHER_COLOR_HEX = "#654321";
   @Mock private TagRepository tagRepository;
   @Mock private Pageable pageable;
+  @Mock private TagDtoMapper tagDtoMapper;
   private TagServiceImpl tagService;
 
   private static Stream<Arguments> test10() {
     // Tag, appUser
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto tag = createTagDto(null, NAME, COLOR_HEX);
     return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(tag, null));
   }
 
@@ -53,7 +59,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   private static Stream<Arguments> test13() {
     // Uuid, tag, appUser
     UUID uuid = UUID.randomUUID();
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto tag = createTagDto(uuid, NAME, COLOR_HEX);
     return Stream.of(
         arguments(null, null, null),
         arguments(null, null, APP_USER),
@@ -72,23 +78,31 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    tagService = new TagServiceImpl(tagRepository);
+    tagService = new TagServiceImpl(tagRepository, tagDtoMapper);
   }
 
   @Test
   @DisplayName("Should create tag and return tag")
   void test1() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), null);
-    Tag createdTag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
-    given(tagRepository.save(tag)).willReturn(createdTag);
+    TagDto tag = createTagDto(null, NAME, COLOR_HEX);
+    Tag tagEntity = createTag(NAME, COLOR_HEX, Collections.emptySet(), null);
+    Tag savedTagEntity = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
+    given(tagDtoMapper.convertToEntity(tag)).willReturn(tagEntity);
+    given(tagRepository.save(tagEntity)).willReturn(savedTagEntity);
+    given(tagDtoMapper.convertToDto(savedTagEntity)).willReturn(tagDto);
 
     // When
-    Tag res = tagService.createTag(tag, APP_USER);
+    TagDto res = tagService.createTag(tag, APP_USER);
 
     // Then
-    verify(tagRepository, times(1)).save(tag);
-    assertEquals(APP_USER, res.getAppUser());
+    verify(tagDtoMapper, times(1)).convertToEntity(tag);
+    verify(tagRepository, times(1)).save(tagEntity);
+    verify(tagDtoMapper, times(1)).convertToDto(savedTagEntity);
+    assertEquals(NAME, res.getName());
+    assertEquals(COLOR_HEX, res.getColorHex());
+    assertNotNull(res.getUuid());
   }
 
   @Test
@@ -100,27 +114,31 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tag);
 
     // When
-    Optional<Tag> res = tagService.readTag(uuid, APP_USER);
+    Optional<TagDto> res = tagService.readTag(uuid, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    assertEquals(tag, res);
+    verify(tagDtoMapper, times(0)).convertToDto((Tag) any());
+    assertEquals(Optional.empty(), res);
   }
 
   @Test
   @DisplayName("Should read tag and return tag optional")
   void test3() {
     // Given
-    Optional<Tag> tag = Optional.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     UUID uuid = UUID.randomUUID();
-    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tag);
+    TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
+    given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(Optional.of(tag));
+    given(tagDtoMapper.convertToDto(tag)).willReturn(tagDto);
 
     // When
-    Optional<Tag> res = tagService.readTag(uuid, APP_USER);
+    Optional<TagDto> res = tagService.readTag(uuid, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    assertEquals(tag, res);
+    verify(tagDtoMapper, times(1)).convertToDto(tag);
+    assertEquals(Optional.of(tagDto), res);
   }
 
   @Test
@@ -131,27 +149,30 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByAppUser(pageable, APP_USER)).willReturn(tags);
 
     // When
-    Page<Tag> res = tagService.readTags(pageable, APP_USER);
+    Page<TagDto> res = tagService.readTags(pageable, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByAppUser(pageable, APP_USER);
-    assertEquals(tags, res);
+    assertEquals(Page.empty(), res);
   }
 
   @Test
   @DisplayName("Should read tags and return tag list")
   void test5() {
     // Given
-    Page<Tag> tags =
-        new PageImpl<>(List.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER)));
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
+    Page<Tag> tags = new PageImpl<>(List.of(tag));
     given(tagRepository.findByAppUser(pageable, APP_USER)).willReturn(tags);
+    given(tagDtoMapper.convertToDto(tag)).willReturn(tagDto);
 
     // When
-    Page<Tag> res = tagService.readTags(pageable, APP_USER);
+    Page<TagDto> res = tagService.readTags(pageable, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByAppUser(pageable, APP_USER);
-    assertEquals(tags, res);
+    verify(tagDtoMapper, times(1)).convertToDto(tag);
+    assertEquals(tagDto, res.get().findFirst().get());
   }
 
   @Test
@@ -163,9 +184,8 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Optional<Tag> res =
-        tagService.updateTag(
-            uuid, createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER), APP_USER);
+    Optional<TagDto> res =
+        tagService.updateTag(uuid, createTagDto(uuid, NAME, COLOR_HEX), APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
@@ -180,24 +200,24 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     Tag prevTag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     Tag updatedTag = createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), APP_USER);
     UUID uuid = UUID.randomUUID();
+    TagDto updatedTagDto = createTagDto(uuid, OTHER_NAME, OTHER_COLOR_HEX);
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(Optional.of(prevTag));
     given(tagRepository.save(prevTag)).willReturn(updatedTag);
+    given(tagDtoMapper.convertToDto(updatedTag)).willReturn(updatedTagDto);
 
     // When
-    Optional<Tag> res =
-        tagService.updateTag(
-            uuid, createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), null), APP_USER);
+    Optional<TagDto> res = tagService.updateTag(uuid, updatedTagDto, APP_USER);
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagRepository, times(1)).save(prevTag);
-    assertEquals(res, Optional.of(updatedTag));
+    assertEquals(res, Optional.of(updatedTagDto));
     assertEquals(OTHER_NAME, res.get().getName());
     assertEquals(OTHER_COLOR_HEX, res.get().getColorHex());
   }
 
   @Test
-  @DisplayName("Should not delete tag and return false")
+  @DisplayName("Should not delete tag and throw")
   void test8() {
     // Given
     Optional<Tag> tagOptional = Optional.empty();
@@ -205,16 +225,17 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Boolean res = tagService.deleteTag(uuid, APP_USER);
+    DailyNotFoundException res =
+        assertThrows(DailyNotFoundException.class, () -> tagService.deleteTag(uuid, APP_USER));
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagRepository, times(0)).delete(any());
-    assertEquals(Boolean.FALSE, res);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
-  @DisplayName("Should delete tag and return true")
+  @DisplayName("Should delete tag")
   void test9() {
     // Given
     Optional<Tag> tagOptional =
@@ -223,18 +244,17 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(tagOptional);
 
     // When
-    Boolean res = tagService.deleteTag(uuid, APP_USER);
+    assertDoesNotThrow(() -> tagService.deleteTag(uuid, APP_USER));
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagRepository, times(1)).delete(tagOptional.get());
-    assertEquals(Boolean.TRUE, res);
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when create tag with null argument")
-  void test10(Tag tag, String appUser) {
+  void test10(TagDto tag, String appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.createTag(tag, appUser));
   }
 
@@ -255,7 +275,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when update tag with null argument")
-  void test13(UUID uuid, Tag tag, String appUser) {
+  void test13(UUID uuid, TagDto tag, String appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.updateTag(uuid, tag, appUser));
   }
 

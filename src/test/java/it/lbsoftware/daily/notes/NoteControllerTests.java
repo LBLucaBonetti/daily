@@ -1,14 +1,14 @@
 package it.lbsoftware.daily.notes;
 
-import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
-import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -16,11 +16,9 @@ import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyException;
-import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.exception.DailyConflictException;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.TagDto;
-import it.lbsoftware.daily.tags.TagDtoMapper;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,8 +43,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
   @Mock private NoteService noteService;
-  @Mock private NoteDtoMapper noteDtoMapper;
-  @Mock private TagDtoMapper tagDtoMapper;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
   @Mock private Pageable pageable;
@@ -54,7 +50,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    noteController = new NoteController(noteService, noteDtoMapper, tagDtoMapper, appUserService);
+    noteController = new NoteController(noteService, appUserService);
     given(appUserService.getUid(appUser)).willReturn(APP_USER);
   }
 
@@ -63,21 +59,15 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   void test1() {
     // Given
     NoteDto noteDto = createNoteDto(null, TEXT);
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
-    Note createdNote = createNote(TEXT, Collections.emptySet(), APP_USER);
     NoteDto createdNoteDto = createNoteDto(UUID.randomUUID(), TEXT);
-    given(noteDtoMapper.convertToEntity(noteDto)).willReturn(note);
-    given(noteService.createNote(note, APP_USER)).willReturn(createdNote);
-    given(noteDtoMapper.convertToDto(createdNote)).willReturn(createdNoteDto);
+    given(noteService.createNote(noteDto, APP_USER)).willReturn(createdNoteDto);
 
     // When
     ResponseEntity<NoteDto> res = noteController.createNote(noteDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
-    verify(noteService, times(1)).createNote(note, APP_USER);
-    verify(noteDtoMapper, times(1)).convertToDto(createdNote);
+    verify(noteService, times(1)).createNote(noteDto, APP_USER);
     assertEquals(HttpStatus.CREATED, res.getStatusCode());
     assertEquals(createdNoteDto, res.getBody());
   }
@@ -86,7 +76,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not read note and return not found")
   void test2() {
     // Given
-    Optional<Note> readNote = Optional.empty();
+    Optional<NoteDto> readNote = Optional.empty();
     UUID uuid = UUID.randomUUID();
     given(noteService.readNote(uuid, APP_USER)).willReturn(readNote);
 
@@ -104,11 +94,9 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read note and return ok")
   void test3() {
     // Given
-    Optional<Note> readNote = Optional.of(createNote(TEXT, Collections.emptySet(), APP_USER));
     UUID uuid = UUID.randomUUID();
-    NoteDto readNoteDto = createNoteDto(uuid, TEXT);
+    Optional<NoteDto> readNote = Optional.of(createNoteDto(uuid, TEXT));
     given(noteService.readNote(uuid, APP_USER)).willReturn(readNote);
-    given(noteDtoMapper.convertToDto(readNote.get())).willReturn(readNoteDto);
 
     // When
     ResponseEntity<NoteDto> res = noteController.readNote(uuid, appUser);
@@ -116,20 +104,17 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).readNote(uuid, APP_USER);
-    verify(noteDtoMapper, times(1)).convertToDto(readNote.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
-    assertEquals(readNoteDto, res.getBody());
+    assertEquals(readNote.get(), res.getBody());
   }
 
   @Test
   @DisplayName("Should read notes and return ok")
   void test4() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
     NoteDto noteDto = createNoteDto(UUID.randomUUID(), TEXT);
-    Page<Note> readNotes = new PageImpl<>(List.of(note));
+    Page<NoteDto> readNotes = new PageImpl<>(List.of(noteDto));
     given(noteService.readNotes(pageable, APP_USER)).willReturn(readNotes);
-    given(noteDtoMapper.convertToDto(note)).willReturn(noteDto);
 
     // When
     ResponseEntity<PageDto<NoteDto>> res = noteController.readNotes(pageable, appUser);
@@ -137,7 +122,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).readNotes(pageable, APP_USER);
-    verify(noteDtoMapper, times(1)).convertToDto(note);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertNotNull(res.getBody());
     assertNotNull(res.getBody().getContent());
@@ -149,20 +133,17 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not update note and return not found")
   void test5() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
-    Optional<Note> updatedNote = Optional.empty();
     UUID uuid = UUID.randomUUID();
     NoteDto noteDto = createNoteDto(uuid, TEXT);
-    given(noteDtoMapper.convertToEntity(noteDto)).willReturn(note);
-    given(noteService.updateNote(uuid, note, APP_USER)).willReturn(updatedNote);
+    Optional<NoteDto> updatedNoteDto = Optional.empty();
+    given(noteService.updateNote(uuid, noteDto, APP_USER)).willReturn(updatedNoteDto);
 
     // When
     ResponseEntity<NoteDto> res = noteController.updateNote(uuid, noteDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
-    verify(noteService, times(1)).updateNote(uuid, note, APP_USER);
+    verify(noteService, times(1)).updateNote(uuid, noteDto, APP_USER);
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -171,39 +152,38 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should update note and return no content")
   void test6() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
-    Optional<Note> updatedNote = Optional.of(note);
     UUID uuid = UUID.randomUUID();
     NoteDto noteDto = createNoteDto(uuid, TEXT);
-    given(noteDtoMapper.convertToEntity(noteDto)).willReturn(note);
-    given(noteService.updateNote(uuid, note, APP_USER)).willReturn(updatedNote);
+    Optional<NoteDto> updatedNote = Optional.of(noteDto);
+    given(noteService.updateNote(uuid, noteDto, APP_USER)).willReturn(updatedNote);
 
     // When
     ResponseEntity<NoteDto> res = noteController.updateNote(uuid, noteDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(noteDtoMapper, times(1)).convertToEntity(noteDto);
-    verify(noteService, times(1)).updateNote(uuid, note, APP_USER);
+    verify(noteService, times(1)).updateNote(uuid, noteDto, APP_USER);
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }
 
   @Test
-  @DisplayName("Should not delete note and return not found")
+  @DisplayName("Should not delete note and throw not found")
   void test7() {
     // Given
     UUID uuid = UUID.randomUUID();
-    given(noteService.deleteNote(uuid, APP_USER)).willReturn(Boolean.FALSE);
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(noteService)
+        .deleteNote(uuid, APP_USER);
 
     // When
-    ResponseEntity<NoteDto> res = noteController.deleteNote(uuid, appUser);
+    DailyNotFoundException res =
+        assertThrows(DailyNotFoundException.class, () -> noteController.deleteNote(uuid, appUser));
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).deleteNote(uuid, APP_USER);
-    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -211,7 +191,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   void test8() {
     // Given
     UUID uuid = UUID.randomUUID();
-    given(noteService.deleteNote(uuid, APP_USER)).willReturn(Boolean.TRUE);
+    doNothing().when(noteService).deleteNote(uuid, APP_USER);
 
     // When
     ResponseEntity<NoteDto> res = noteController.deleteNote(uuid, appUser);
@@ -224,21 +204,25 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not add tag to note and return not found")
+  @DisplayName("Should not add tag to note and throw not found")
   void test9() {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willReturn(Boolean.FALSE);
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(noteService)
+        .addTagToNote(uuid, tagUuid, APP_USER);
 
     // When
-    ResponseEntity<TagDto> res = noteController.addTagToNote(uuid, tagUuid, appUser);
+    DailyNotFoundException res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> noteController.addTagToNote(uuid, tagUuid, appUser));
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).addTagToNote(uuid, tagUuid, APP_USER);
-    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -247,7 +231,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willReturn(Boolean.TRUE);
+    doNothing().when(noteService).addTagToNote(uuid, tagUuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = noteController.addTagToNote(uuid, tagUuid, appUser);
@@ -265,16 +249,20 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    given(noteService.removeTagFromNote(uuid, tagUuid, APP_USER)).willReturn(Boolean.FALSE);
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(noteService)
+        .removeTagFromNote(uuid, tagUuid, APP_USER);
 
     // When
-    ResponseEntity<TagDto> res = noteController.removeTagFromNote(uuid, tagUuid, appUser);
+    DailyNotFoundException res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> noteController.removeTagFromNote(uuid, tagUuid, appUser));
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).removeTagFromNote(uuid, tagUuid, APP_USER);
-    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -283,7 +271,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    given(noteService.removeTagFromNote(uuid, tagUuid, APP_USER)).willReturn(Boolean.TRUE);
+    doNothing().when(noteService).removeTagFromNote(uuid, tagUuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = noteController.removeTagFromNote(uuid, tagUuid, appUser);
@@ -299,7 +287,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not read note tags and return not found")
   void test13() {
     // Given
-    Optional<Set<Tag>> readNoteTags = Optional.empty();
+    Optional<Set<TagDto>> readNoteTags = Optional.empty();
     UUID uuid = UUID.randomUUID();
     given(noteService.readNoteTags(uuid, APP_USER)).willReturn(readNoteTags);
 
@@ -317,12 +305,9 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read note tags and return ok")
   void test14() {
     // Given
-    Optional<Set<Tag>> readNoteTags =
-        Optional.of(Set.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER)));
     UUID uuid = UUID.randomUUID();
     Set<TagDto> readNoteTagDtos = Set.of(createTagDto(uuid, NAME, COLOR_HEX));
-    given(noteService.readNoteTags(uuid, APP_USER)).willReturn(readNoteTags);
-    given(tagDtoMapper.convertToDto(readNoteTags.get())).willReturn(readNoteTagDtos);
+    given(noteService.readNoteTags(uuid, APP_USER)).willReturn(Optional.of(readNoteTagDtos));
 
     // When
     ResponseEntity<Set<TagDto>> res = noteController.readNoteTags(uuid, appUser);
@@ -330,7 +315,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).readNoteTags(uuid, APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(readNoteTags.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readNoteTagDtos, res.getBody());
   }
@@ -359,18 +343,18 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    DailyException dailyException = new DailyException(Constants.ERROR_NOTE_TAGS_MAX);
-    given(noteService.addTagToNote(uuid, tagUuid, APP_USER)).willThrow(dailyException);
+    doThrow(new DailyConflictException(Constants.ERROR_NOTE_TAGS_MAX))
+        .when(noteService)
+        .addTagToNote(uuid, tagUuid, APP_USER);
 
     // When
-    ResponseStatusException res =
+    DailyConflictException res =
         assertThrows(
-            ResponseStatusException.class,
+            DailyConflictException.class,
             () -> noteController.addTagToNote(uuid, tagUuid, appUser));
 
     // Then
     assertNotNull(res);
-    assertEquals(HttpStatus.CONFLICT, res.getStatusCode());
-    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getReason());
+    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getMessage());
   }
 }

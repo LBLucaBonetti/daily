@@ -14,7 +14,7 @@ public interface TagService {
    * @param appUser Unique id of the appUser
    * @return Created tag
    */
-  Tag createTag(Tag tag, String appUser);
+  TagDto createTag(TagDto tag, String appUser);
 
   /**
    * Reads a tag
@@ -23,7 +23,7 @@ public interface TagService {
    * @param appUser Unique id of the appUser
    * @return Read tag or empty value
    */
-  Optional<Tag> readTag(UUID uuid, String appUser);
+  Optional<TagDto> readTag(UUID uuid, String appUser);
 
   /**
    * Reads tags
@@ -32,7 +32,7 @@ public interface TagService {
    * @param appUser Unique id of the appUser
    * @return Read tags or empty list
    */
-  Page<Tag> readTags(Pageable pageable, String appUser);
+  Page<TagDto> readTags(Pageable pageable, String appUser);
 
   /**
    * Updates a tag
@@ -42,14 +42,13 @@ public interface TagService {
    * @param appUser Unique id of the appUser
    * @return Updated tag or empty value
    */
-  Optional<Tag> updateTag(UUID uuid, Tag tag, String appUser);
+  Optional<TagDto> updateTag(UUID uuid, TagDto tag, String appUser);
 
   /**
    * Deletes a tag
    *
    * @param uuid Tag uuid
    * @param appUser Unique id of the appUser
-   * @return True if the tag is deleted, false otherwise
    */
-  Boolean deleteTag(UUID uuid, String appUser);
+  void deleteTag(UUID uuid, String appUser);
 }

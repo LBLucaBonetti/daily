@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 public final class TestUtils {
 
+  // The order in which the table names are listed matters
   private static final String[] tableNames = {"note_tag", "tag", "note"};
 
   private TestUtils() {

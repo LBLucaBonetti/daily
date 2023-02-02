@@ -1,19 +1,21 @@
 package it.lbsoftware.daily.tags;
 
-import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
-import java.util.Collections;
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,7 +37,6 @@ class TagControllerTests extends DailyAbstractUnitTests {
   private static final String COLOR_HEX = "#123456";
   private static final String APP_USER = "appUser";
   @Mock private TagService tagService;
-  @Mock private TagDtoMapper tagDtoMapper;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
   @Mock private Pageable pageable;
@@ -43,7 +44,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    tagController = new TagController(tagService, tagDtoMapper, appUserService);
+    tagController = new TagController(tagService, appUserService);
     given(appUserService.getUid(appUser)).willReturn(APP_USER);
   }
 
@@ -52,21 +53,15 @@ class TagControllerTests extends DailyAbstractUnitTests {
   void test1() {
     // Given
     TagDto tagDto = createTagDto(null, NAME, COLOR_HEX);
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
-    Tag createdTag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     TagDto createdTagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
-    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
-    given(tagService.createTag(tag, APP_USER)).willReturn(createdTag);
-    given(tagDtoMapper.convertToDto(createdTag)).willReturn(createdTagDto);
+    given(tagService.createTag(tagDto, APP_USER)).willReturn(createdTagDto);
 
     // When
     ResponseEntity<TagDto> res = tagController.createTag(tagDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
-    verify(tagService, times(1)).createTag(tag, APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(createdTag);
+    verify(tagService, times(1)).createTag(tagDto, APP_USER);
     assertEquals(HttpStatus.CREATED, res.getStatusCode());
     assertEquals(createdTagDto, res.getBody());
   }
@@ -75,7 +70,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not read tag and return not found")
   void test2() {
     // Given
-    Optional<Tag> readTag = Optional.empty();
+    Optional<TagDto> readTag = Optional.empty();
     UUID uuid = UUID.randomUUID();
     given(tagService.readTag(uuid, APP_USER)).willReturn(readTag);
 
@@ -93,12 +88,9 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read tag and return ok")
   void test3() {
     // Given
-    Optional<Tag> readTag =
-        Optional.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
     UUID uuid = UUID.randomUUID();
-    TagDto readTagDto = createTagDto(uuid, NAME, COLOR_HEX);
+    Optional<TagDto> readTag = Optional.of(createTagDto(uuid, NAME, COLOR_HEX));
     given(tagService.readTag(uuid, APP_USER)).willReturn(readTag);
-    given(tagDtoMapper.convertToDto(readTag.get())).willReturn(readTagDto);
 
     // When
     ResponseEntity<TagDto> res = tagController.readTag(uuid, appUser);
@@ -106,20 +98,17 @@ class TagControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(tagService, times(1)).readTag(uuid, APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(readTag.get());
     assertEquals(HttpStatus.OK, res.getStatusCode());
-    assertEquals(readTagDto, res.getBody());
+    assertEquals(readTag.get(), res.getBody());
   }
 
   @Test
   @DisplayName("Should read tags and return ok")
   void test4() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
-    Page<Tag> readTags = new PageImpl<>(List.of(tag));
+    Page<TagDto> readTags = new PageImpl<>(List.of(tagDto));
     given(tagService.readTags(pageable, APP_USER)).willReturn(readTags);
-    given(tagDtoMapper.convertToDto(tag)).willReturn(tagDto);
 
     // When
     ResponseEntity<PageDto<TagDto>> res = tagController.readTags(pageable, appUser);
@@ -127,7 +116,6 @@ class TagControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(tagService, times(1)).readTags(pageable, APP_USER);
-    verify(tagDtoMapper, times(1)).convertToDto(tag);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertNotNull(res.getBody());
     assertNotNull(res.getBody().getContent());
@@ -139,20 +127,17 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should not update tag and return not found")
   void test5() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
-    Optional<Tag> updatedTag = Optional.empty();
     UUID uuid = UUID.randomUUID();
     TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
-    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
-    given(tagService.updateTag(uuid, tag, APP_USER)).willReturn(updatedTag);
+    Optional<TagDto> updatedTagDto = Optional.empty();
+    given(tagService.updateTag(uuid, tagDto, APP_USER)).willReturn(updatedTagDto);
 
     // When
     ResponseEntity<TagDto> res = tagController.updateTag(uuid, tagDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
-    verify(tagService, times(1)).updateTag(uuid, tag, APP_USER);
+    verify(tagService, times(1)).updateTag(uuid, tagDto, APP_USER);
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -161,20 +146,17 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should update tag and return no content")
   void test6() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
-    Optional<Tag> updatedTag = Optional.of(tag);
     UUID uuid = UUID.randomUUID();
     TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
-    given(tagDtoMapper.convertToEntity(tagDto)).willReturn(tag);
-    given(tagService.updateTag(uuid, tag, APP_USER)).willReturn(updatedTag);
+    Optional<TagDto> updatedTag = Optional.of(tagDto);
+    given(tagService.updateTag(uuid, tagDto, APP_USER)).willReturn(updatedTag);
 
     // When
     ResponseEntity<TagDto> res = tagController.updateTag(uuid, tagDto, appUser);
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
-    verify(tagDtoMapper, times(1)).convertToEntity(tagDto);
-    verify(tagService, times(1)).updateTag(uuid, tag, APP_USER);
+    verify(tagService, times(1)).updateTag(uuid, tagDto, APP_USER);
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }
@@ -184,16 +166,18 @@ class TagControllerTests extends DailyAbstractUnitTests {
   void test7() {
     // Given
     UUID uuid = UUID.randomUUID();
-    given(tagService.deleteTag(uuid, APP_USER)).willReturn(Boolean.FALSE);
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(tagService)
+        .deleteTag(uuid, APP_USER);
 
     // When
-    ResponseEntity<TagDto> res = tagController.deleteTag(uuid, appUser);
+    DailyNotFoundException res =
+        assertThrows(DailyNotFoundException.class, () -> tagController.deleteTag(uuid, appUser));
 
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(tagService, times(1)).deleteTag(uuid, APP_USER);
-    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
 
   @Test
@@ -201,7 +185,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
   void test8() {
     // Given
     UUID uuid = UUID.randomUUID();
-    given(tagService.deleteTag(uuid, APP_USER)).willReturn(Boolean.TRUE);
+    doNothing().when(tagService).deleteTag(uuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = tagController.deleteTag(uuid, appUser);

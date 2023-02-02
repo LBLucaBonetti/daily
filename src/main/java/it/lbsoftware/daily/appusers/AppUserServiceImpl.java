@@ -1,14 +1,12 @@
 package it.lbsoftware.daily.appusers;
 
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class AppUserServiceImpl implements AppUserService {
 
   private static final String UID_CLAIM = "sub";

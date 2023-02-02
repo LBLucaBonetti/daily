@@ -3,7 +3,6 @@ package it.lbsoftware.daily.notes;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.tags.TagDto;
-import it.lbsoftware.daily.tags.TagDtoMapper;
 import jakarta.validation.Valid;
 import java.util.Set;
 import java.util.UUID;
@@ -30,16 +29,12 @@ import org.springframework.web.server.ResponseStatusException;
 class NoteController {
 
   private final NoteService noteService;
-  private final NoteDtoMapper noteDtoMapper;
-  private final TagDtoMapper tagDtoMapper;
   private final AppUserService appUserService;
 
   @PostMapping
   public ResponseEntity<NoteDto> createNote(
       @Valid @RequestBody NoteDto noteDto, @AuthenticationPrincipal OidcUser appUser) {
-    Note note = noteDtoMapper.convertToEntity(noteDto);
-    Note createdNote = noteService.createNote(note, appUserService.getUid(appUser));
-    NoteDto createdNoteDto = noteDtoMapper.convertToDto(createdNote);
+    NoteDto createdNoteDto = noteService.createNote(noteDto, appUserService.getUid(appUser));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdNoteDto);
   }
@@ -49,20 +44,20 @@ class NoteController {
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
     return noteService
         .readNote(uuid, appUserService.getUid(appUser))
-        .map(readNote -> ResponseEntity.ok(noteDtoMapper.convertToDto(readNote)))
+        .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @GetMapping
   public ResponseEntity<PageDto<NoteDto>> readNotes(
       Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
-    Page<Note> readNotes;
+    Page<NoteDto> readNotes;
     try {
       readNotes = noteService.readNotes(pageable, appUserService.getUid(appUser));
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
     }
-    PageDto<NoteDto> readNoteDtos = new PageDto<>(readNotes.map(noteDtoMapper::convertToDto));
+    PageDto<NoteDto> readNoteDtos = new PageDto<>(readNotes);
 
     return ResponseEntity.ok(readNoteDtos);
   }
@@ -72,10 +67,8 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @Valid @RequestBody NoteDto noteDto,
       @AuthenticationPrincipal OidcUser appUser) {
-    Note note = noteDtoMapper.convertToEntity(noteDto);
-
     return noteService
-        .updateNote(uuid, note, appUserService.getUid(appUser))
+        .updateNote(uuid, noteDto, appUserService.getUid(appUser))
         .<ResponseEntity<NoteDto>>map(updatedNote -> ResponseEntity.noContent().build())
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
@@ -83,9 +76,7 @@ class NoteController {
   @DeleteMapping(value = "/{uuid}")
   public ResponseEntity<NoteDto> deleteNote(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
-    if (!Boolean.TRUE.equals(noteService.deleteNote(uuid, appUserService.getUid(appUser)))) {
-      return ResponseEntity.notFound().build();
-    }
+    noteService.deleteNote(uuid, appUserService.getUid(appUser));
 
     return ResponseEntity.noContent().build();
   }
@@ -95,14 +86,7 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @PathVariable("tagUuid") UUID tagUuid,
       @AuthenticationPrincipal OidcUser appUser) {
-    try {
-      if (!Boolean.TRUE.equals(
-          noteService.addTagToNote(uuid, tagUuid, appUserService.getUid(appUser)))) {
-        return ResponseEntity.notFound().build();
-      }
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
-    }
+    noteService.addTagToNote(uuid, tagUuid, appUserService.getUid(appUser));
 
     return ResponseEntity.noContent().build();
   }
@@ -112,10 +96,7 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @PathVariable("tagUuid") UUID tagUuid,
       @AuthenticationPrincipal OidcUser appUser) {
-    if (!Boolean.TRUE.equals(
-        noteService.removeTagFromNote(uuid, tagUuid, appUserService.getUid(appUser)))) {
-      return ResponseEntity.notFound().build();
-    }
+    noteService.removeTagFromNote(uuid, tagUuid, appUserService.getUid(appUser));
 
     return ResponseEntity.noContent().build();
   }
@@ -125,7 +106,7 @@ class NoteController {
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
     return noteService
         .readNoteTags(uuid, appUserService.getUid(appUser))
-        .map(readNoteTags -> ResponseEntity.ok(tagDtoMapper.convertToDto(readNoteTags)))
+        .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 }

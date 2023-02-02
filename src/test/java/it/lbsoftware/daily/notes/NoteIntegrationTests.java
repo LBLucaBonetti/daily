@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyConflictException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
@@ -1003,7 +1004,6 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     String nonexistentField = "nonexistent-field";
 
     // When
-
     var res =
         mockMvc
             .perform(
@@ -1054,7 +1054,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             .getResolvedException();
 
     // Then
-    assertTrue(res instanceof ResponseStatusException);
-    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, ((ResponseStatusException) res).getReason());
+    assertTrue(res instanceof DailyConflictException);
+    assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getMessage());
   }
 }

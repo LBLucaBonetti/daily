@@ -27,15 +27,12 @@ import org.springframework.web.server.ResponseStatusException;
 class TagController {
 
   private final TagService tagService;
-  private final TagDtoMapper tagDtoMapper;
   private final AppUserService appUserService;
 
   @PostMapping
   public ResponseEntity<TagDto> createTag(
       @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal OidcUser appUser) {
-    Tag tag = tagDtoMapper.convertToEntity(tagDto);
-    Tag createdTag = tagService.createTag(tag, appUserService.getUid(appUser));
-    TagDto createdTagDto = tagDtoMapper.convertToDto(createdTag);
+    TagDto createdTagDto = tagService.createTag(tagDto, appUserService.getUid(appUser));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdTagDto);
   }
@@ -45,20 +42,20 @@ class TagController {
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
     return tagService
         .readTag(uuid, appUserService.getUid(appUser))
-        .map(readTag -> ResponseEntity.ok(tagDtoMapper.convertToDto(readTag)))
+        .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @GetMapping
   public ResponseEntity<PageDto<TagDto>> readTags(
       Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
-    Page<Tag> readTags;
+    Page<TagDto> readTags;
     try {
       readTags = tagService.readTags(pageable, appUserService.getUid(appUser));
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
     }
-    PageDto<TagDto> readTagDtos = new PageDto<>(readTags.map(tagDtoMapper::convertToDto));
+    PageDto<TagDto> readTagDtos = new PageDto<>(readTags);
 
     return ResponseEntity.ok(readTagDtos);
   }
@@ -68,10 +65,8 @@ class TagController {
       @PathVariable("uuid") UUID uuid,
       @Valid @RequestBody TagDto tagDto,
       @AuthenticationPrincipal OidcUser appUser) {
-    Tag tag = tagDtoMapper.convertToEntity(tagDto);
-
     return tagService
-        .updateTag(uuid, tag, appUserService.getUid(appUser))
+        .updateTag(uuid, tagDto, appUserService.getUid(appUser))
         .<ResponseEntity<TagDto>>map(updatedTag -> ResponseEntity.noContent().build())
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
@@ -79,9 +74,7 @@ class TagController {
   @DeleteMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> deleteTag(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
-    if (!Boolean.TRUE.equals(tagService.deleteTag(uuid, appUserService.getUid(appUser)))) {
-      return ResponseEntity.notFound().build();
-    }
+    tagService.deleteTag(uuid, appUserService.getUid(appUser));
 
     return ResponseEntity.noContent().build();
   }

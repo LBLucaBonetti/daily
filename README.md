@@ -5,7 +5,8 @@
 Technically speaking, this is a "monorepo" with a Spring Boot backend and a Quasar (Vue.js)
 frontend.
 <br>
-The backend exposes both the frontend assets, by serving the index file for each request, and a set
+The backend exposes both the frontend assets, routed by serving the index file for each request, and
+a set
 of APIs under a specific context.
 
 #### Build & run with Docker
@@ -20,7 +21,8 @@ Follow these instructions:
 
 - From the root of the project, run ```docker-compose -f daily-docker-compose.yml up --build```
   to download and build the required environment
-- When Postgres is ready to accept connections and Keycloak has started, run the following Maven
+- When Postgres and Redis are ready to accept connections and Keycloak has started, run the
+  following Maven
   command to start the
   app: ```mvn clean spring-boot:run "-Dspring-boot.run.jvmArguments=-DGOOGLE_OAUTH2_CLIENT_SECRET=nz754EdKFuBI8kJFF9fYqucW91q6mJV1 -DGOOGLE_OAUTH2_CLIENT_ID=daily -Dspring.security.oauth2.client.registration.google.scope=openid,profile,email -Dspring.security.oauth2.client.provider.google.issuer-uri=http://localhost:8081/realms/daily -Dspring.datasource.url=jdbc:postgresql://localhost:5433/daily_develop"```
 - Visit http://localhost:8080 and use ```user1@trydaily.click``` or ```user2@trydaily.click``` for

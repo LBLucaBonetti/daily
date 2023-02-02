@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.notes;
 
-import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDto;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -16,7 +16,7 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Created note
    */
-  Note createNote(Note note, String appUser);
+  NoteDto createNote(NoteDto note, String appUser);
 
   /**
    * Reads a note
@@ -25,7 +25,7 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Read note or empty value
    */
-  Optional<Note> readNote(UUID uuid, String appUser);
+  Optional<NoteDto> readNote(UUID uuid, String appUser);
 
   /**
    * Reads notes
@@ -34,7 +34,7 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Read notes or empty page
    */
-  Page<Note> readNotes(Pageable pageable, String appUser);
+  Page<NoteDto> readNotes(Pageable pageable, String appUser);
 
   /**
    * Updates a note
@@ -44,16 +44,15 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Updated note or empty value
    */
-  Optional<Note> updateNote(UUID uuid, Note note, String appUser);
+  Optional<NoteDto> updateNote(UUID uuid, NoteDto note, String appUser);
 
   /**
    * Deletes a note
    *
    * @param uuid Note uuid
    * @param appUser Unique id of the appUser
-   * @return True if the note is deleted, false otherwise
    */
-  Boolean deleteNote(UUID uuid, String appUser);
+  void deleteNote(UUID uuid, String appUser);
 
   /**
    * Adds a tag to a note
@@ -61,9 +60,8 @@ public interface NoteService {
    * @param uuid Note uuid
    * @param tagUuid Tag uuid
    * @param appUser Unique id of the appUser
-   * @return True if the tag is correctly added to the note, false otherwise
    */
-  Boolean addTagToNote(UUID uuid, UUID tagUuid, String appUser);
+  void addTagToNote(UUID uuid, UUID tagUuid, String appUser);
 
   /**
    * Removes a tag from a note
@@ -71,9 +69,8 @@ public interface NoteService {
    * @param uuid Note uuid
    * @param tagUuid Tag uuid
    * @param appUser Unique id of the appUser
-   * @return True if the tag is correctly removed from the note, false otherwise
    */
-  Boolean removeTagFromNote(UUID uuid, UUID tagUuid, String appUser);
+  void removeTagFromNote(UUID uuid, UUID tagUuid, String appUser);
 
   /**
    * Reads note tags
@@ -82,5 +79,5 @@ public interface NoteService {
    * @param appUser Unique id of the appUser
    * @return Read note tags or empty value if the note does not exist
    */
-  Optional<Set<Tag>> readNoteTags(UUID uuid, String appUser);
+  Optional<Set<TagDto>> readNoteTags(UUID uuid, String appUser);
 }
