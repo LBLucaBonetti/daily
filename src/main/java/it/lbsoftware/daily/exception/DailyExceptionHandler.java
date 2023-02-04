@@ -2,6 +2,7 @@ package it.lbsoftware.daily.exception;
 
 import it.lbsoftware.daily.config.Constants;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,7 +14,7 @@ public class DailyExceptionHandler {
   @ExceptionHandler(value = DailyNotFoundException.class)
   public ResponseEntity<Map<String, Object>> handle(DailyNotFoundException exception) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(Map.of(Constants.ERROR_KEY, exception.getMessage()));
+        .body(getExceptionBody(exception.getMessage()));
   }
 
   @ExceptionHandler(value = DailyConflictException.class)
@@ -25,10 +26,11 @@ public class DailyExceptionHandler {
   @ExceptionHandler(value = DailyBadRequestException.class)
   public ResponseEntity<Map<String, Object>> handle(DailyBadRequestException exception) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(getExceptionBody(exception.getMessage()));
+        .body(getExceptionBody((exception.getMessage())));
   }
 
   public Map<String, Object> getExceptionBody(final String errorCode) {
-    return Map.of(Constants.ERROR_KEY, errorCode);
+    return Map.of(
+        Constants.ERROR_KEY, Optional.ofNullable(errorCode).orElse(Constants.ERROR_DEFAULT));
   }
 }

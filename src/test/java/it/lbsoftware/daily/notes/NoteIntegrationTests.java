@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyBadRequestException;
 import it.lbsoftware.daily.exception.DailyConflictException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
@@ -42,7 +43,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("Note integration tests")
 class NoteIntegrationTests extends DailyAbstractIntegrationTests {
@@ -1012,10 +1012,12 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                     .param("sort", nonexistentField)
                     .with(loginOf(APP_USER)))
             .andExpect(status().isBadRequest())
-            .andReturn();
+            .andReturn()
+            .getResolvedException();
 
     // Then
-    assertTrue(res.getResolvedException() instanceof ResponseStatusException);
+    assertTrue(res instanceof DailyBadRequestException);
+    assertNull(res.getMessage());
   }
 
   @Test

@@ -16,6 +16,7 @@ import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyBadRequestException;
 import it.lbsoftware.daily.exception.DailyConflictException;
 import it.lbsoftware.daily.exception.DailyNotFoundException;
 import it.lbsoftware.daily.tags.TagDto;
@@ -33,7 +34,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("NoteController unit tests")
 class NoteControllerTests extends DailyAbstractUnitTests {
@@ -324,17 +324,19 @@ class NoteControllerTests extends DailyAbstractUnitTests {
       "Should not read notes because of wrong note field name as sort parameter and return bad request")
   void test15() {
     // Given
-    RuntimeException runtimeException = new RuntimeException();
-    given(noteService.readNotes(pageable, APP_USER)).willThrow(runtimeException);
+    doThrow(new RuntimeException("Wrong field name as sort parameter"))
+        .when(noteService)
+        .readNotes(pageable, APP_USER);
 
     // When
-    ResponseStatusException res =
+    DailyBadRequestException res =
         assertThrows(
-            ResponseStatusException.class, () -> noteController.readNotes(pageable, appUser));
+            DailyBadRequestException.class, () -> noteController.readNotes(pageable, appUser));
 
     // Then
     assertNotNull(res);
-    assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+    verify(noteService, times(1)).readNotes(pageable, APP_USER);
+    assertEquals(null, res.getMessage());
   }
 
   @Test

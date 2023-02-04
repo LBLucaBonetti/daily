@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.bases.PageDto;
+import it.lbsoftware.daily.exception.DailyBadRequestException;
 import it.lbsoftware.daily.notes.Note;
 import it.lbsoftware.daily.notes.NoteRepository;
 import java.util.Collections;
@@ -36,7 +37,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("Tag integration tests")
 class TagIntegrationTests extends DailyAbstractIntegrationTests {
@@ -632,8 +632,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     String nonexistentField = "nonexistent-field";
 
     // When
-
-    Exception res =
+    var res =
         mockMvc
             .perform(
                 get(BASE_URL)
@@ -645,7 +644,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             .getResolvedException();
 
     // Then
-    assertTrue(res instanceof ResponseStatusException);
-    assertNull(((ResponseStatusException) res).getReason());
+    assertTrue(res instanceof DailyBadRequestException);
+    assertNull(res.getMessage());
   }
 }

@@ -2,9 +2,11 @@ package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
+import it.lbsoftware.daily.exception.DailyBadRequestException;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,11 +21,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/tags")
+@CommonsLog
 class TagController {
 
   private final TagService tagService;
@@ -53,7 +55,8 @@ class TagController {
     try {
       readTags = tagService.readTags(pageable, appUserService.getUid(appUser));
     } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, null, e);
+      log.error(e);
+      throw new DailyBadRequestException(null);
     }
     PageDto<TagDto> readTagDtos = new PageDto<>(readTags);
 

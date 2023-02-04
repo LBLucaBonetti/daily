@@ -15,6 +15,7 @@ import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exception.DailyBadRequestException;
 import it.lbsoftware.daily.exception.DailyNotFoundException;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.web.server.ResponseStatusException;
 
 @DisplayName("TagController unit tests")
 class TagControllerTests extends DailyAbstractUnitTests {
@@ -202,16 +202,18 @@ class TagControllerTests extends DailyAbstractUnitTests {
       "Should not read tags because of wrong tag field name as sort parameter and return bad request")
   void test9() {
     // Given
-    ResponseStatusException responseStatusException =
-        new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    given(tagService.readTags(pageable, APP_USER)).willThrow(responseStatusException);
+    doThrow(new RuntimeException("Wrong field name as sort parameter"))
+        .when(tagService)
+        .readTags(pageable, APP_USER);
 
     // When
-    ResponseStatusException res =
+    DailyBadRequestException res =
         assertThrows(
-            ResponseStatusException.class, () -> tagController.readTags(pageable, appUser));
+            DailyBadRequestException.class, () -> tagController.readTags(pageable, appUser));
 
     // Then
     assertNotNull(res);
+    verify(tagService, times(1)).readTags(pageable, APP_USER);
+    assertEquals(null, res.getMessage());
   }
 }
