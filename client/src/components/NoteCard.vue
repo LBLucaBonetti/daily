@@ -5,7 +5,7 @@
     leave-active-class="animated fadeOut"
   >
     <q-card class="q-mt-md bg-1 text-1" flat bordered>
-      <q-card-section class="break-all">
+      <q-card-section class="note-text">
         {{ note.text }}
       </q-card-section>
 

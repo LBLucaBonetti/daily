@@ -63,8 +63,10 @@
 }
 
 // Utils
-.break-all {
-  word-break: break-all;
+.note-text {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .w-sm-50 {
