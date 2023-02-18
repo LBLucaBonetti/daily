@@ -22,9 +22,17 @@
           v-if="noteEditable"
         >
         </q-input>
-        <template v-else>
-          {{ noteText }}
-        </template>
+        <q-input
+          autogrow
+          input-class="text-1"
+          v-model="noteText"
+          min-height="15rem"
+          counter
+          maxlength="255"
+          borderless
+          readonly
+          v-else
+        ></q-input>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -148,7 +156,7 @@ async function updateNote() {
 }
 
 function editNote() {
-  noteUpdateText.value = props.note.text;
+  noteUpdateText.value = noteText.value;
   noteEditable.value = true;
 }
 
