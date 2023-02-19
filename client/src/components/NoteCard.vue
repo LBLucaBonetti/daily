@@ -84,6 +84,7 @@ import { onMounted, PropType, ref } from 'vue';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
+import { useNotesInEditStateStore } from 'src/stores/noteEditingStore';
 
 const $q = useQuasar();
 const noteText = ref('');
@@ -92,6 +93,7 @@ const noteEditable = ref(false);
 const noteUpdateText = ref('');
 const noteUpdateBtnLoading = ref(false);
 const noteUpdateInput = ref<QInput | null>(null);
+const notesInEditStateCounter = useNotesInEditStateStore();
 
 const props = defineProps({
   note: { type: Object as PropType<NoteDto>, required: true },
@@ -132,6 +134,7 @@ async function updateNote() {
       });
       // Restore non-editable state
       noteText.value = noteUpdateText.value;
+      notesInEditStateCounter.decrementNotesInEditState();
       noteEditable.value = false;
     }
   } catch (err) {
@@ -157,10 +160,12 @@ async function updateNote() {
 
 function editNote() {
   noteUpdateText.value = noteText.value;
+  notesInEditStateCounter.incrementNotesInEditState();
   noteEditable.value = true;
 }
 
 function cancelEditNote() {
+  notesInEditStateCounter.decrementNotesInEditState();
   noteEditable.value = false;
 }
 
