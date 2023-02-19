@@ -54,6 +54,7 @@
           <q-btn
             flat
             :loading="noteUpdateBtnLoading"
+            :disable="props.note.text === noteUpdateText"
             label="Save"
             aria-label="Save"
             @click="updateNote"
