@@ -21,7 +21,7 @@
         padding="sm xl"
         aria-label="Save note"
         class="q-mt-sm bg-2 text-2"
-        @click="saveNote"
+        @click="askConfirmationIfThereAreNotesInEditState"
         label="Save"
         ref="noteSaveBtn"
         :loading="noteSaveBtnLoading"
@@ -71,6 +71,7 @@ import PageDto from 'src/interfaces/PageDto';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
+import { useNotesInEditStateStore } from 'src/stores/noteEditingStore';
 
 const note = ref('');
 const noteInput = ref<QInput | null>(null);
@@ -79,6 +80,7 @@ const noteSaveBtnLoading = ref(false);
 const $q = useQuasar();
 const notes = ref<NoteDto[]>([]);
 const infiniteScroll = ref<QInfiniteScroll | null>(null);
+const notesInEditStateCounter = useNotesInEditStateStore();
 
 async function saveNote() {
   // Validate first
@@ -131,6 +133,33 @@ async function saveNote() {
   }
 }
 
+function askConfirmationIfThereAreNotesInEditState() {
+  if (notesInEditStateCounter.counter <= 0) {
+    saveNote();
+    return;
+  }
+  $q.dialog({
+    title: 'Confirm',
+    message:
+      'You currently have ' +
+      notesInEditStateCounter.counter +
+      ' notes being edited. If you proceed, you will lose your changes to them. Choose ok to discard changes and save the note or cancel to keep editing them and avoid saving this note',
+    persistent: true,
+    class: 'bg-1 text-1',
+    ok: {
+      flat: true,
+      class: 'bg-1 text-1',
+    },
+    cancel: {
+      flat: true,
+      class: 'bg-1 text-1',
+    },
+    focus: 'cancel',
+  }).onOk(() => {
+    saveNote();
+  });
+}
+
 function onLoad(index: number, done: () => void) {
   api
     .get('/notes', {
@@ -172,6 +201,7 @@ function reloadNotes() {
     return;
   }
 
+  notesInEditStateCounter.$reset();
   infiniteScroll.value.reset();
   notes.value = [];
   infiniteScroll.value.resume();
