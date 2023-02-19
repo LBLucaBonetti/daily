@@ -143,7 +143,9 @@ function askConfirmationIfThereAreNotesInEditState() {
     message:
       'You currently have ' +
       notesInEditStateCounter.counter +
-      ' notes being edited. If you proceed, you will lose your changes to them. Choose ok to discard changes and save the note or cancel to keep editing them and avoid saving this note',
+      (notesInEditStateCounter.counter == 1 ? ' note' : ' notes') +
+      ' being edited. If you proceed, you will lose your changes to them. Choose <span class="text-1 text-weight-medium">OK</span> to discard changes and save the note or <span class="text-1 text-weight-medium">CANCEL</span> to keep editing them and avoid saving this note',
+    html: true,
     persistent: true,
     class: 'bg-1 text-1',
     ok: {
