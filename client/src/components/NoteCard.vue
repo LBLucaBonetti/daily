@@ -4,7 +4,15 @@
     enter-active-class="animated fadeIn"
     leave-active-class="animated fadeOut"
   >
-    <q-card class="q-mt-md bg-1 text-1" flat bordered>
+    <q-card
+      :class="
+        noteEditable
+          ? 'q-mt-md bg-1 text-1 border-primary'
+          : 'q-mt-md bg-1 text-1'
+      "
+      flat
+      bordered
+    >
       <q-card-section class="note-text">
         <q-input
           autogrow

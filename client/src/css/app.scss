@@ -25,6 +25,10 @@
   border-color: #3f3d56 !important;
 }
 
+.border-primary {
+  border-color: $primary;
+}
+
 // Fonts
 @font-face {
   font-family: poppins-regular;
