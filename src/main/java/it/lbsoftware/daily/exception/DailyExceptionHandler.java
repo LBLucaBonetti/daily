@@ -26,11 +26,14 @@ public class DailyExceptionHandler {
   @ExceptionHandler(value = DailyBadRequestException.class)
   public ResponseEntity<Map<String, Object>> handle(DailyBadRequestException exception) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(getExceptionBody((exception.getMessage())));
+        .body(getExceptionBody(exception.getMessage()));
   }
 
   public Map<String, Object> getExceptionBody(final String errorCode) {
     return Map.of(
-        Constants.ERROR_KEY, Optional.ofNullable(errorCode).orElse(Constants.ERROR_DEFAULT));
+        Constants.ERROR_KEY,
+        Optional.ofNullable(errorCode)
+            .filter(ec -> ec.startsWith(Constants.ERROR_PREFIX))
+            .orElse(Constants.ERROR_DEFAULT));
   }
 }

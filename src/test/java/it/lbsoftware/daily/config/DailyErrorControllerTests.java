@@ -27,7 +27,8 @@ import org.springframework.http.ResponseEntity;
 class DailyErrorControllerTests extends DailyAbstractUnitTests {
 
   private static final String ERROR_KEY = "error";
-  private static final String ERROR_DEFAULT = "error.default";
+  private static final String ERROR_PREFIX = "daily.error.";
+  private static final String ERROR_DEFAULT = ERROR_PREFIX + "default";
   private DailyErrorController dailyErrorController;
   @Mock private DailyExceptionHandler dailyExceptionHandler;
 
