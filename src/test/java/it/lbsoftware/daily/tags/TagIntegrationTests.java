@@ -118,7 +118,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
 
   @ParameterizedTest
   @NullAndEmptySource
-  @ValueSource(strings = {"   ", "12345678901234567890123456789012"})
+  @ValueSource(strings = {"   ", "1234567890123456789012345678901"})
   @DisplayName("Should return bad request when create tag with wrong name")
   void test9(final String name) throws Exception {
     // Given
