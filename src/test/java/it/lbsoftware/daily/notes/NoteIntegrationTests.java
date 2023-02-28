@@ -59,6 +59,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   private static final String COLOR_HEX = "#123456";
   private static final String OTHER_NAME = "otherName";
   private static final String OTHER_COLOR_HEX = "#654321";
+  private static final LocalDateTime A_LOCALDATETIME_IN_THE_PAST =
+      LocalDateTime.of(1993, 5, 17, 0, 0, 0, 0);
   @Autowired private ObjectMapper objectMapper;
   @Autowired private NoteRepository noteRepository;
   @Autowired private NoteDtoMapper noteDtoMapper;
@@ -1076,8 +1078,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   void test57() throws Exception {
     // Given
     UUID uuid = UUID.randomUUID();
-    LocalDateTime createdAt = LocalDateTime.MIN;
-    LocalDateTime updatedAt = LocalDateTime.MIN;
+    LocalDateTime createdAt = A_LOCALDATETIME_IN_THE_PAST;
+    LocalDateTime updatedAt = A_LOCALDATETIME_IN_THE_PAST;
     NoteDto noteDto = createNoteDto(uuid, TEXT);
     noteDto.setCreatedAt(createdAt);
     noteDto.setUpdatedAt(updatedAt);
@@ -1111,8 +1113,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   void test58() throws Exception {
     // Given
     UUID uuid = UUID.randomUUID();
-    LocalDateTime createdAt = LocalDateTime.MIN;
-    LocalDateTime updatedAt = LocalDateTime.MIN;
+    LocalDateTime createdAt = A_LOCALDATETIME_IN_THE_PAST;
+    LocalDateTime updatedAt = A_LOCALDATETIME_IN_THE_PAST;
     NoteDto noteDto = createNoteDto(uuid, OTHER_TEXT);
     noteDto.setCreatedAt(createdAt);
     noteDto.setUpdatedAt(updatedAt);

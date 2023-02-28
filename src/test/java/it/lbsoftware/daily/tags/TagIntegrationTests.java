@@ -52,6 +52,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   private static final String OTHER_NAME = "otherName";
   private static final String OTHER_COLOR_HEX = "#654321";
   private static final String TEXT = "text";
+  private static final LocalDateTime A_LOCALDATETIME_IN_THE_PAST =
+      LocalDateTime.of(1993, 5, 17, 0, 0, 0, 0);
   @Autowired private ObjectMapper objectMapper;
   @Autowired private TagRepository tagRepository;
   @Autowired private TagDtoMapper tagDtoMapper;
@@ -660,8 +662,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   void test32() throws Exception {
     // Given
     UUID uuid = UUID.randomUUID();
-    LocalDateTime createdAt = LocalDateTime.MIN;
-    LocalDateTime updatedAt = LocalDateTime.MIN;
+    LocalDateTime createdAt = A_LOCALDATETIME_IN_THE_PAST;
+    LocalDateTime updatedAt = A_LOCALDATETIME_IN_THE_PAST;
     TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
     tagDto.setCreatedAt(createdAt);
     tagDto.setUpdatedAt(updatedAt);
@@ -695,8 +697,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   void test33() throws Exception {
     // Given
     UUID uuid = UUID.randomUUID();
-    LocalDateTime createdAt = LocalDateTime.MIN;
-    LocalDateTime updatedAt = LocalDateTime.MIN;
+    LocalDateTime createdAt = A_LOCALDATETIME_IN_THE_PAST;
+    LocalDateTime updatedAt = A_LOCALDATETIME_IN_THE_PAST;
     TagDto tagDto = createTagDto(uuid, OTHER_NAME, OTHER_COLOR_HEX);
     tagDto.setCreatedAt(createdAt);
     tagDto.setUpdatedAt(updatedAt);
