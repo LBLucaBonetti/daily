@@ -4,8 +4,10 @@ import static it.lbsoftware.daily.TestUtils.loginOf;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,6 +26,7 @@ import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.exception.DailyBadRequestException;
 import it.lbsoftware.daily.notes.Note;
 import it.lbsoftware.daily.notes.NoteRepository;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -340,8 +343,12 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     List<TagDto> tagDtos = res.getContent();
     assertFalse(tagDtos.isEmpty());
     assertEquals(2, tagDtos.size());
-    assertTrue(tagDtos.contains(tagDto1));
-    assertTrue(tagDtos.contains(tagDto2));
+    assertThat(tagDtos)
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
+        .contains(tagDto1);
+    assertThat(tagDtos)
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
+        .contains(tagDto2);
   }
 
   @ParameterizedTest
@@ -646,5 +653,87 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertTrue(res instanceof DailyBadRequestException);
     assertNull(res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should ignore uuid, createdAt and updatedAt from TagDto when create tag")
+  void test32() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+    LocalDateTime createdAt = LocalDateTime.MIN;
+    LocalDateTime updatedAt = LocalDateTime.MIN;
+    TagDto tagDto = createTagDto(uuid, NAME, COLOR_HEX);
+    tagDto.setCreatedAt(createdAt);
+    tagDto.setUpdatedAt(updatedAt);
+
+    // When
+    TagDto res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagDto))
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            TagDto.class);
+
+    // Then
+    assertNotNull(res.getUuid());
+    assertNotNull(res.getCreatedAt());
+    assertNotNull(res.getUpdatedAt());
+    assertNotEquals(uuid, res.getUuid());
+    assertNotEquals(createdAt, res.getCreatedAt());
+    assertNotEquals(updatedAt, res.getUpdatedAt());
+  }
+
+  @Test
+  @DisplayName("Should ignore uuid, createdAt and updatedAt from TagDto when update tag")
+  void test33() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+    LocalDateTime createdAt = LocalDateTime.MIN;
+    LocalDateTime updatedAt = LocalDateTime.MIN;
+    TagDto tagDto = createTagDto(uuid, OTHER_NAME, OTHER_COLOR_HEX);
+    tagDto.setCreatedAt(createdAt);
+    tagDto.setUpdatedAt(updatedAt);
+
+    // When
+    String savedUuid =
+        objectMapper
+            .readValue(
+                mockMvc
+                    .perform(
+                        post(BASE_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(
+                                objectMapper.writeValueAsString(
+                                    createTagDto(null, NAME, COLOR_HEX)))
+                            .with(csrf())
+                            .with(loginOf(APP_USER)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(),
+                TagDto.class)
+            .getUuid()
+            .toString();
+    mockMvc.perform(
+        put(BASE_URL + "/{uuid}", savedUuid)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(tagDto))
+            .with(csrf())
+            .with(loginOf(APP_USER)));
+
+    // Then
+    Tag updatedTag = tagRepository.findAll().get(0);
+    assertNotNull(updatedTag.getUuid());
+    assertNotNull(updatedTag.getCreatedAt());
+    assertNotNull(updatedTag.getUpdatedAt());
+    assertNotEquals(uuid, updatedTag.getUuid());
+    assertNotEquals(createdAt, updatedTag.getCreatedAt());
+    assertNotEquals(updatedAt, updatedTag.getUpdatedAt());
   }
 }

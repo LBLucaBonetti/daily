@@ -71,6 +71,11 @@ public final class TestUtils {
     return oidcLogin().oidcUser(createAppUser(idTokenClaims));
   }
 
+  /**
+   * Deletes all data from the defined caches
+   *
+   * @param cacheManager The cache manager instance to operate on
+   */
   public static void cleanCaches(@NonNull final CacheManager cacheManager) {
     cacheManager.getCacheNames().stream()
         .map(cacheManager::getCache)

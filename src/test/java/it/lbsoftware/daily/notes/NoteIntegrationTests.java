@@ -4,8 +4,10 @@ import static it.lbsoftware.daily.TestUtils.loginOf;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,6 +31,7 @@ import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
 import it.lbsoftware.daily.tags.TagRepository;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -361,8 +364,12 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     List<NoteDto> noteDtos = res.getContent();
     assertFalse(noteDtos.isEmpty());
     assertEquals(2, noteDtos.size());
-    assertTrue(noteDtos.contains(noteDto1));
-    assertTrue(noteDtos.contains(noteDto2));
+    assertThat(noteDtos)
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
+        .contains(noteDto1);
+    assertThat(noteDtos)
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
+        .contains(noteDto2);
   }
 
   @ParameterizedTest
@@ -913,8 +920,12 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
     // Then
     assertEquals(2, res.size());
-    assertTrue(res.contains(tagDtoMapper.convertToDto(tag1)));
-    assertTrue(res.contains(tagDtoMapper.convertToDto(tag2)));
+    assertThat(res)
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
+        .contains(tagDtoMapper.convertToDto(tag1));
+    assertThat(res)
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
+        .contains(tagDtoMapper.convertToDto(tag2));
   }
 
   @Test
@@ -1058,5 +1069,85 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertTrue(res instanceof DailyConflictException);
     assertEquals(Constants.ERROR_NOTE_TAGS_MAX, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should ignore uuid, createdAt and updatedAt from NoteDto when create note")
+  void test57() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+    LocalDateTime createdAt = LocalDateTime.MIN;
+    LocalDateTime updatedAt = LocalDateTime.MIN;
+    NoteDto noteDto = createNoteDto(uuid, TEXT);
+    noteDto.setCreatedAt(createdAt);
+    noteDto.setUpdatedAt(updatedAt);
+
+    // When
+    NoteDto res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(noteDto))
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            NoteDto.class);
+
+    // Then
+    assertNotNull(res.getUuid());
+    assertNotNull(res.getCreatedAt());
+    assertNotNull(res.getUpdatedAt());
+    assertNotEquals(uuid, res.getUuid());
+    assertNotEquals(createdAt, res.getCreatedAt());
+    assertNotEquals(updatedAt, res.getUpdatedAt());
+  }
+
+  @Test
+  @DisplayName("Should ignore uuid, createdAt and updatedAt from NoteDto when update note")
+  void test58() throws Exception {
+    // Given
+    UUID uuid = UUID.randomUUID();
+    LocalDateTime createdAt = LocalDateTime.MIN;
+    LocalDateTime updatedAt = LocalDateTime.MIN;
+    NoteDto noteDto = createNoteDto(uuid, OTHER_TEXT);
+    noteDto.setCreatedAt(createdAt);
+    noteDto.setUpdatedAt(updatedAt);
+
+    // When
+    String savedUuid =
+        objectMapper
+            .readValue(
+                mockMvc
+                    .perform(
+                        post(BASE_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createNoteDto(null, TEXT)))
+                            .with(csrf())
+                            .with(loginOf(APP_USER)))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString(),
+                NoteDto.class)
+            .getUuid()
+            .toString();
+    mockMvc.perform(
+        put(BASE_URL + "/{uuid}", savedUuid)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(noteDto))
+            .with(csrf())
+            .with(loginOf(APP_USER)));
+
+    // Then
+    Note updatedNote = noteRepository.findAll().get(0);
+    assertNotNull(updatedNote.getUuid());
+    assertNotNull(updatedNote.getCreatedAt());
+    assertNotNull(updatedNote.getUpdatedAt());
+    assertNotEquals(uuid, updatedNote.getUuid());
+    assertNotEquals(createdAt, updatedNote.getCreatedAt());
+    assertNotEquals(updatedAt, updatedNote.getUpdatedAt());
   }
 }

@@ -6,6 +6,7 @@ public final class Constants {
   public static final String CSRF_TOKEN_NAME = "XSRF-TOKEN";
   public static final String CONTENT_SECURITY_POLICY = "default-src 'self'";
   public static final String PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
+  public static final String LOCALDATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
   public static final String DAILY_COOKIE_CSRF_SECURE_KEY = "daily.cookie.csrf.secure";
   public static final String DAILY_COOKIE_CSRF_SAME_SITE_KEY = "daily.cookie.csrf.same-site";
   public static final String ERROR_KEY = "error";
