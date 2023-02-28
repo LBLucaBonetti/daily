@@ -35,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -1151,5 +1152,40 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     assertNotEquals(uuid, updatedNote.getUuid());
     assertNotEquals(createdAt, updatedNote.getCreatedAt());
     assertNotEquals(updatedAt, updatedNote.getUpdatedAt());
+  }
+
+  @Test
+  @DisplayName("Should cache when read note tags")
+  void test59() throws Exception {
+    // Given
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    tag.addToNote(note);
+    noteRepository.save(note);
+    Set<TagDto> tagDtos =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL + "/{uuid}/tags", note.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(loginOf(APP_USER)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            new TypeReference<>() {});
+    TagDto tagDto = tagDtos.stream().findFirst().get();
+
+    // When
+    Optional<Set<TagDto>> res =
+        Optional.ofNullable(cacheManager.getCache(Constants.NOTE_CACHE))
+            .map(
+                r ->
+                    r.get(
+                        "appUser:" + APP_USER + ":" + note.getUuid().toString() + ":tags",
+                        Set.class));
+
+    // Then
+    assertTrue(res.isPresent());
+    assertTrue(res.get().contains(tagDto));
   }
 }

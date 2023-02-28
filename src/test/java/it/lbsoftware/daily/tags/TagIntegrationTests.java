@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.bases.PageDto;
+import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyBadRequestException;
 import it.lbsoftware.daily.notes.Note;
 import it.lbsoftware.daily.notes.NoteRepository;
@@ -30,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -737,5 +739,67 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     assertNotEquals(uuid, updatedTag.getUuid());
     assertNotEquals(createdAt, updatedTag.getCreatedAt());
     assertNotEquals(updatedAt, updatedTag.getUpdatedAt());
+  }
+
+  @Test
+  @DisplayName("Should cache when read tag")
+  void test34() throws Exception {
+    // Given
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    TagDto tagDto =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL + "/{uuid}", tag.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(loginOf(APP_USER)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            TagDto.class);
+
+    // When
+    Optional<TagDto> res =
+        Optional.ofNullable(cacheManager.getCache(Constants.TAG_CACHE))
+            .map(r -> r.get("appUser:" + APP_USER + ":" + tag.getUuid().toString(), TagDto.class));
+
+    // Then
+    assertTrue(res.isPresent());
+    assertEquals(tagDto, res.get());
+  }
+
+  @Test
+  @DisplayName("Should cache when update tag")
+  void test35() throws Exception {
+    // Given
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    mockMvc.perform(
+        put(BASE_URL + "/{uuid}", tag.getUuid())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                objectMapper.writeValueAsString(createTagDto(null, OTHER_NAME, OTHER_COLOR_HEX)))
+            .with(csrf())
+            .with(loginOf(APP_USER)));
+    TagDto tagDto =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL + "/{uuid}", tag.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(loginOf(APP_USER)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            TagDto.class);
+
+    // When
+    Optional<TagDto> res =
+        Optional.ofNullable(cacheManager.getCache(Constants.TAG_CACHE))
+            .map(r -> r.get("appUser:" + APP_USER + ":" + tag.getUuid().toString(), TagDto.class));
+
+    // Then
+    assertTrue(res.isPresent());
+    assertEquals(tagDto, res.get());
   }
 }

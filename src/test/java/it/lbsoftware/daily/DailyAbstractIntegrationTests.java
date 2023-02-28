@@ -24,8 +24,8 @@ public non-sealed abstract class DailyAbstractIntegrationTests extends DailyAbst
 
   @Autowired protected WebApplicationContext webApplicationContext;
   protected MockMvc mockMvc;
+  @Autowired protected CacheManager cacheManager;
   @Autowired private JdbcTemplate jdbcTemplate;
-  @Autowired private CacheManager cacheManager;
 
   @AfterEach
   void afterEach() {
