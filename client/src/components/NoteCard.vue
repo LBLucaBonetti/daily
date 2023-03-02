@@ -47,7 +47,7 @@
         <template v-if="noteEditable">
           <q-btn
             flat
-            label="Cancel"
+            :label="$t('dialog.cancel')"
             aria-label="Cancel"
             @click="cancelEditNote"
           ></q-btn>
@@ -55,17 +55,22 @@
             flat
             :loading="noteUpdateBtnLoading"
             :disable="props.note.text === noteUpdateText"
-            label="Save"
+            :label="$t('dialog.save')"
             aria-label="Save"
             @click="updateNote"
           />
         </template>
         <template v-else>
-          <q-btn flat label="Edit" aria-label="Edit" @click="editNote"></q-btn>
+          <q-btn
+            flat
+            :label="$t('dialog.edit')"
+            aria-label="Edit"
+            @click="editNote"
+          ></q-btn>
           <q-btn
             flat
             :loading="noteDeleteBtnLoading"
-            label="Delete"
+            :label="$t('dialog.delete')"
             @click="askConfirmationToDeleteNote"
             aria-label="Delete"
             color="negative"
@@ -94,7 +99,9 @@ import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { useNotesInEditStateStore } from 'src/stores/noteEditingStore';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const $q = useQuasar();
 const noteText = ref('');
 const noteDeleteBtnLoading = ref(false);
@@ -134,7 +141,7 @@ async function updateNote() {
         classes: 'q-px-lg',
         position: notifyPosition($q),
         progress: true,
-        message: 'Note correctly saved',
+        message: t('note.save.ok'),
         color: 'white',
         textColor: 'info',
         icon: 'img:icons/success.svg',
@@ -155,7 +162,7 @@ async function updateNote() {
       classes: 'q-px-lg',
       position: notifyPosition($q),
       progress: true,
-      message: 'Error saving note',
+      message: t('note.save.error'),
       color: 'white',
       textColor: 'info',
       icon: 'img:icons/error.svg',
@@ -180,8 +187,8 @@ function cancelEditNote() {
 
 function askConfirmationToDeleteNote() {
   $q.dialog({
-    title: 'Confirm',
-    message: 'Do you really want to delete the note?',
+    title: t('dialog.confirm'),
+    message: t('note.delete.confirm'),
     persistent: true,
     class: 'bg-1 text-1',
     ok: {
@@ -209,7 +216,7 @@ async function deleteNote() {
         classes: 'q-px-lg',
         position: notifyPosition($q),
         progress: true,
-        message: 'Note correctly deleted',
+        message: t('note.delete.ok'),
         color: 'white',
         textColor: 'info',
         icon: 'img:icons/success.svg',
@@ -228,7 +235,7 @@ async function deleteNote() {
       classes: 'q-px-lg',
       position: notifyPosition($q),
       progress: true,
-      message: 'Error deleting note',
+      message: t('note.delete.error'),
       color: 'white',
       textColor: 'info',
       icon: 'img:icons/error.svg',
