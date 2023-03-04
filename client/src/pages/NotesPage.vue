@@ -10,7 +10,7 @@
       :placeholder="$t('note.placeholder')"
       counter
       maxlength="255"
-      :rules="[validateNote]"
+      :rules="[(val) => validateNote(val, $t('note.save.validation.empty'))]"
       lazy-rules="ondemand"
       ref="noteInput"
     >

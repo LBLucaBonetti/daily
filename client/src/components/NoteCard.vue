@@ -24,7 +24,9 @@
           counter
           maxlength="255"
           borderless
-          :rules="[validateNote]"
+          :rules="[
+            (val) => validateNote(val, $t('note.save.validation.empty')),
+          ]"
           lazy-rules="ondemand"
           ref="noteUpdateInput"
           v-if="noteEditable"
