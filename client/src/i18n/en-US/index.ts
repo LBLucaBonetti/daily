@@ -1,4 +1,9 @@
 export default {
+  language: {
+    label: 'Language',
+    english: 'English',
+    italian: 'Italian',
+  },
   dialog: {
     confirm: 'Confirm',
     cancel: 'Cancel',
