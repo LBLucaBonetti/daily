@@ -13,12 +13,22 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { useQuasar } from 'quasar';
+import { PropType, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   localeOptions: { type: Array as PropType<object[]>, required: true },
 });
 
+const langList = import.meta.glob(
+  '../../node_modules/quasar/lang/(en-US|it).mjs'
+);
 const { locale } = useI18n({ useScope: 'global' });
+const $q = useQuasar();
+watch(locale, (val) => {
+  langList[`../../node_modules/quasar/lang/${val}.mjs`]().then((lang) => {
+    $q.lang.set(lang.default);
+  });
+});
 </script>
