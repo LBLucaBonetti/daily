@@ -6,6 +6,7 @@ public final class Constants {
   public static final String CSRF_TOKEN_NAME = "XSRF-TOKEN";
   public static final String CONTENT_SECURITY_POLICY = "default-src 'self'";
   public static final String PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
+  public static final String LOCALDATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
   public static final String DAILY_COOKIE_CSRF_SECURE_KEY = "daily.cookie.csrf.secure";
   public static final String DAILY_COOKIE_CSRF_SAME_SITE_KEY = "daily.cookie.csrf.same-site";
   public static final String ERROR_KEY = "error";
@@ -21,8 +22,9 @@ public final class Constants {
   public static final String TAG_CACHE = "tag";
   public static final String NOTE_CACHE = "note";
   public static final int NOTE_TEXT_MAX = 255;
-  public static final int TAG_NAME_MAX = 31;
+  public static final int TAG_NAME_MAX = 30;
   public static final int NOTE_TAGS_MAX = 5;
+  public static final String TAG_COLOR_HEX_REGEXP = "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$";
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");

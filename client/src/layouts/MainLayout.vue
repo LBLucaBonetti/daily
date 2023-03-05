@@ -41,6 +41,14 @@
             <logout-button />
           </div>
         </q-item>
+        <q-item
+          ><language-select
+            :locale-options="[
+              { value: 'en-US', label: $t('language.english') },
+              { value: 'it', label: $t('language.italian') },
+            ]"
+          ></language-select
+        ></q-item>
       </q-list>
     </q-drawer>
 
@@ -56,6 +64,7 @@ import { heroOutline24Bars3 } from 'quasar-extras-svg-icons/hero-icons-v2';
 import { api } from 'src/boot/axios';
 import { AxiosResponse } from 'axios';
 import LogoutButton from 'components/LogoutButton.vue';
+import LanguageSelect from 'src/components/LanguageSelect.vue';
 import InfoDto from 'src/interfaces/InfoDto';
 import { refreshPage } from 'src/utils/refresh-page';
 import {

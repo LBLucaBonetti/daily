@@ -7,10 +7,10 @@
       clearable
       input-class="text-1"
       v-model="note"
-      placeholder="Write something here, then save it"
+      :placeholder="$t('note.placeholder')"
       counter
       maxlength="255"
-      :rules="[validateNote]"
+      :rules="[(val) => validateNote(val, $t('note.save.validation.empty'))]"
       lazy-rules="ondemand"
       ref="noteInput"
     >
@@ -22,7 +22,7 @@
         aria-label="Save note"
         class="q-mt-sm bg-2 text-2"
         @click="askConfirmationIfThereAreNotesInEditState"
-        label="Save"
+        :label="$t('note.save.button')"
         ref="noteSaveBtn"
         :loading="noteSaveBtnLoading"
       ></q-btn>
@@ -72,7 +72,9 @@ import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { useNotesInEditStateStore } from 'src/stores/noteEditingStore';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const note = ref('');
 const noteInput = ref<QInput | null>(null);
 const noteSaveBtn = ref<QBtn | null>(null);
@@ -98,7 +100,7 @@ async function saveNote() {
         classes: 'q-px-lg',
         position: notifyPosition($q),
         progress: true,
-        message: 'Note correctly saved',
+        message: t('note.save.ok'),
         color: 'white',
         textColor: 'info',
         icon: 'img:icons/success.svg',
@@ -121,7 +123,7 @@ async function saveNote() {
       classes: 'q-px-lg',
       position: notifyPosition($q),
       progress: true,
-      message: 'Error saving note',
+      message: t('note.save.error'),
       color: 'white',
       textColor: 'info',
       icon: 'img:icons/error.svg',
@@ -139,12 +141,8 @@ function askConfirmationIfThereAreNotesInEditState() {
     return;
   }
   $q.dialog({
-    title: 'Confirm',
-    message:
-      'You currently have ' +
-      notesInEditStateCounter.counter +
-      (notesInEditStateCounter.counter == 1 ? ' note' : ' notes') +
-      ' being edited. If you proceed, you will lose your changes to them. Choose <span class="text-1 text-weight-medium">OK</span> to discard changes and save the note or <span class="text-1 text-weight-medium">CANCEL</span> to keep editing them and avoid saving this note',
+    title: t('dialog.confirm'),
+    message: t('note.save.beingEdited'),
     html: true,
     persistent: true,
     class: 'bg-1 text-1',
@@ -188,7 +186,7 @@ function onLoad(index: number, done: () => void) {
         classes: 'q-px-lg',
         position: notifyPosition($q),
         progress: true,
-        message: 'Error loading notes',
+        message: t('note.loading.error'),
         color: 'white',
         textColor: 'info',
         icon: 'img:icons/error.svg',

@@ -8,8 +8,11 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.NonNull;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
@@ -66,5 +69,17 @@ public final class TestUtils {
     Optional.ofNullable(email).ifPresent(e -> idTokenClaims.put(EMAIL_CLAIM, e));
 
     return oidcLogin().oidcUser(createAppUser(idTokenClaims));
+  }
+
+  /**
+   * Deletes all data from the defined caches
+   *
+   * @param cacheManager The cache manager instance to operate on
+   */
+  public static void cleanCaches(@NonNull final CacheManager cacheManager) {
+    cacheManager.getCacheNames().stream()
+        .map(cacheManager::getCache)
+        .filter(Objects::nonNull)
+        .forEach(Cache::clear);
   }
 }

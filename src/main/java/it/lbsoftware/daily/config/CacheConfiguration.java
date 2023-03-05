@@ -1,7 +1,6 @@
 package it.lbsoftware.daily.config;
 
 import java.time.Duration;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +10,6 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 
 @Configuration
 @EnableCaching
-@RequiredArgsConstructor
 public class CacheConfiguration {
 
   @Bean

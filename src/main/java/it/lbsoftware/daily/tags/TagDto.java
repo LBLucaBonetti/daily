@@ -20,6 +20,6 @@ public class TagDto extends BaseDto {
   private String name;
 
   @NotNull
-  @Pattern(regexp = "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$")
+  @Pattern(regexp = Constants.TAG_COLOR_HEX_REGEXP)
   private String colorHex;
 }

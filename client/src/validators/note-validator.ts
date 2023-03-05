@@ -1,7 +1,7 @@
-export function validateNote(note: string) {
+export function validateNote(note: string, translatedInvalidMessage: string) {
   return !note ||
     note === '' ||
     note.replaceAll(' ', '').replaceAll('\n', '') === ''
-    ? 'The note cannot be empty'
+    ? translatedInvalidMessage
     : true;
 }
