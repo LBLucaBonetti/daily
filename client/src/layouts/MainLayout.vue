@@ -16,12 +16,6 @@
         <q-toolbar-title class="poppins-regular text-1 non-selectable">
           daily
         </q-toolbar-title>
-        <language-select
-          :locale-options="[
-            { value: 'en-US', label: $t('language.english') },
-            { value: 'it', label: $t('language.italian') },
-          ]"
-        ></language-select>
       </q-toolbar>
     </q-header>
 
@@ -47,6 +41,14 @@
             <logout-button />
           </div>
         </q-item>
+        <q-item
+          ><language-select
+            :locale-options="[
+              { value: 'en-US', label: $t('language.english') },
+              { value: 'it', label: $t('language.italian') },
+            ]"
+          ></language-select
+        ></q-item>
       </q-list>
     </q-drawer>
 

@@ -31,5 +31,6 @@ export default {
     loading: {
       error: 'Errore nel caricamento delle note',
     },
+    created: 'Creata',
   },
 };

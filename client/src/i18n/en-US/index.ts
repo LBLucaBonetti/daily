@@ -31,5 +31,6 @@ export default {
     loading: {
       error: 'Error loading notes',
     },
+    created: 'Created',
   },
 };

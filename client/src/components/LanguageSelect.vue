@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
+import { useLanguageStore } from 'src/stores/languageStore';
 import { PropType, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -26,9 +27,11 @@ const langList = import.meta.glob(
 );
 const { locale } = useI18n({ useScope: 'global' });
 const $q = useQuasar();
+const language = useLanguageStore();
 watch(locale, (val) => {
   langList[`../../node_modules/quasar/lang/${val}.mjs`]().then((lang) => {
     $q.lang.set(lang.default);
+    language.setLanguage(locale.value.toString());
   });
 });
 </script>

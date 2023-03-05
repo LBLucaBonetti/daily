@@ -45,40 +45,53 @@
         ></q-input>
       </q-card-section>
 
-      <q-card-actions align="right">
-        <template v-if="noteEditable">
-          <q-btn
-            flat
-            :label="$t('dialog.cancel')"
-            aria-label="Cancel"
-            @click="cancelEditNote"
-          ></q-btn>
-          <q-btn
-            flat
-            :loading="noteUpdateBtnLoading"
-            :disable="props.note.text === noteUpdateText"
-            :label="$t('dialog.save')"
-            aria-label="Save"
-            @click="updateNote"
-          />
-        </template>
-        <template v-else>
-          <q-btn
-            flat
-            :label="$t('dialog.edit')"
-            aria-label="Edit"
-            @click="editNote"
-          ></q-btn>
-          <q-btn
-            flat
-            :loading="noteDeleteBtnLoading"
-            :label="$t('dialog.delete')"
-            @click="askConfirmationToDeleteNote"
-            aria-label="Delete"
-            color="negative"
-          ></q-btn>
-        </template>
-      </q-card-actions>
+      <q-card-section>
+        <q-card-actions class="no-padding" :vertical="$q.screen.lt.sm">
+          <div :class="$q.screen.lt.sm ? 'text-3 text-center' : 'text-3'">
+            {{
+              $t('note.created') +
+              ' ' +
+              new Date(note.createdAt?.toString() + 'Z')?.toLocaleString(
+                languageStore.language
+              )
+            }}
+          </div>
+          <q-space></q-space>
+          <template v-if="noteEditable">
+            <q-btn
+              flat
+              :label="$t('dialog.cancel')"
+              aria-label="Cancel"
+              @click="cancelEditNote"
+            ></q-btn>
+            <q-btn
+              unelevated
+              :loading="noteUpdateBtnLoading"
+              :disable="props.note.text === noteUpdateText"
+              :label="$t('dialog.save')"
+              aria-label="Save"
+              @click="updateNote"
+              color="primary"
+            />
+          </template>
+          <template v-else>
+            <q-btn
+              flat
+              :label="$t('dialog.edit')"
+              aria-label="Edit"
+              @click="editNote"
+            ></q-btn>
+            <q-btn
+              unelevated
+              :loading="noteDeleteBtnLoading"
+              :label="$t('dialog.delete')"
+              @click="askConfirmationToDeleteNote"
+              aria-label="Delete"
+              color="negative"
+            ></q-btn>
+          </template>
+        </q-card-actions>
+      </q-card-section>
     </q-card>
   </transition>
 </template>
@@ -102,6 +115,7 @@ import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { useNotesInEditStateStore } from 'src/stores/noteEditingStore';
 import { useI18n } from 'vue-i18n';
+import { useLanguageStore } from 'src/stores/languageStore';
 
 const { t } = useI18n();
 const $q = useQuasar();
@@ -112,6 +126,7 @@ const noteUpdateText = ref('');
 const noteUpdateBtnLoading = ref(false);
 const noteUpdateInput = ref<QInput | null>(null);
 const notesInEditStateCounter = useNotesInEditStateStore();
+const languageStore = useLanguageStore();
 
 const props = defineProps({
   note: { type: Object as PropType<NoteDto>, required: true },
