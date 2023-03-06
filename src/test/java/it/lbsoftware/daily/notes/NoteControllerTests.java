@@ -149,7 +149,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should update note and return no content")
+  @DisplayName("Should update note and return ok")
   void test6() {
     // Given
     UUID uuid = UUID.randomUUID();
@@ -163,8 +163,8 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(noteService, times(1)).updateNote(uuid, noteDto, APP_USER);
-    assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(HttpStatus.OK, res.getStatusCode());
+    assertEquals(noteDto, res.getBody());
   }
 
   @Test
@@ -336,7 +336,7 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Then
     assertNotNull(res);
     verify(noteService, times(1)).readNotes(pageable, APP_USER);
-    assertEquals(null, res.getMessage());
+    assertNull(res.getMessage());
   }
 
   @Test

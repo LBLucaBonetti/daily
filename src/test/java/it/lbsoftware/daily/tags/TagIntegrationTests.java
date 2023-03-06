@@ -472,19 +472,24 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     TagDto tagDto = createTagDto(null, OTHER_NAME, OTHER_COLOR_HEX);
 
     // When
-    mockMvc
-        .perform(
-            put(BASE_URL + "/{uuid}", tag.getUuid())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(tagDto))
-                .with(csrf())
-                .with(loginOf(APP_USER)))
-        .andExpect(status().isNoContent());
+    TagDto res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    put(BASE_URL + "/{uuid}", tag.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagDto))
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            TagDto.class);
 
     // Then
-    tag = tagRepository.findAll().get(0);
-    assertEquals(OTHER_NAME, tag.getName());
-    assertEquals(OTHER_COLOR_HEX, tag.getColorHex());
+    assertEquals(OTHER_NAME, res.getName());
+    assertEquals(OTHER_COLOR_HEX, res.getColorHex());
   }
 
   @Test
