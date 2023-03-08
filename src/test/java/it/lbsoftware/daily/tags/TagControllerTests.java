@@ -143,7 +143,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should update tag and return no content")
+  @DisplayName("Should update tag and return ok")
   void test6() {
     // Given
     UUID uuid = UUID.randomUUID();
@@ -157,8 +157,8 @@ class TagControllerTests extends DailyAbstractUnitTests {
     // Then
     verify(appUserService, times(1)).getUid(appUser);
     verify(tagService, times(1)).updateTag(uuid, tagDto, APP_USER);
-    assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
-    assertNull(res.getBody());
+    assertEquals(HttpStatus.OK, res.getStatusCode());
+    assertEquals(tagDto, res.getBody());
   }
 
   @Test
@@ -214,6 +214,6 @@ class TagControllerTests extends DailyAbstractUnitTests {
     // Then
     assertNotNull(res);
     verify(tagService, times(1)).readTags(pageable, APP_USER);
-    assertEquals(null, res.getMessage());
+    assertNull(res.getMessage());
   }
 }

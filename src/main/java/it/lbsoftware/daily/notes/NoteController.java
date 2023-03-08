@@ -72,7 +72,7 @@ class NoteController {
       @AuthenticationPrincipal OidcUser appUser) {
     return noteService
         .updateNote(uuid, noteDto, appUserService.getUid(appUser))
-        .<ResponseEntity<NoteDto>>map(updatedNote -> ResponseEntity.noContent().build())
+        .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 

@@ -67,7 +67,7 @@
             <q-btn
               unelevated
               :loading="noteUpdateBtnLoading"
-              :disable="props.note.text === noteUpdateText"
+              :disable="noteText === noteUpdateText"
               :label="$t('dialog.save')"
               aria-label="Save"
               @click="updateNote"
@@ -153,7 +153,7 @@ async function updateNote() {
       '/notes/' + updateNoteDto.uuid,
       updateNoteDto
     );
-    if (res.status === 204) {
+    if (res.status === 200) {
       $q.notify({
         classes: 'q-px-lg',
         position: notifyPosition($q),

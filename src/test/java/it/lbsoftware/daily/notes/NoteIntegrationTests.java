@@ -443,17 +443,23 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     NoteDto noteDto = createNoteDto(null, OTHER_TEXT);
 
     // When
-    mockMvc
-        .perform(
-            put(BASE_URL + "/{uuid}", note.getUuid())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(noteDto))
-                .with(csrf())
-                .with(loginOf(APP_USER)))
-        .andExpect(status().isNoContent());
+    NoteDto res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    put(BASE_URL + "/{uuid}", note.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(noteDto))
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            NoteDto.class);
 
     // Then
-    assertEquals(OTHER_TEXT, noteRepository.findAll().get(0).getText());
+    assertEquals(OTHER_TEXT, res.getText());
   }
 
   @Test

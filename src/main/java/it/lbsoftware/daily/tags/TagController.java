@@ -70,7 +70,7 @@ class TagController {
       @AuthenticationPrincipal OidcUser appUser) {
     return tagService
         .updateTag(uuid, tagDto, appUserService.getUid(appUser))
-        .<ResponseEntity<TagDto>>map(updatedTag -> ResponseEntity.noContent().build())
+        .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
