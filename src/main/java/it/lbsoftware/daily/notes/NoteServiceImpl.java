@@ -64,7 +64,7 @@ public class NoteServiceImpl implements NoteService {
         .map(
             prevNote -> {
               prevNote.setText(note.getText());
-              return noteRepository.save(prevNote);
+              return noteRepository.saveAndFlush(prevNote);
             })
         .map(noteDtoMapper::convertToDto);
   }

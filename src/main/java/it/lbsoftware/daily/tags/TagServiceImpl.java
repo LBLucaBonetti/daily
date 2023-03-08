@@ -71,7 +71,7 @@ public class TagServiceImpl implements TagService {
             prevTag -> {
               prevTag.setName(tag.getName());
               prevTag.setColorHex(tag.getColorHex());
-              return tagRepository.save(prevTag);
+              return tagRepository.saveAndFlush(prevTag);
             })
         .map(tagDtoMapper::convertToDto);
   }

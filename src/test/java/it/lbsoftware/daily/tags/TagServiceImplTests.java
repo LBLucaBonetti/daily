@@ -202,7 +202,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     UUID uuid = UUID.randomUUID();
     TagDto updatedTagDto = createTagDto(uuid, OTHER_NAME, OTHER_COLOR_HEX);
     given(tagRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(Optional.of(prevTag));
-    given(tagRepository.save(prevTag)).willReturn(updatedTag);
+    given(tagRepository.saveAndFlush(prevTag)).willReturn(updatedTag);
     given(tagDtoMapper.convertToDto(updatedTag)).willReturn(updatedTagDto);
 
     // When
@@ -210,7 +210,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagRepository, times(1)).save(prevTag);
+    verify(tagRepository, times(1)).saveAndFlush(prevTag);
     assertEquals(res, Optional.of(updatedTagDto));
     assertEquals(OTHER_NAME, res.get().getName());
     assertEquals(OTHER_COLOR_HEX, res.get().getColorHex());
