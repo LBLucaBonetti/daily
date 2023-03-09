@@ -398,7 +398,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         .andExpect(status().isBadRequest());
 
     // Then
-    assertEquals(TEXT, noteRepository.findAll().get(0).getText());
+    note = noteRepository.findAll().get(0);
+    assertEquals(TEXT, note.getText());
   }
 
   @Test
@@ -1143,15 +1144,21 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 NoteDto.class)
             .getUuid()
             .toString();
-    mockMvc.perform(
-        put(BASE_URL + "/{uuid}", savedUuid)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(noteDto))
-            .with(csrf())
-            .with(loginOf(APP_USER)));
+    NoteDto updatedNote =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    put(BASE_URL + "/{uuid}", savedUuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(noteDto))
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            NoteDto.class);
 
     // Then
-    Note updatedNote = noteRepository.findAll().get(0);
     assertNotNull(updatedNote.getUuid());
     assertNotNull(updatedNote.getCreatedAt());
     assertNotNull(updatedNote.getUpdatedAt());

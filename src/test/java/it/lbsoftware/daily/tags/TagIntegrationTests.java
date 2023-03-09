@@ -729,15 +729,21 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 TagDto.class)
             .getUuid()
             .toString();
-    mockMvc.perform(
-        put(BASE_URL + "/{uuid}", savedUuid)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(tagDto))
-            .with(csrf())
-            .with(loginOf(APP_USER)));
+    TagDto updatedTag =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    put(BASE_URL + "/{uuid}", savedUuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagDto))
+                        .with(csrf())
+                        .with(loginOf(APP_USER)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            TagDto.class);
 
     // Then
-    Tag updatedTag = tagRepository.findAll().get(0);
     assertNotNull(updatedTag.getUuid());
     assertNotNull(updatedTag.getCreatedAt());
     assertNotNull(updatedTag.getUpdatedAt());
