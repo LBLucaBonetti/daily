@@ -25,6 +25,8 @@ public final class Constants {
   public static final int TAG_NAME_MAX = 30;
   public static final int NOTE_TAGS_MAX = 5;
   public static final String TAG_COLOR_HEX_REGEXP = "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$";
+  public static final String VIEW_LOGIN = "login";
+  public static final String VIEW_SIGNUP = "signup";
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
