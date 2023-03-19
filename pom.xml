@@ -222,6 +222,14 @@
       <groupId>org.apache.commons</groupId>
       <version>${apache-commons-lang3.version}</version>
     </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+      <groupId>org.thymeleaf.extras</groupId>
+    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
