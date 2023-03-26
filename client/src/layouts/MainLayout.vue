@@ -12,10 +12,12 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-icon tag="span" right name="img:img/logo.svg" size="2rem"></q-icon>
-        <q-toolbar-title class="poppins-regular text-1 non-selectable">
-          daily
-        </q-toolbar-title>
+        <q-icon
+          tag="span"
+          right
+          name="img:img/daily-logo.svg"
+          size="5rem"
+        ></q-icon>
       </q-toolbar>
     </q-header>
 
@@ -72,7 +74,6 @@ import {
   QHeader,
   QToolbar,
   QBtn,
-  QToolbarTitle,
   QDrawer,
   QList,
   QItemLabel,

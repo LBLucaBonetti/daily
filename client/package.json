@@ -23,14 +23,14 @@
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@quasar/app-vite": "^1.2.1",
-    "@types/node": "^18.15.3",
-    "@typescript-eslint/eslint-plugin": "^5.55.0",
-    "@typescript-eslint/parser": "^5.55.0",
+    "@types/node": "^18.15.6",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.36.0",
-    "eslint-config-prettier": "^8.7.0",
-    "eslint-plugin-vue": "^9.9.0",
-    "prettier": "^2.8.4",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-vue": "^9.10.0",
+    "prettier": "^2.8.6",
     "typescript": "^4.9.5"
   },
   "engines": {
