@@ -32,7 +32,7 @@ public final class NoteTestUtils {
    * @param appUser The creator
    * @return The created Note
    */
-  public static Note createNote(final String text, final Set<Tag> tags, final String appUser) {
+  public static Note createNote(final String text, final Set<Tag> tags, final UUID appUser) {
     return Note.builder().text(text).tags(tags).appUser(appUser).build();
   }
 }

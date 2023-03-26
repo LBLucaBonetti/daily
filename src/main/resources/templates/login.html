@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+</head>
+<body>
+<h1>Login</h1>
+
+<form method="post" th:action="@{/login}">
+
+  <div th:if="${param.error}">
+    Invalid username and password.
+  </div>
+  <div th:if="${param.logout}">
+    You have been logged out.
+  </div>
+
+  <label for="email">Email:</label>
+  <input autofocus="autofocus" id="email" name="email" required type="email"/>
+
+  <label for="password">Password:</label>
+  <input id="password" name="password" required type="password"/>
+
+  <input type="submit" value="Sign in">
+
+</form>
+
+<a th:href="@{/oauth2/authorization/google}">Login with Google</a>
+
+<a th:href="@{/signup}">Don't have an account? Sign up</a>
+
+</body>
+</html>

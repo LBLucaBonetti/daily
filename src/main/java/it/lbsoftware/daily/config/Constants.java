@@ -25,8 +25,14 @@ public final class Constants {
   public static final int TAG_NAME_MAX = 30;
   public static final int NOTE_TAGS_MAX = 5;
   public static final String TAG_COLOR_HEX_REGEXP = "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$";
-  public static final String VIEW_LOGIN = "login";
-  public static final String VIEW_SIGNUP = "signup";
+  public static final int APP_USER_EMAIL_MAX = 320;
+  public static final int APP_USER_FIRST_NAME_MAX = 255;
+  public static final int APP_USER_LAST_NAME_MAX = 255;
+  public static final int APP_USER_AUTH_PROVIDER_MAX = 255;
+  public static final String LOGIN_VIEW = "login";
+  public static final String LOGIN_PATH = "/" + LOGIN_VIEW;
+  public static final String SIGNUP_VIEW = "signup";
+  public static final String SIGNUP_PATH = "/" + SIGNUP_VIEW;
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");

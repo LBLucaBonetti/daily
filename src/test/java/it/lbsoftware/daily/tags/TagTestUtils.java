@@ -36,7 +36,7 @@ public final class TagTestUtils {
    * @return The created Tag
    */
   public static Tag createTag(
-      final String name, final String colorHex, final Set<Note> notes, final String appUser) {
+      final String name, final String colorHex, final Set<Note> notes, final UUID appUser) {
     return Tag.builder().name(name).colorHex(colorHex).notes(notes).appUser(appUser).build();
   }
 }

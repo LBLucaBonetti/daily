@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,7 +22,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 public final class TestUtils {
 
   // The order in which the table names are listed matters
-  private static final String[] tableNames = {"note_tag", "tag", "note"};
+  private static final String[] tableNames = {"note_tag", "tag", "note", "app_user"};
 
   private TestUtils() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
@@ -40,11 +42,10 @@ public final class TestUtils {
    * Configures a mocked OpenID Connect login with an app user whose id token contains a sub claim
    * with the provided appUser as value
    *
-   * @param appUser String that will be used as the sub claim of the id token for the mocked app
-   *     user
+   * @param appUser UUID that will be used as the sub claim of the id token for the mocked app user
    * @return The configured RequestPostProcessor to be used to configure a MockMvc instance
    */
-  public static RequestPostProcessor loginOf(@NonNull final String appUser) {
+  public static RequestPostProcessor loginOf(@NonNull final UUID appUser) {
     return loginOf(appUser, null, null);
   }
 
@@ -53,8 +54,7 @@ public final class TestUtils {
    * with the provided appUser as value, a name claim with the provided fullName and an email claim
    * with the provided email
    *
-   * @param appUser String that will be used as the sub claim of the id token for the mocked app
-   *     user
+   * @param appUser UUID that will be used as the sub claim of the id token for the mocked app user
    * @param fullName String that will be used as the name claim of the id token for the mocked app
    *     user
    * @param email String that will be used as the email claim of the id token for the mocked app
@@ -62,11 +62,11 @@ public final class TestUtils {
    * @return The configured RequestPostProcessor to be used to configure a MockMvc instance
    */
   public static RequestPostProcessor loginOf(
-      @NonNull final String appUser, final String fullName, final String email) {
+      @NonNull final UUID appUser, final String fullName, final String email) {
     Map<String, Object> idTokenClaims = new HashMap<>();
     idTokenClaims.put(UID_CLAIM, appUser);
     Optional.ofNullable(fullName).ifPresent(e -> idTokenClaims.put(FULL_NAME_CLAIM, e));
-    Optional.ofNullable(email).ifPresent(e -> idTokenClaims.put(EMAIL_CLAIM, e));
+    Optional.ofNullable(email).ifPresent(e -> idTokenClaims.put(EMAIL_CLAIM, StringUtils.lowerCase(e)));
 
     return oidcLogin().oidcUser(createAppUser(idTokenClaims));
   }

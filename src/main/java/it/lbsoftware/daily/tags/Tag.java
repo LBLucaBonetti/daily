@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,12 +55,12 @@ public class Tag extends BaseEntity {
   */
   private Set<Note> notes = new HashSet<>();
 
-  @Column(name = "app_user", nullable = false)
-  @NotBlank
+  @Column(name = "app_user", updatable = false, nullable = false)
+  @NotNull
   /*
   Unique user id
   */
-  private String appUser;
+  private UUID appUser;
 
   /**
    * Adds a tag to the specified note and vice-versa
