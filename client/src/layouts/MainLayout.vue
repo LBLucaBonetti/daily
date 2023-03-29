@@ -32,12 +32,8 @@
         <q-item-label class="poppins-regular" header> daily </q-item-label>
         <q-item class="justify-between items-center">
           <div>
-            <q-item-label class="inter-regular text-1">{{
-              fullName
-            }}</q-item-label>
-            <q-item-label class="inter-regular text-1">{{
-              email
-            }}</q-item-label>
+            <q-item-label class="text-1">{{ fullName }}</q-item-label>
+            <q-item-label class="text-1">{{ email }}</q-item-label>
           </div>
           <div>
             <logout-button />
