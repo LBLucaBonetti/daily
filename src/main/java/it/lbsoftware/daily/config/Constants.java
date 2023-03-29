@@ -1,10 +1,14 @@
 package it.lbsoftware.daily.config;
 
+import java.util.List;
+
 public final class Constants {
 
   public static final String COOKIE_CSRF_TOKEN_REPOSITORY_BEAN_NAME = "cookieCsrfTokenRepository";
   public static final String CSRF_TOKEN_NAME = "XSRF-TOKEN";
-  public static final String CONTENT_SECURITY_POLICY = "default-src 'self'";
+  // Allow everything but only from the same origin & Bootstrap CDN & Bunny Fonts CDN
+  public static final String CONTENT_SECURITY_POLICY =
+      "default-src 'self' https://cdn.jsdelivr.net/npm/ https://fonts.bunny.net/";
   public static final String PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
   public static final String LOCALDATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
   public static final String DAILY_COOKIE_CSRF_SECURE_KEY = "daily.cookie.csrf.secure";
@@ -33,6 +37,9 @@ public final class Constants {
   public static final String LOGIN_PATH = "/" + LOGIN_VIEW;
   public static final String SIGNUP_VIEW = "signup";
   public static final String SIGNUP_PATH = "/" + SIGNUP_VIEW;
+  public static final List<String> ALLOWED_STATIC_TEMPLATES = List.of(SIGNUP_PATH);
+  public static final List<String> ALLOWED_STATIC_ASSETS =
+      List.of("/public-style.css", "/img/daily-logo.svg", "/favicon.ico", "/img/google-logo.svg");
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");

@@ -5,6 +5,8 @@ import static it.lbsoftware.daily.config.Constants.PERMISSIONS_POLICY;
 
 import it.lbsoftware.daily.appusers.AppUserDetailsService;
 import it.lbsoftware.daily.appusers.AppUserOidcUserService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +31,15 @@ public class WebSecurityConfiguration {
   private final AppUserDetailsService appUserDetailsService;
   private final PasswordEncoder passwordEncoder;
 
+  private String[] getAllowedPaths() {
+    final List<String> allowedPaths = new ArrayList<>();
+    allowedPaths.addAll(Constants.ALLOWED_STATIC_ASSETS);
+    allowedPaths.addAll(Constants.ALLOWED_STATIC_TEMPLATES);
+    // The login template is already allowed by default
+
+    return allowedPaths.toArray(new String[0]);
+  }
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // CSRF configuration
@@ -51,7 +62,7 @@ public class WebSecurityConfiguration {
     http.authorizeHttpRequests(
         authorizeHttpRequests ->
             authorizeHttpRequests
-                .requestMatchers(Constants.SIGNUP_PATH)
+                .requestMatchers(getAllowedPaths())
                 .permitAll()
                 .anyRequest()
                 .authenticated());

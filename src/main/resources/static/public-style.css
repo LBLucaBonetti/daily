@@ -1,0 +1,55 @@
+body {
+  background-color: #fafafa !important;
+  font-family: "Inter", sans-serif;
+}
+
+.daily-text {
+  color: #2f2e41;
+}
+
+.daily-logo {
+  width: 230px;
+}
+
+.daily-btn {
+  background-color: #3f3d56 !important;
+  color: #fafafa !important;
+  transition: 0.3s !important;
+}
+
+.daily-btn:hover {
+  background-color: #3f3d56 !important;
+  color: #fafafa !important;
+  opacity: 0.85 !important;
+}
+
+.daily-btn:focus {
+  background-color: #3f3d56 !important;
+  color: #fafafa !important;
+  opacity: 0.78 !important;
+}
+
+.daily-outline-btn {
+  border: 1px solid #3f3d56 !important;
+  color: #2f2e41 !important;
+  transition: 0.3s !important;
+}
+
+.daily-outline-btn:hover {
+  border: 1px solid #3f3d56 !important;
+  color: #2f2e41 !important;
+}
+
+.daily-outline-btn:focus {
+  border: 1px solid #3f3d56 !important;
+  color: #2f2e41 !important;
+}
+
+.google-logo {
+  height: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.daily-link {
+  color: #ea580c !important;
+}
