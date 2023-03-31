@@ -32,11 +32,11 @@
 
         <form method="post" th:action="@{/login}">
 
-          <div th:if="${param.error}">
-            Invalid username and password.
+          <div class="alert alert-danger" role="alert" th:if="${param.error}">
+            Invalid username and password
           </div>
-          <div th:if="${param.logout}">
-            You have been logged out.
+          <div class="alert alert-success" role="alert" th:if="${param.logout}">
+            You have been logged out
           </div>
 
           <div class="mb-3">

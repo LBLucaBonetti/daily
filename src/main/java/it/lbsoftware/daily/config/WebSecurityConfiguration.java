@@ -66,6 +66,12 @@ public class WebSecurityConfiguration {
                 .permitAll()
                 .anyRequest()
                 .authenticated());
+    // The /logout endpoint is automatically permitted but the /login?logout one is not
+    http.logout().permitAll();
+    http.exceptionHandling()
+        .defaultAuthenticationEntryPointFor(
+            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+            new AntPathRequestMatcher("/api/**"));
     // Form login
     http.formLogin()
         .usernameParameter("email")
@@ -79,10 +85,6 @@ public class WebSecurityConfiguration {
         .permitAll()
         .userInfoEndpoint()
         .oidcUserService(appUserOidcUserService);
-    http.exceptionHandling()
-        .defaultAuthenticationEntryPointFor(
-            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-            new AntPathRequestMatcher("/api/**"));
     return http.build();
   }
 

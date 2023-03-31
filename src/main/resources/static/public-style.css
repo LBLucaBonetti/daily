@@ -11,6 +11,12 @@ body {
   width: 230px;
 }
 
+@media (max-width: 355px) {
+  .daily-logo {
+    width: 160px;
+  }
+}
+
 .daily-btn {
   background-color: #3f3d56 !important;
   color: #fafafa !important;
