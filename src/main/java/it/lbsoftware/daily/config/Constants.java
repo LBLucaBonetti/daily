@@ -39,7 +39,12 @@ public final class Constants {
   public static final String SIGNUP_PATH = "/" + SIGNUP_VIEW;
   public static final List<String> ALLOWED_STATIC_TEMPLATES = List.of(SIGNUP_PATH);
   public static final List<String> ALLOWED_STATIC_ASSETS =
-      List.of("/public-style.css", "/img/daily-logo.svg", "/favicon.ico", "/img/google-logo.svg");
+      List.of(
+          "/public-style.css",
+          "/img/daily-logo.svg",
+          "/favicon.ico",
+          "/img/google-logo.svg",
+          "/login.js");
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
