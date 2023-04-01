@@ -12,6 +12,7 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -23,11 +24,19 @@ class DailyErrorController implements ErrorController {
   private final DailyExceptionHandler dailyExceptionHandler;
 
   @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
-  public String handleError(HttpServletResponse httpServletResponse) {
-    // Change response status code to avoid having the error popping up in the browser console.
-    // The error is still picked up by the frontend router and handled showing the 404 page.
-    httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-    return "forward:/";
+  public String handleError(
+      HttpServletResponse httpServletResponse, Authentication authentication) {
+    return Optional.ofNullable(authentication)
+        .map(
+            auth -> {
+              // Change response status code to avoid having the error popping up in the browser
+              // console.
+              // The error is still picked up by the frontend router and handled showing the 404
+              // page.
+              httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+              return "forward:/";
+            })
+        .orElseGet(() -> Constants.ERROR_VIEW);
   }
 
   @RequestMapping

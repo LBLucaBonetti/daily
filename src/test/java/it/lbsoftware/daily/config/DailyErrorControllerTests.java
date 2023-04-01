@@ -22,6 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 @DisplayName("DailyErrorController unit tests")
 class DailyErrorControllerTests extends DailyAbstractUnitTests {
@@ -42,9 +43,10 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
   void test1() {
     // Given
     HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    Authentication authentication = mock(Authentication.class);
 
     // When
-    String res = dailyErrorController.handleError(httpServletResponse);
+    String res = dailyErrorController.handleError(httpServletResponse, authentication);
 
     // Then
     verify(httpServletResponse, times(1)).setStatus(HttpServletResponse.SC_OK);
