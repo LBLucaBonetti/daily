@@ -1,14 +1,15 @@
 body {
   background-color: #fafafa !important;
-  font-family: "Inter", sans-serif;
-}
-
-.daily-text {
-  color: #2f2e41;
+  font-family: "Inter", sans-serif !important;
+  color: #2f2e41 !important;
 }
 
 .daily-logo {
   width: 230px;
+}
+
+.daily-small-logo {
+  width: 64px;
 }
 
 @media (max-width: 355px) {

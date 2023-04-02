@@ -46,7 +46,10 @@ public final class Constants {
           "/img/daily-logo.svg",
           "/favicon.ico",
           "/img/google-logo.svg",
-          "/login.js");
+          "/public-login.js",
+          "/public-signup.js",
+          "/img/logo.svg");
+  public static final String NOT_BLANK_MESSAGE = "Please fill out this field";
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");

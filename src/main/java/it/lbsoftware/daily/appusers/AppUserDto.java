@@ -18,18 +18,33 @@ public class AppUserDto {
   @Size(max = Constants.APP_USER_EMAIL_MAX)
   @Email
   @NotNull
+  @NotBlank(
+      message =
+          Constants
+              .NOT_BLANK_MESSAGE) // This is only used to produce the same invalid message the other
+  // fields produce; it is
+  // not strictly required since the @Email annotation would not accept a blank string
+  // anyway
   private String email;
 
-  @NotBlank private String password;
-  @NotBlank private String passwordConfirmation;
+  @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
+  private String password;
+
+  @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
+  private String passwordConfirmation;
 
   @Size(max = Constants.APP_USER_FIRST_NAME_MAX)
-  @NotBlank
+  @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
   private String firstName;
 
   @Size(max = Constants.APP_USER_LAST_NAME_MAX)
-  @NotBlank
+  @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
   private String lastName;
+
+  //  @NotNull
+  //  @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
+  //  @Pattern(regexp = "^(en|it)$", message = "Invalid language provided")
+  //  private String language;
 
   public String getEmail() {
     return StringUtils.lowerCase(this.email);
