@@ -27,9 +27,13 @@ CREATE INDEX idx_appuser_uuid ON app_user(uuid);
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create users
+ALTER SEQUENCE hibernate_sequence INCREMENT BY 1;
+
 INSERT INTO app_user (id, uuid, created_at, updated_at, version, auth_provider_id, auth_provider, email, enabled)
 SELECT nextval('hibernate_sequence'), uuid_generate_v4(), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, app_user, 'GOOGLE', uuid_generate_v4() || '@trydaily.click', TRUE
 FROM (SELECT DISTINCT app_user FROM note) AS subquery;
+
+ALTER SEQUENCE hibernate_sequence INCREMENT BY 50;
 
 -- Remove the extension to generate UUID v4 values
 DROP EXTENSION IF EXISTS "uuid-ossp";
