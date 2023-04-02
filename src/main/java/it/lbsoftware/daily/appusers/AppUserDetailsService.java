@@ -1,7 +1,9 @@
 package it.lbsoftware.daily.appusers;
 
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,13 +17,21 @@ public class AppUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    AppUser appUser =
-        appUserRepository
-            .findByEmailIgnoreCaseAndAuthProvider(username, AuthProvider.DAILY)
+    final String usernameToSearch =
+        Optional.ofNullable(username)
+            .filter(StringUtils::isNotBlank)
             .orElseThrow(
                 () ->
                     new UsernameNotFoundException(
-                        "AppUser with email " + username + " not found!"));
+                        "AppUser with a null or blank email does not exist"));
+
+    AppUser appUser =
+        appUserRepository
+            .findByEmailIgnoreCaseAndAuthProvider(usernameToSearch, AuthProvider.DAILY)
+            .orElseThrow(
+                () ->
+                    new UsernameNotFoundException(
+                        "AppUser with email " + usernameToSearch + " not found!"));
 
     return new AppUserDetails(appUser);
   }
