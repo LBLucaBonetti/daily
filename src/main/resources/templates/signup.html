@@ -45,9 +45,9 @@
           </div>
 
           <div class="mb-3">
-            <input autofocus class="form-control" id="email" placeholder="Email" required
-                   th:field="*{email}"
-                   type="email"/>
+            <input autofocus class="form-control" id="email" maxlength="320" placeholder="Email"
+                   required
+                   th:field="*{email}" type="email"/>
             <div class="text-danger text-start" th:errors="*{email}"
                  th:if="${#fields.hasErrors('email')}"></div>
           </div>
@@ -71,15 +71,16 @@
           </div>
 
           <div class="mb-3">
-            <input class="form-control" id="first-name" placeholder="First name" required
-                   th:field="*{firstName}"
+            <input class="form-control" id="first-name" maxlength="255" placeholder="First name"
+                   required th:field="*{firstName}"
                    type="text"/>
             <div class="text-danger text-start" th:errors="*{firstName}"
                  th:if="${#fields.hasErrors('firstName')}"></div>
           </div>
 
           <div class="mb-3">
-            <input class="form-control" id="last-name" placeholder="Last name" required
+            <input class="form-control" id="last-name" maxlength="255" placeholder="Last name"
+                   required
                    th:field="*{lastName}" type="text"/>
             <div class="text-danger text-start" th:errors="*{lastName}"
                  th:if="${#fields.hasErrors('lastName')}"></div>
