@@ -91,6 +91,20 @@
                  th:if="${#fields.hasErrors('lastName')}"></div>
           </div>
 
+          <div class="text-start mb-5">
+            <label class="mb-1">Preferred language</label>
+            <div class="btn-group d-flex" role="group">
+              <input autocomplete="off" class="btn-check" id="language-en"
+                     name="language" th:field="*{language}" type="radio" value="en">
+              <label class="btn daily-radio" for="language-en">English</label>
+              <input autocomplete="off" class="btn-check" id="language-it"
+                     name="language" th:field="*{language}" type="radio" value="it">
+              <label class="btn daily-radio" for="language-it">Italian</label>
+            </div>
+            <div class="text-danger" th:errors="*{language}"
+                 th:if="${#fields.hasErrors('language')}"></div>
+          </div>
+
           <div class="d-grid">
             <input class="btn daily-btn text-uppercase" type="submit" value="Confirm">
           </div>

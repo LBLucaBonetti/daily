@@ -1,6 +1,6 @@
 body {
   background-color: #fafafa !important;
-  font-family: "Inter", sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   color: #2f2e41 !important;
 }
 
@@ -65,4 +65,14 @@ body {
 
 .daily-link {
   color: #ea580c !important;
+}
+
+.daily-radio {
+  border-color: #dee2e6 !important;
+}
+
+.btn-check:checked + .btn {
+  background-color: #ea580c !important;
+  color: #fafafa !important;
+  border-color: #dee2e6 !important;
 }

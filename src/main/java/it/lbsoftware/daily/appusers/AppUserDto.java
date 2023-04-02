@@ -4,6 +4,7 @@ import it.lbsoftware.daily.config.Constants;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -41,10 +42,10 @@ public class AppUserDto {
   @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
   private String lastName;
 
-  //  @NotNull
-  //  @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
-  //  @Pattern(regexp = "^(en|it)$", message = "Invalid language provided")
-  //  private String language;
+  @NotNull
+  @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
+  @Pattern(regexp = "^(en|it)$", message = "Invalid language")
+  private String language = "en";
 
   public String getEmail() {
     return StringUtils.lowerCase(this.email);
