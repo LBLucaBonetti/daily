@@ -44,44 +44,49 @@
                th:text="${err}">
           </div>
 
-          <div class="mb-3">
+          <div class="form-floating mb-3">
             <input autofocus class="form-control" id="email" maxlength="320" placeholder="Email"
                    required
                    th:field="*{email}" type="email"/>
+            <label for="email">Email</label>
             <div class="text-danger text-start" th:errors="*{email}"
                  th:if="${#fields.hasErrors('email')}"></div>
           </div>
 
-          <div class="mb-3">
+          <div class="form-floating mb-3">
             <input class="form-control" id="password" placeholder="Password" required
                    th:field="*{password}"
                    type="password"/>
+            <label for="password">Password</label>
             <div class="text-danger text-start" th:errors="*{password}"
                  th:if="${#fields.hasErrors('password')}"></div>
           </div>
 
 
-          <div class="mb-3">
+          <div class="form-floating mb-3">
             <input class="form-control" id="password-confirmation"
                    placeholder="Re-enter password" required
                    th:field="*{passwordConfirmation}"
                    type="password"/>
+            <label for="password-confirmation">Re-enter password</label>
             <div class="text-danger text-start" th:errors="*{passwordConfirmation}"
                  th:if="${#fields.hasErrors('passwordConfirmation')}"></div>
           </div>
 
-          <div class="mb-3">
+          <div class="form-floating mb-3">
             <input class="form-control" id="first-name" maxlength="255" placeholder="First name"
                    required th:field="*{firstName}"
                    type="text"/>
+            <label for="first-name">First name</label>
             <div class="text-danger text-start" th:errors="*{firstName}"
                  th:if="${#fields.hasErrors('firstName')}"></div>
           </div>
 
-          <div class="mb-3">
+          <div class="form-floating mb-3">
             <input class="form-control" id="last-name" maxlength="255" placeholder="Last name"
                    required
                    th:field="*{lastName}" type="text"/>
+            <label for="last-name">Last name</label>
             <div class="text-danger text-start" th:errors="*{lastName}"
                  th:if="${#fields.hasErrors('lastName')}"></div>
           </div>
