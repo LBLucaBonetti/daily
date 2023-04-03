@@ -65,11 +65,11 @@ public class AppUser extends BaseEntity {
   private boolean enabled;
 
   public String getEmail() {
-    return StringUtils.lowerCase(this.email);
+    return StringUtils.toRootLowerCase(this.email);
   }
 
   public void setEmail(String email) {
-    this.email = StringUtils.lowerCase(email);
+    this.email = StringUtils.toRootLowerCase(email);
   }
 
   public enum AuthProvider {
@@ -82,7 +82,7 @@ public class AppUser extends BaseEntity {
     private String email;
 
     public AppUserBuilder email(String email) {
-      this.email = StringUtils.lowerCase(email);
+      this.email = StringUtils.toRootLowerCase(email);
       return this;
     }
   }

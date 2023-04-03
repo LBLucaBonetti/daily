@@ -48,10 +48,10 @@ public class AppUserDto {
   private String language = "en";
 
   public String getEmail() {
-    return StringUtils.lowerCase(this.email);
+    return StringUtils.toRootLowerCase(this.email);
   }
 
   public void setEmail(String email) {
-    this.email = StringUtils.lowerCase(email);
+    this.email = StringUtils.toRootLowerCase(email);
   }
 }

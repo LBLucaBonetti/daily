@@ -66,7 +66,8 @@ public final class TestUtils {
     Map<String, Object> idTokenClaims = new HashMap<>();
     idTokenClaims.put(UID_CLAIM, appUser);
     Optional.ofNullable(fullName).ifPresent(e -> idTokenClaims.put(FULL_NAME_CLAIM, e));
-    Optional.ofNullable(email).ifPresent(e -> idTokenClaims.put(EMAIL_CLAIM, StringUtils.lowerCase(e)));
+    Optional.ofNullable(email)
+        .ifPresent(e -> idTokenClaims.put(EMAIL_CLAIM, StringUtils.toRootLowerCase(e)));
 
     return oidcLogin().oidcUser(createAppUser(idTokenClaims));
   }

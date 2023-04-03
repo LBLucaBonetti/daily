@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
@@ -68,7 +67,7 @@ public final class AppUserTestUtils {
                 .authProvider(AuthProvider.GOOGLE)
                 .firstName(APP_USER_FIRSTNAME)
                 .lastName(APP_USER_LASTNAME)
-                .email(StringUtils.lowerCase(APP_USER_EMAIL))
+                .email(APP_USER_EMAIL)
                 .build())
         .getUuid();
   }
@@ -82,7 +81,7 @@ public final class AppUserTestUtils {
                 .authProvider(AuthProvider.GOOGLE)
                 .firstName(OTHER_APP_USER_FIRSTNAME)
                 .lastName(OTHER_APP_USER_LASTNAME)
-                .email(StringUtils.lowerCase(OTHER_APP_USER_EMAIL))
+                .email(OTHER_APP_USER_EMAIL)
                 .build())
         .getUuid();
   }
