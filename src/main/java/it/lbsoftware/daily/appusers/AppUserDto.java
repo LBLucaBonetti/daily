@@ -44,8 +44,10 @@ public class AppUserDto {
 
   @NotNull
   @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
-  @Pattern(regexp = "^(en|it)$", message = "Invalid language")
-  private String language = "en";
+  @Pattern(
+      regexp = Constants.APP_USER_LANG_REGEXP,
+      message = Constants.APP_USER_LANG_PATTERN_MESSAGE)
+  private String lang = "en";
 
   public String getEmail() {
     return StringUtils.toRootLowerCase(this.email);

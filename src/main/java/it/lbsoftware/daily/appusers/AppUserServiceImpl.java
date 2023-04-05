@@ -4,6 +4,8 @@ import static it.lbsoftware.daily.views.ViewUtils.addErrorToView;
 import static it.lbsoftware.daily.views.ViewUtils.getOauth2AuthProvider;
 
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
+import it.lbsoftware.daily.appusersettings.AppUserSettingDto;
+import it.lbsoftware.daily.appusersettings.AppUserSettingService;
 import it.lbsoftware.daily.bases.BaseEntity;
 import it.lbsoftware.daily.config.Constants;
 import java.util.Objects;
@@ -26,6 +28,7 @@ public class AppUserServiceImpl implements AppUserService {
 
   private final AppUserRepository appUserRepository;
   private final PasswordEncoder passwordEncoder;
+  private final AppUserSettingService appUserSettingService;
 
   @Override
   public UUID getUuid(@NonNull Object principal) {
@@ -92,6 +95,7 @@ public class AppUserServiceImpl implements AppUserService {
   }
 
   @Override
+  @Transactional
   public void createDailyAppUser(@NonNull AppUserDto appUserDto) {
     AppUser appUser =
         AppUser.builder()
@@ -102,10 +106,12 @@ public class AppUserServiceImpl implements AppUserService {
             .password(passwordEncoder.encode(appUserDto.getPassword()))
             .email(appUserDto.getEmail())
             .build();
-    appUserRepository.save(appUser);
+    final UUID appUserUuid = appUserRepository.save(appUser).getUuid();
+    appUserSettingService.createAppUserSetting(getAppUserSetting(appUserDto), appUserUuid);
   }
 
   @Override
+  @Transactional
   public void createOauth2AppUser(
       @NonNull AppUserDto appUserDto,
       @NonNull AuthProvider authProvider,
@@ -117,6 +123,13 @@ public class AppUserServiceImpl implements AppUserService {
             .enabled(true)
             .email(appUserDto.getEmail())
             .build();
-    appUserRepository.save(appUser);
+    final UUID appUserUuid = appUserRepository.save(appUser).getUuid();
+    appUserSettingService.createAppUserSetting(getAppUserSetting(appUserDto), appUserUuid);
+  }
+
+  private AppUserSettingDto getAppUserSetting(AppUserDto appUser) {
+    AppUserSettingDto appUserSetting = new AppUserSettingDto();
+    appUserSetting.setLang(appUser.getLang());
+    return appUserSetting;
   }
 }

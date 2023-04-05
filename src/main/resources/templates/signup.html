@@ -94,15 +94,15 @@
           <div class="text-start mb-5">
             <label class="mb-1">Preferred language</label>
             <div class="btn-group d-flex" role="group">
-              <input autocomplete="off" class="btn-check" id="language-en"
-                     name="language" th:field="*{language}" type="radio" value="en">
-              <label class="btn daily-radio" for="language-en">English</label>
-              <input autocomplete="off" class="btn-check" id="language-it"
-                     name="language" th:field="*{language}" type="radio" value="it">
-              <label class="btn daily-radio" for="language-it">Italian</label>
+              <input autocomplete="off" class="btn-check" id="lang-en"
+                     name="lang" th:field="*{lang}" type="radio" value="en">
+              <label class="btn daily-radio" for="lang-en">English</label>
+              <input autocomplete="off" class="btn-check" id="lang-it"
+                     name="lang" th:field="*{lang}" type="radio" value="it">
+              <label class="btn daily-radio" for="lang-it">Italian</label>
             </div>
-            <div class="text-danger" th:errors="*{language}"
-                 th:if="${#fields.hasErrors('language')}"></div>
+            <div class="text-danger" th:errors="*{lang}"
+                 th:if="${#fields.hasErrors('lang')}"></div>
           </div>
 
           <div class="d-grid">
