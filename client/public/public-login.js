@@ -41,6 +41,7 @@ loginForm.addEventListener('submit', (e) => {
   if (isGoogleEmail(email)) {
     removeAlerts();
     addGoogleEmailAlert();
+    loginForm.reset();
     e.preventDefault();
   }
 });
