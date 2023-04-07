@@ -25,7 +25,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 ALTER SEQUENCE hibernate_sequence INCREMENT BY 1;
 
 INSERT INTO app_user_setting (id, uuid, created_at, updated_at, version, app_user, lang)
-SELECT nextval('hibernate_sequence'), uuid_generate_v4(), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, app_user_uuid, 'en'
+SELECT nextval('hibernate_sequence'), uuid_generate_v4(), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, app_user_uuid, 'en-US'
 FROM (SELECT DISTINCT uuid AS app_user_uuid FROM app_user) AS subquery;
 
 ALTER SEQUENCE hibernate_sequence INCREMENT BY 50;

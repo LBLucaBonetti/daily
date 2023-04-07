@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusersettings;
 
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,5 +19,25 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
     AppUserSetting savedAppUserSettingEntity = appUserSettingRepository.save(appUserSettingEntity);
 
     return appUserSettingDtoMapper.convertToDto(savedAppUserSettingEntity);
+  }
+
+  @Override
+  public Optional<AppUserSettingDto> readAppUserSettings(UUID appUser) {
+    return appUserSettingRepository
+        .findByAppUser(appUser)
+        .map(appUserSettingDtoMapper::convertToDto);
+  }
+
+  @Override
+  public Optional<AppUserSettingDto> updateAppUserSettings(
+      AppUserSettingDto appUserSetting, UUID appUser) {
+    return appUserSettingRepository
+        .findByAppUser(appUser)
+        .map(
+            prevAppUserSetting -> {
+              Optional.ofNullable(appUserSetting.getLang()).ifPresent(prevAppUserSetting::setLang);
+              return appUserSettingRepository.saveAndFlush(prevAppUserSetting);
+            })
+        .map(appUserSettingDtoMapper::convertToDto);
   }
 }

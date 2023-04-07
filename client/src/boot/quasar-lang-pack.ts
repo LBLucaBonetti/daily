@@ -1,11 +1,13 @@
+import { boot } from 'quasar/wrappers';
 import { Quasar } from 'quasar';
+import { useLanguageStore } from 'src/stores/languageStore';
 
 const langList = import.meta.glob(
   '../../node_modules/quasar/lang/(en-US|it).mjs'
 );
 
-export default async () => {
-  const langIso = 'en-US'; // ... some logic to determine it (use Cookies Plugin?)
+export default boot(async ({ store }) => {
+  const langIso = useLanguageStore().language;
 
   try {
     langList[`../../node_modules/quasar/lang/${langIso}.mjs`]().then((lang) => {
@@ -15,4 +17,4 @@ export default async () => {
     // Requested Quasar Language Pack does not exist,
     // let's not break the app, so catching error
   }
-};
+});

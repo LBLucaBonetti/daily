@@ -47,7 +47,7 @@ public class AppUserDto {
   @Pattern(
       regexp = Constants.APP_USER_LANG_REGEXP,
       message = Constants.APP_USER_LANG_PATTERN_MESSAGE)
-  private String lang = "en";
+  private String lang = "en-US";
 
   public String getEmail() {
     return StringUtils.toRootLowerCase(this.email);
