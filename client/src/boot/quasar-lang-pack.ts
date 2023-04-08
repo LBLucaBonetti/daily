@@ -6,7 +6,7 @@ const langList = import.meta.glob(
   '../../node_modules/quasar/lang/(en-US|it).mjs'
 );
 
-export default boot(async ({ store }) => {
+export default boot(async () => {
   const langIso = useLanguageStore().language;
 
   try {

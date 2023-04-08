@@ -86,7 +86,6 @@ import {
 } from 'quasar';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { RouterView } from 'vue-router';
-import { useI18n } from 'vue-i18n';
 import { useLanguageStore } from 'src/stores/languageStore';
 
 const leftDrawerOpen = ref(false);
@@ -95,7 +94,6 @@ function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 
-const { t } = useI18n();
 const fullName = ref('');
 const email = ref('');
 const language = useLanguageStore();
