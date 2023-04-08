@@ -259,8 +259,8 @@
     <java.version>17</java.version>
     <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     <mapstruct.version>1.5.3.Final</mapstruct.version>
-    <node.version>v18.12.1</node.version>
-    <npm.version>8.19.2</npm.version>
+    <node.version>v18.15.0</node.version>
+    <npm.version>9.5.0</npm.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>lblucabonetti</sonar.organization>
     <testcontainers.version>1.18.0</testcontainers.version>
