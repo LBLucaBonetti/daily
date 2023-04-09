@@ -107,7 +107,7 @@ public class AppUserServiceImpl implements AppUserService {
             .email(appUserDto.getEmail())
             .build();
     final UUID appUserUuid = appUserRepository.save(appUser).getUuid();
-    appUserSettingService.createAppUserSetting(getAppUserSetting(appUserDto), appUserUuid);
+    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), appUserUuid);
   }
 
   @Override
@@ -124,10 +124,10 @@ public class AppUserServiceImpl implements AppUserService {
             .email(appUserDto.getEmail())
             .build();
     final UUID appUserUuid = appUserRepository.save(appUser).getUuid();
-    appUserSettingService.createAppUserSetting(getAppUserSetting(appUserDto), appUserUuid);
+    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), appUserUuid);
   }
 
-  private AppUserSettingDto getAppUserSetting(AppUserDto appUser) {
+  private AppUserSettingDto getAppUserSettings(@NonNull AppUserDto appUser) {
     AppUserSettingDto appUserSetting = new AppUserSettingDto();
     appUserSetting.setLang(appUser.getLang());
     return appUserSetting;

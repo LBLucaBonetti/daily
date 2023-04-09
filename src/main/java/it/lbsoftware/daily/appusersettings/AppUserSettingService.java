@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public interface AppUserSettingService {
 
-  AppUserSettingDto createAppUserSetting(AppUserSettingDto appUserSetting, UUID appUser);
+  AppUserSettingDto createAppUserSettings(AppUserSettingDto appUserSetting, UUID appUser);
 
   Optional<AppUserSettingDto> readAppUserSettings(UUID appUser);
 

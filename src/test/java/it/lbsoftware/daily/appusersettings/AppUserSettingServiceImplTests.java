@@ -2,8 +2,10 @@ package it.lbsoftware.daily.appusersettings;
 
 import static it.lbsoftware.daily.appusersettings.AppUserSettingTestUtils.createAppUserSetting;
 import static it.lbsoftware.daily.appusersettings.AppUserSettingTestUtils.createAppUserSettingDto;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -12,9 +14,14 @@ import static org.mockito.Mockito.verify;
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 
 @DisplayName("AppUserSettingServiceImpl unit tests")
@@ -27,6 +34,20 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   @Mock private AppUserSettingDtoMapper appUserSettingDtoMapper;
   private AppUserSettingServiceImpl appUserSettingService;
 
+  private static Stream<Arguments> test6() {
+    // AppUserSetting, appUser
+    AppUserSettingDto appUserSetting = createAppUserSettingDto(null, LANG);
+    return Stream.of(
+        arguments(null, null), arguments(null, APP_USER), arguments(appUserSetting, null));
+  }
+
+  private static Stream<Arguments> test8() {
+    // AppUserSetting, appUser
+    AppUserSettingDto appUserSetting = createAppUserSettingDto(null, LANG);
+    return Stream.of(
+        arguments(null, null), arguments(null, APP_USER), arguments(appUserSetting, null));
+  }
+
   @BeforeEach
   void beforeEach() {
     appUserSettingService =
@@ -34,7 +55,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should create app user setting and return app user setting")
+  @DisplayName("Should create app user settings and return app user setting")
   void test1() {
     // Given
     AppUserSettingDto appUserSetting = createAppUserSettingDto(null, LANG);
@@ -45,7 +66,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
         .willReturn(appUserSettingDto);
 
     // When
-    AppUserSettingDto res = appUserSettingService.createAppUserSetting(appUserSetting, APP_USER);
+    AppUserSettingDto res = appUserSettingService.createAppUserSettings(appUserSetting, APP_USER);
 
     // Then
     verify(appUserSettingRepository, times(1)).save(any());
@@ -128,5 +149,31 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
     verify(appUserSettingRepository, times(1)).saveAndFlush(prevAppUserSetting);
     assertEquals(res, Optional.of(updatedAppUserSettingDto));
     assertEquals(OTHER_LANG, res.get().getLang());
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when create app user settings with null argument")
+  void test6(AppUserSettingDto appUserSetting, UUID appUser) {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> appUserSettingService.createAppUserSettings(appUserSetting, appUser));
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @DisplayName("Should throw when read app user settings with null argument")
+  void test7(UUID appUser) {
+    assertThrows(
+        IllegalArgumentException.class, () -> appUserSettingService.readAppUserSettings(appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when update app user settings with null argument")
+  void test8(AppUserSettingDto appUserSetting, UUID appUser) {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> appUserSettingService.updateAppUserSettings(appUserSetting, appUser));
   }
 }
