@@ -35,17 +35,17 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   private AppUserSettingServiceImpl appUserSettingService;
 
   private static Stream<Arguments> test6() {
-    // AppUserSetting, appUser
-    AppUserSettingDto appUserSetting = createAppUserSettingDto(null, LANG);
+    // AppUserSettings, appUser
+    AppUserSettingDto appUserSettings = createAppUserSettingDto(null, LANG);
     return Stream.of(
-        arguments(null, null), arguments(null, APP_USER), arguments(appUserSetting, null));
+        arguments(null, null), arguments(null, APP_USER), arguments(appUserSettings, null));
   }
 
   private static Stream<Arguments> test8() {
-    // AppUserSetting, appUser
-    AppUserSettingDto appUserSetting = createAppUserSettingDto(null, LANG);
+    // AppUserSettings, appUser
+    AppUserSettingDto appUserSettings = createAppUserSettingDto(null, LANG);
     return Stream.of(
-        arguments(null, null), arguments(null, APP_USER), arguments(appUserSetting, null));
+        arguments(null, null), arguments(null, APP_USER), arguments(appUserSettings, null));
   }
 
   @BeforeEach
@@ -58,7 +58,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should create app user settings and return app user setting")
   void test1() {
     // Given
-    AppUserSettingDto appUserSetting = createAppUserSettingDto(null, LANG);
+    AppUserSettingDto appUserSettings = createAppUserSettingDto(null, LANG);
     AppUserSetting savedAppUserSettingEntity = createAppUserSetting(LANG, APP_USER);
     AppUserSettingDto appUserSettingDto = createAppUserSettingDto(UUID.randomUUID(), LANG);
     given(appUserSettingRepository.save(any())).willReturn(savedAppUserSettingEntity);
@@ -66,7 +66,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
         .willReturn(appUserSettingDto);
 
     // When
-    AppUserSettingDto res = appUserSettingService.createAppUserSettings(appUserSetting, APP_USER);
+    AppUserSettingDto res = appUserSettingService.createAppUserSettings(appUserSettings, APP_USER);
 
     // Then
     verify(appUserSettingRepository, times(1)).save(any());
@@ -129,35 +129,35 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should update app user settings and return app user settings optional")
   void test5() {
     // Given
-    AppUserSetting prevAppUserSetting = createAppUserSetting(LANG, APP_USER);
-    AppUserSetting updatedAppUserSetting = createAppUserSetting(OTHER_LANG, APP_USER);
-    AppUserSettingDto updatedAppUserSettingDto =
+    AppUserSetting prevAppUserSettings = createAppUserSetting(LANG, APP_USER);
+    AppUserSetting updatedAppUserSettings = createAppUserSetting(OTHER_LANG, APP_USER);
+    AppUserSettingDto updatedAppUserSettingsDto =
         createAppUserSettingDto(UUID.randomUUID(), OTHER_LANG);
     given(appUserSettingRepository.findByAppUser(APP_USER))
-        .willReturn(Optional.of(prevAppUserSetting));
-    given(appUserSettingRepository.saveAndFlush(prevAppUserSetting))
-        .willReturn(updatedAppUserSetting);
-    given(appUserSettingDtoMapper.convertToDto(updatedAppUserSetting))
-        .willReturn(updatedAppUserSettingDto);
+        .willReturn(Optional.of(prevAppUserSettings));
+    given(appUserSettingRepository.saveAndFlush(prevAppUserSettings))
+        .willReturn(updatedAppUserSettings);
+    given(appUserSettingDtoMapper.convertToDto(updatedAppUserSettings))
+        .willReturn(updatedAppUserSettingsDto);
 
     // When
     Optional<AppUserSettingDto> res =
-        appUserSettingService.updateAppUserSettings(updatedAppUserSettingDto, APP_USER);
+        appUserSettingService.updateAppUserSettings(updatedAppUserSettingsDto, APP_USER);
 
     // Then
     verify(appUserSettingRepository, times(1)).findByAppUser(APP_USER);
-    verify(appUserSettingRepository, times(1)).saveAndFlush(prevAppUserSetting);
-    assertEquals(res, Optional.of(updatedAppUserSettingDto));
+    verify(appUserSettingRepository, times(1)).saveAndFlush(prevAppUserSettings);
+    assertEquals(res, Optional.of(updatedAppUserSettingsDto));
     assertEquals(OTHER_LANG, res.get().getLang());
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when create app user settings with null argument")
-  void test6(AppUserSettingDto appUserSetting, UUID appUser) {
+  void test6(AppUserSettingDto appUserSettings, UUID appUser) {
     assertThrows(
         IllegalArgumentException.class,
-        () -> appUserSettingService.createAppUserSettings(appUserSetting, appUser));
+        () -> appUserSettingService.createAppUserSettings(appUserSettings, appUser));
   }
 
   @ParameterizedTest
@@ -171,9 +171,9 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when update app user settings with null argument")
-  void test8(AppUserSettingDto appUserSetting, UUID appUser) {
+  void test8(AppUserSettingDto appUserSettings, UUID appUser) {
     assertThrows(
         IllegalArgumentException.class,
-        () -> appUserSettingService.updateAppUserSettings(appUserSetting, appUser));
+        () -> appUserSettingService.updateAppUserSettings(appUserSettings, appUser));
   }
 }

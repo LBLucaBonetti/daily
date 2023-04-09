@@ -15,12 +15,13 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
 
   @Override
   public AppUserSettingDto createAppUserSettings(
-      @NonNull AppUserSettingDto appUserSetting, @NonNull UUID appUser) {
-    AppUserSetting appUserSettingEntity =
-        AppUserSetting.builder().appUser(appUser).lang(appUserSetting.getLang()).build();
-    AppUserSetting savedAppUserSettingEntity = appUserSettingRepository.save(appUserSettingEntity);
+      @NonNull AppUserSettingDto appUserSettings, @NonNull UUID appUser) {
+    AppUserSetting appUserSettingsEntity =
+        AppUserSetting.builder().appUser(appUser).lang(appUserSettings.getLang()).build();
+    AppUserSetting savedAppUserSettingsEntity =
+        appUserSettingRepository.save(appUserSettingsEntity);
 
-    return appUserSettingDtoMapper.convertToDto(savedAppUserSettingEntity);
+    return appUserSettingDtoMapper.convertToDto(savedAppUserSettingsEntity);
   }
 
   @Override
@@ -32,13 +33,14 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
 
   @Override
   public Optional<AppUserSettingDto> updateAppUserSettings(
-      @NonNull AppUserSettingDto appUserSetting, @NonNull UUID appUser) {
+      @NonNull AppUserSettingDto appUserSettings, @NonNull UUID appUser) {
     return appUserSettingRepository
         .findByAppUser(appUser)
         .map(
-            prevAppUserSetting -> {
-              Optional.ofNullable(appUserSetting.getLang()).ifPresent(prevAppUserSetting::setLang);
-              return appUserSettingRepository.saveAndFlush(prevAppUserSetting);
+            prevAppUserSettings -> {
+              Optional.ofNullable(appUserSettings.getLang())
+                  .ifPresent(prevAppUserSettings::setLang);
+              return appUserSettingRepository.saveAndFlush(prevAppUserSettings);
             })
         .map(appUserSettingDtoMapper::convertToDto);
   }

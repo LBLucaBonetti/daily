@@ -35,11 +35,11 @@ class AppUserController {
   }
 
   @PutMapping(value = "/settings")
-  public ResponseEntity<AppUserSettingDto> updateAppUserSetting(
-      @Valid @RequestBody AppUserSettingDto appUserSetting,
+  public ResponseEntity<AppUserSettingDto> updateAppUserSettings(
+      @Valid @RequestBody AppUserSettingDto appUserSettings,
       @AuthenticationPrincipal Object principal) {
     return appUserSettingService
-        .updateAppUserSettings(appUserSetting, appUserService.getUuid(principal))
+        .updateAppUserSettings(appUserSettings, appUserService.getUuid(principal))
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
