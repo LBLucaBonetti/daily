@@ -330,4 +330,14 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
         IllegalArgumentException.class,
         () -> appUserService.createOauth2AppUser(appUserDto, authProvider, authProviderId));
   }
+
+  @Test
+  @DisplayName("Should throw when get app user info and app user is not recognized")
+  void test18() {
+    // Given
+    String appUser = "appUser";
+
+    // When & then
+    assertThrows(IllegalStateException.class, () -> appUserService.getAppUserInfo(appUser));
+  }
 }
