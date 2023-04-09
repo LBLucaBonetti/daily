@@ -130,7 +130,7 @@ public class AppUserServiceImpl implements AppUserService {
     appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), appUserUuid);
   }
 
-  private AppUserSettingDto getAppUserSettings(@NonNull AppUserDto appUser) {
+  private AppUserSettingDto getAppUserSettings(AppUserDto appUser) {
     AppUserSettingDto appUserSetting = new AppUserSettingDto();
     appUserSetting.setLang(appUser.getLang());
     return appUserSetting;
