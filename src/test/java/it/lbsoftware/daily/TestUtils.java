@@ -3,9 +3,9 @@ package it.lbsoftware.daily;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.EMAIL_CLAIM;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.FULL_NAME_CLAIM;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.UID_CLAIM;
-import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 
+import it.lbsoftware.daily.appusers.AppUserTestUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -69,7 +69,7 @@ public final class TestUtils {
     Optional.ofNullable(email)
         .ifPresent(e -> idTokenClaims.put(EMAIL_CLAIM, StringUtils.toRootLowerCase(e)));
 
-    return oidcLogin().oidcUser(createAppUser(idTokenClaims));
+    return oidcLogin().oidcUser(AppUserTestUtils.createOauth2AppUser(idTokenClaims));
   }
 
   /**
