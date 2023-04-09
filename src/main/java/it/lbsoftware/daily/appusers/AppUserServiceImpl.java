@@ -116,6 +116,9 @@ public class AppUserServiceImpl implements AppUserService {
       @NonNull AppUserDto appUserDto,
       @NonNull AuthProvider authProvider,
       @NonNull String authProviderId) {
+    if (AuthProvider.DAILY.equals(authProvider)) {
+      throw new IllegalArgumentException();
+    }
     AppUser appUser =
         AppUser.builder()
             .authProvider(authProvider)
