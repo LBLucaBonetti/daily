@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
     })
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @Builder
@@ -63,6 +61,23 @@ public class AppUser extends BaseEntity {
 
   @Column(nullable = false)
   private boolean enabled;
+
+  public AppUser(
+      String authProviderId,
+      AuthProvider authProvider,
+      String email,
+      String password,
+      String firstName,
+      String lastName,
+      boolean enabled) {
+    this.authProviderId = authProviderId;
+    this.authProvider = authProvider;
+    setEmail(email); // Custom logic there
+    this.password = password;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.enabled = enabled;
+  }
 
   public String getEmail() {
     return StringUtils.toRootLowerCase(this.email);
