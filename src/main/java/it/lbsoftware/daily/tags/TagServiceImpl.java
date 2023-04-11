@@ -29,7 +29,7 @@ public class TagServiceImpl implements TagService {
   private final TagDtoMapper tagDtoMapper;
 
   @Override
-  public TagDto createTag(@NonNull TagDto tag, @NonNull String appUser) {
+  public TagDto createTag(@NonNull TagDto tag, @NonNull UUID appUser) {
     Tag tagEntity = tagDtoMapper.convertToEntity(tag);
     tagEntity.setAppUser(appUser);
     Tag savedTagEntity = tagRepository.save(tagEntity);
@@ -43,13 +43,13 @@ public class TagServiceImpl implements TagService {
       cacheNames = TAG_CACHE,
       key = BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL,
       unless = DO_NOT_STORE_NULL_SPEL)
-  public Optional<TagDto> readTag(@NonNull UUID uuid, @NonNull String appUser) {
+  public Optional<TagDto> readTag(@NonNull UUID uuid, @NonNull UUID appUser) {
     return tagRepository.findByUuidAndAppUser(uuid, appUser).map(tagDtoMapper::convertToDto);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Page<TagDto> readTags(Pageable pageable, @NonNull String appUser) {
+  public Page<TagDto> readTags(Pageable pageable, @NonNull UUID appUser) {
     return tagRepository.findByAppUser(pageable, appUser).map(tagDtoMapper::convertToDto);
   }
 
@@ -64,7 +64,7 @@ public class TagServiceImpl implements TagService {
       },
       evict = {@CacheEvict(cacheNames = NOTE_CACHE, allEntries = true)})
   public Optional<TagDto> updateTag(
-      @NonNull UUID uuid, @NonNull TagDto tag, @NonNull String appUser) {
+      @NonNull UUID uuid, @NonNull TagDto tag, @NonNull UUID appUser) {
     return tagRepository
         .findByUuidAndAppUser(uuid, appUser)
         .map(
@@ -83,7 +83,7 @@ public class TagServiceImpl implements TagService {
         @CacheEvict(cacheNames = TAG_CACHE, key = BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL),
         @CacheEvict(cacheNames = NOTE_CACHE, allEntries = true)
       })
-  public void deleteTag(@NonNull UUID uuid, @NonNull String appUser) {
+  public void deleteTag(@NonNull UUID uuid, @NonNull UUID appUser) {
     Tag tag =
         tagRepository
             .findByUuidAndAppUser(uuid, appUser)

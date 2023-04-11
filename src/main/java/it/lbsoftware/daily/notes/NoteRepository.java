@@ -17,7 +17,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
    * @param appUser Unique id of the appUser
    * @return Found note or empty value
    */
-  Optional<Note> findByUuidAndAppUser(UUID uuid, String appUser);
+  Optional<Note> findByUuidAndAppUser(UUID uuid, UUID appUser);
 
   /**
    * Finds notes by their AppUser
@@ -26,7 +26,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
    * @param appUser Unique id of the appUser
    * @return Found notes or empty page
    */
-  Page<Note> findByAppUser(Pageable pageable, String appUser);
+  Page<Note> findByAppUser(Pageable pageable, UUID appUser);
 
   /**
    * Finds a note by its uuid and AppUser fetching the associated tags
@@ -38,5 +38,5 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
   @Query(
       "select n from Note n left join fetch n.tags where n.uuid = :uuid and n.appUser = :appUser")
   Optional<Note> findByUuidAndAppUserFetchTags(
-      @Param("uuid") UUID uuid, @Param("appUser") String appUser);
+      @Param("uuid") UUID uuid, @Param("appUser") UUID appUser);
 }

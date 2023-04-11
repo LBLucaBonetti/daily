@@ -6,15 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import java.util.Collections;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("Tag unit tests")
 class TagTests extends DailyAbstractUnitTests {
 
-  private final String NAME = "name";
-  private final String COLOR_HEX = "#123456";
-  private final String APP_USER = "appUser";
+  private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final String NAME = "name";
+  private static final String COLOR_HEX = "#123456";
 
   @Test
   @DisplayName("Should equal with itself")

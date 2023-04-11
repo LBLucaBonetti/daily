@@ -32,12 +32,8 @@
         <q-item-label class="poppins-regular" header> daily </q-item-label>
         <q-item class="justify-between items-center">
           <div>
-            <q-item-label class="inter-regular text-1">{{
-              fullName
-            }}</q-item-label>
-            <q-item-label class="inter-regular text-1">{{
-              email
-            }}</q-item-label>
+            <q-item-label class="text-1">{{ fullName }}</q-item-label>
+            <q-item-label class="text-1">{{ email }}</q-item-label>
           </div>
           <div>
             <logout-button />
@@ -46,8 +42,16 @@
         <q-item
           ><language-select
             :locale-options="[
-              { value: 'en-US', label: $t('language.english') },
-              { value: 'it', label: $t('language.italian') },
+              {
+                value: 'en-US',
+                label: $t('language.english'),
+                selected: language.language === 'en-US',
+              },
+              {
+                value: 'it',
+                label: $t('language.italian'),
+                selected: language.language === 'it',
+              },
             ]"
           ></language-select
         ></q-item>
@@ -82,6 +86,7 @@ import {
 } from 'quasar';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { RouterView } from 'vue-router';
+import { useLanguageStore } from 'src/stores/languageStore';
 
 const leftDrawerOpen = ref(false);
 
@@ -91,8 +96,10 @@ function toggleLeftDrawer() {
 
 const fullName = ref('');
 const email = ref('');
+const language = useLanguageStore();
 
 onMounted(() => {
+  // Get info
   api
     .get('/appusers/info')
     .then((res: AxiosResponse<InfoDto>) => {

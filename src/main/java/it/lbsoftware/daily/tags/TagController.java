@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,27 +32,27 @@ class TagController {
 
   @PostMapping
   public ResponseEntity<TagDto> createTag(
-      @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal OidcUser appUser) {
-    TagDto createdTagDto = tagService.createTag(tagDto, appUserService.getUid(appUser));
+      @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal Object principal) {
+    TagDto createdTagDto = tagService.createTag(tagDto, appUserService.getUuid(principal));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdTagDto);
   }
 
   @GetMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> readTag(
-      @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
+      @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
     return tagService
-        .readTag(uuid, appUserService.getUid(appUser))
+        .readTag(uuid, appUserService.getUuid(principal))
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @GetMapping
   public ResponseEntity<PageDto<TagDto>> readTags(
-      Pageable pageable, @AuthenticationPrincipal OidcUser appUser) {
+      Pageable pageable, @AuthenticationPrincipal Object principal) {
     Page<TagDto> readTags;
     try {
-      readTags = tagService.readTags(pageable, appUserService.getUid(appUser));
+      readTags = tagService.readTags(pageable, appUserService.getUuid(principal));
     } catch (Exception e) {
       log.error(e);
       throw new DailyBadRequestException(null);
@@ -67,17 +66,17 @@ class TagController {
   public ResponseEntity<TagDto> updateTag(
       @PathVariable("uuid") UUID uuid,
       @Valid @RequestBody TagDto tagDto,
-      @AuthenticationPrincipal OidcUser appUser) {
+      @AuthenticationPrincipal Object principal) {
     return tagService
-        .updateTag(uuid, tagDto, appUserService.getUid(appUser))
+        .updateTag(uuid, tagDto, appUserService.getUuid(principal))
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @DeleteMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> deleteTag(
-      @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal OidcUser appUser) {
-    tagService.deleteTag(uuid, appUserService.getUid(appUser));
+      @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
+    tagService.deleteTag(uuid, appUserService.getUuid(principal));
 
     return ResponseEntity.noContent().build();
   }

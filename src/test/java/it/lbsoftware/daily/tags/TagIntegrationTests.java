@@ -1,6 +1,11 @@
 package it.lbsoftware.daily.tags;
 
 import static it.lbsoftware.daily.TestUtils.loginOf;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_EMAIL;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_FULLNAME;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.OTHER_APP_USER_EMAIL;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.OTHER_APP_USER_FULLNAME;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.saveOauth2OtherAppUser;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
@@ -22,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import it.lbsoftware.daily.appusers.AppUserRepository;
+import it.lbsoftware.daily.appusers.AppUserTestUtils;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyBadRequestException;
@@ -49,8 +56,6 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   private static final String BASE_URL = "/api/tags";
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
-  private static final String APP_USER = "appUser";
-  private static final String OTHER_APP_USER = "otherAppUser";
   private static final String OTHER_NAME = "otherName";
   private static final String OTHER_COLOR_HEX = "#654321";
   private static final String TEXT = "text";
@@ -60,6 +65,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @Autowired private TagRepository tagRepository;
   @Autowired private TagDtoMapper tagDtoMapper;
   @Autowired private NoteRepository noteRepository;
+  @Autowired private AppUserRepository appUserRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -129,6 +135,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when create tag with wrong name")
   void test9(final String name) throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     TagDto tagDto = createTagDto(null, name, COLOR_HEX);
 
     // When
@@ -138,7 +145,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(tagDto))
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
 
     // Then
@@ -173,6 +180,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when create tag with wrong colorHex")
   void test10(final String colorHex) throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     TagDto tagDto = createTagDto(null, NAME, colorHex);
 
     // When
@@ -182,7 +190,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(tagDto))
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
 
     // Then
@@ -193,6 +201,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should create tag")
   void test11() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     TagDto tagDto = createTagDto(null, NAME, COLOR_HEX);
 
     // When
@@ -204,7 +213,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagDto))
                         .with(csrf())
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -215,7 +224,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     assertNotNull(res.getUuid());
     assertEquals(NAME, res.getName());
     assertEquals(COLOR_HEX, res.getColorHex());
-    Tag resEntity = tagRepository.findByUuidAndAppUser(res.getUuid(), APP_USER).get();
+    Tag resEntity = tagRepository.findByUuidAndAppUser(res.getUuid(), appUser).get();
     assertNotNull(resEntity.getUuid());
     assertEquals(NAME, resEntity.getName());
     assertEquals(COLOR_HEX, resEntity.getColorHex());
@@ -225,6 +234,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when read tag with wrong uuid")
   void test12() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -232,7 +242,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -240,15 +250,17 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when read tag of another app user")
   void test13() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
     UUID uuid =
-        tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER)).getUuid();
+        tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser)).getUuid();
 
     // When & then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(OTHER_APP_USER)))
+                .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -256,6 +268,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when read tag and it does not exist")
   void test14() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
     // When & then
@@ -263,7 +276,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -271,7 +284,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should read tag")
   void test15() throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
 
     // When
     TagDto res =
@@ -280,7 +294,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 .perform(
                     get(BASE_URL + "/{uuid}", tag.getUuid())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -297,8 +311,10 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return empty list when read tags of another app user")
   void test16() throws Exception {
     // Given
-    tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
-    tagRepository.save(createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
+    tagRepository.save(createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), appUser));
 
     // When
     PageDto<TagDto> res =
@@ -307,7 +323,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 .perform(
                     get(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(loginOf(OTHER_APP_USER)))
+                        .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -323,20 +339,23 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should read tags")
   void test17() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     TagDto tagDto1 =
         tagDtoMapper.convertToDto(
-            tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER)));
+            tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser)));
     TagDto tagDto2 =
         tagDtoMapper.convertToDto(
             tagRepository.save(
-                createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), APP_USER)));
+                createTag(OTHER_NAME, OTHER_COLOR_HEX, Collections.emptySet(), appUser)));
 
     // When
     PageDto<TagDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
-                    get(BASE_URL).contentType(MediaType.APPLICATION_JSON).with(loginOf(APP_USER)))
+                    get(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -364,7 +383,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when update tag with wrong name")
   void test18(final String name) throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
     TagDto tagDto = createTagDto(null, name, COLOR_HEX);
 
     // When
@@ -374,7 +394,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(tagDto))
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
 
     // Then
@@ -411,7 +431,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when update tag with wrong colorHex")
   void test19(final String colorHex) throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
     TagDto tagDto = createTagDto(null, NAME, colorHex);
 
     // When
@@ -421,7 +442,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(tagDto))
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
 
     // Then
@@ -434,6 +455,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when update tag with wrong uuid")
   void test20() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -442,7 +464,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -450,7 +472,9 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when update tag of another app user")
   void test21() throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
     TagDto tagDto = createTagDto(null, OTHER_NAME, OTHER_COLOR_HEX);
 
     // When & then
@@ -460,7 +484,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(tagDto))
                 .with(csrf())
-                .with(loginOf(OTHER_APP_USER)))
+                .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -468,7 +492,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should update tag")
   void test22() throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
     TagDto tagDto = createTagDto(null, OTHER_NAME, OTHER_COLOR_HEX);
 
     // When
@@ -480,7 +505,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagDto))
                         .with(csrf())
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -496,6 +521,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when delete tag with wrong uuid")
   void test23() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -504,7 +530,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -512,7 +538,9 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when delete tag of another app user")
   void test24() throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
 
     // When
     mockMvc
@@ -520,7 +548,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", tag.getUuid())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(OTHER_APP_USER)))
+                .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
 
     // Then
@@ -531,6 +559,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when delete tag and it does not exist")
   void test25() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
     // When & then
@@ -539,7 +568,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -547,8 +576,9 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should not delete note and should remove tag from note tags when delete tag")
   void test26() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), appUser));
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
     tag.addToNote(note);
     noteRepository.save(note);
     assertTrue(tag.getNotes().contains(note));
@@ -560,7 +590,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", tag.getUuid())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNoContent());
 
     // Then
@@ -568,7 +598,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     assertEquals(1, noteRepository.count());
     assertTrue(
         noteRepository
-            .findByUuidAndAppUserFetchTags(note.getUuid(), APP_USER)
+            .findByUuidAndAppUserFetchTags(note.getUuid(), appUser)
             .get()
             .getTags()
             .isEmpty());
@@ -578,7 +608,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should delete tag")
   void test27() throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
 
     // When
     mockMvc
@@ -586,7 +617,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", tag.getUuid())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNoContent());
 
     // Then
@@ -597,7 +628,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should have id, createdAt, updatedAt and version when save tag")
   void test28() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser);
     assertNull(tag.getCreatedAt());
     assertNull(tag.getUpdatedAt());
     assertEquals(0, tag.getVersion());
@@ -615,7 +647,8 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should update version when update tag")
   void test29() {
     // Given
-    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser);
     assertEquals(0, tag.getVersion());
 
     // When
@@ -630,8 +663,9 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should not equal when ids differ")
   void test30() {
     // Given
-    Tag tag1 = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
-    Tag tag2 = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag1 = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
+    Tag tag2 = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
 
     // When
     boolean res = tag1.equals(tag2);
@@ -645,6 +679,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
       "Should not read tags because of wrong tag field name as sort parameter and return bad request")
   void test31() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String nonexistentField = "nonexistent-field";
 
     // When
@@ -654,7 +689,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                 get(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .param("sort", nonexistentField)
-                    .with(loginOf(APP_USER)))
+                    .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
             .andExpect(status().isBadRequest())
             .andReturn()
             .getResolvedException();
@@ -668,6 +703,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should ignore uuid, createdAt and updatedAt from TagDto when create tag")
   void test32() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
     LocalDateTime createdAt = A_LOCALDATETIME_IN_THE_PAST;
     LocalDateTime updatedAt = A_LOCALDATETIME_IN_THE_PAST;
@@ -684,7 +720,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagDto))
                         .with(csrf())
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
@@ -703,6 +739,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should ignore uuid, createdAt and updatedAt from TagDto when update tag")
   void test33() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
     LocalDateTime createdAt = A_LOCALDATETIME_IN_THE_PAST;
     LocalDateTime updatedAt = A_LOCALDATETIME_IN_THE_PAST;
@@ -722,7 +759,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                                 objectMapper.writeValueAsString(
                                     createTagDto(null, NAME, COLOR_HEX)))
                             .with(csrf())
-                            .with(loginOf(APP_USER)))
+                            .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                     .andReturn()
                     .getResponse()
                     .getContentAsString(),
@@ -737,7 +774,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tagDto))
                         .with(csrf())
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
@@ -756,14 +793,15 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should cache when read tag")
   void test34() throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
     TagDto tagDto =
         objectMapper.readValue(
             mockMvc
                 .perform(
                     get(BASE_URL + "/{uuid}", tag.getUuid())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
@@ -772,7 +810,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     // When
     Optional<TagDto> res =
         Optional.ofNullable(cacheManager.getCache(Constants.TAG_CACHE))
-            .map(r -> r.get("appUser:" + APP_USER + ":" + tag.getUuid().toString(), TagDto.class));
+            .map(r -> r.get("appUser:" + appUser + ":" + tag.getUuid().toString(), TagDto.class));
 
     // Then
     assertTrue(res.isPresent());
@@ -783,21 +821,22 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should cache when update tag")
   void test35() throws Exception {
     // Given
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
     mockMvc.perform(
         put(BASE_URL + "/{uuid}", tag.getUuid())
             .contentType(MediaType.APPLICATION_JSON)
             .content(
                 objectMapper.writeValueAsString(createTagDto(null, OTHER_NAME, OTHER_COLOR_HEX)))
             .with(csrf())
-            .with(loginOf(APP_USER)));
+            .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)));
     TagDto tagDto =
         objectMapper.readValue(
             mockMvc
                 .perform(
                     get(BASE_URL + "/{uuid}", tag.getUuid())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -807,7 +846,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     // When
     Optional<TagDto> res =
         Optional.ofNullable(cacheManager.getCache(Constants.TAG_CACHE))
-            .map(r -> r.get("appUser:" + APP_USER + ":" + tag.getUuid().toString(), TagDto.class));
+            .map(r -> r.get("appUser:" + appUser + ":" + tag.getUuid().toString(), TagDto.class));
 
     // Then
     assertTrue(res.isPresent());

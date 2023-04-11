@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.config;
 
+import static it.lbsoftware.daily.config.Constants.ERROR_VIEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
@@ -22,6 +23,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 @DisplayName("DailyErrorController unit tests")
 class DailyErrorControllerTests extends DailyAbstractUnitTests {
@@ -42,9 +44,10 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
   void test1() {
     // Given
     HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    Authentication authentication = mock(Authentication.class);
 
     // When
-    String res = dailyErrorController.handleError(httpServletResponse);
+    String res = dailyErrorController.handleError(httpServletResponse, authentication);
 
     // Then
     verify(httpServletResponse, times(1)).setStatus(HttpServletResponse.SC_OK);
@@ -173,5 +176,19 @@ class DailyErrorControllerTests extends DailyAbstractUnitTests {
     assertNotNull(res);
     assertEquals(Map.of(ERROR_KEY, errorKey), res.getBody());
     assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+  }
+
+  @Test
+  @DisplayName("Should not handle error and return error view when not authenticated")
+  void test8() {
+    // Given
+    HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    Authentication authentication = null;
+
+    // When
+    var res = dailyErrorController.handleError(httpServletResponse, authentication);
+
+    // Then
+    assertEquals(ERROR_VIEW, res);
   }
 }

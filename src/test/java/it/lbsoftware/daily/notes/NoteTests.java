@@ -6,14 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import java.util.Collections;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("Note unit tests")
 class NoteTests extends DailyAbstractUnitTests {
 
-  private final String TEXT = "text";
-  private final String APP_USER = "appUser";
+  private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final String TEXT = "text";
 
   @Test
   @DisplayName("Should equal with itself")

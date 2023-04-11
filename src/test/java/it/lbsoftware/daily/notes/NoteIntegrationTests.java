@@ -1,6 +1,11 @@
 package it.lbsoftware.daily.notes;
 
 import static it.lbsoftware.daily.TestUtils.loginOf;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_EMAIL;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_FULLNAME;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.OTHER_APP_USER_EMAIL;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.OTHER_APP_USER_FULLNAME;
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.saveOauth2OtherAppUser;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
@@ -23,6 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import it.lbsoftware.daily.appusers.AppUserRepository;
+import it.lbsoftware.daily.appusers.AppUserTestUtils;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exception.DailyBadRequestException;
@@ -53,8 +60,6 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
   private static final String BASE_URL = "/api/notes";
   private static final String TEXT = "text";
-  private static final String APP_USER = "appUser";
-  private static final String OTHER_APP_USER = "otherAppUser";
   private static final String OTHER_TEXT = "otherText";
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
@@ -67,6 +72,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @Autowired private NoteDtoMapper noteDtoMapper;
   @Autowired private TagRepository tagRepository;
   @Autowired private TagDtoMapper tagDtoMapper;
+  @Autowired private AppUserRepository appUserRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -198,6 +204,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when create note with wrong text")
   void test14(final String text) throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     NoteDto noteDto = createNoteDto(null, text);
 
     // When
@@ -207,7 +214,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(noteDto))
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
 
     // Then
@@ -218,6 +225,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should create note")
   void test15() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     NoteDto noteDto = createNoteDto(null, TEXT);
 
     // When
@@ -229,7 +237,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(noteDto))
                         .with(csrf())
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -239,7 +247,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertNotNull(res.getUuid());
     assertEquals(TEXT, res.getText());
-    Note resEntity = noteRepository.findByUuidAndAppUser(res.getUuid(), APP_USER).get();
+    Note resEntity = noteRepository.findByUuidAndAppUser(res.getUuid(), appUser).get();
     assertNotNull(resEntity.getUuid());
     assertEquals(TEXT, resEntity.getText());
   }
@@ -248,6 +256,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when read note with wrong uuid")
   void test16() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -255,7 +264,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -263,14 +272,16 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when read note of another app user")
   void test17() throws Exception {
     // Given
-    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
 
     // When & then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(OTHER_APP_USER)))
+                .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -278,6 +289,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when read note and it does not exist")
   void test18() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
     // When & then
@@ -285,7 +297,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -293,7 +305,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should read note")
   void test19() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
 
     // When
     NoteDto res =
@@ -302,7 +315,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .perform(
                     get(BASE_URL + "/{uuid}", note.getUuid())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -318,8 +331,10 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return empty list when read notes of another app user")
   void test20() throws Exception {
     // Given
-    noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
-    noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
+    noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), appUser));
 
     // When
     PageDto<NoteDto> res =
@@ -328,7 +343,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .perform(
                     get(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(loginOf(OTHER_APP_USER)))
+                        .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -344,19 +359,22 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should read notes")
   void test21() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     NoteDto noteDto1 =
         noteDtoMapper.convertToDto(
-            noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)));
+            noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)));
     NoteDto noteDto2 =
         noteDtoMapper.convertToDto(
-            noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), APP_USER)));
+            noteRepository.save(createNote(OTHER_TEXT, Collections.emptySet(), appUser)));
 
     // When
     PageDto<NoteDto> res =
         objectMapper.readValue(
             mockMvc
                 .perform(
-                    get(BASE_URL).contentType(MediaType.APPLICATION_JSON).with(loginOf(APP_USER)))
+                    get(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -384,7 +402,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when update note with wrong text")
   void test22(final String text) throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
     NoteDto noteDto = createNoteDto(null, text);
 
     // When
@@ -394,7 +413,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(noteDto))
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
 
     // Then
@@ -406,6 +425,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when update note with wrong uuid")
   void test23() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -414,7 +434,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -422,7 +442,9 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when update note of another app user")
   void test24() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
     NoteDto noteDto = createNoteDto(null, OTHER_TEXT);
 
     // When & then
@@ -432,7 +454,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(noteDto))
                 .with(csrf())
-                .with(loginOf(OTHER_APP_USER)))
+                .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -440,7 +462,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should update note")
   void test25() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
     NoteDto noteDto = createNoteDto(null, OTHER_TEXT);
 
     // When
@@ -452,7 +475,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(noteDto))
                         .with(csrf())
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -467,6 +490,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when delete note with wrong uuid")
   void test26() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -475,7 +499,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -483,7 +507,9 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when delete note of another app user")
   void test27() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
 
     // When
     mockMvc
@@ -491,7 +517,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", note.getUuid())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(OTHER_APP_USER)))
+                .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
 
     // Then
@@ -502,6 +528,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when delete note and it does not exist")
   void test28() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
     // When & then
@@ -510,7 +537,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -518,8 +545,9 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should not delete tag and should remove note from tag notes when delete note")
   void test29() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), appUser));
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
     tag.addToNote(note);
     noteRepository.save(note);
     assertTrue(note.getTags().contains(tag));
@@ -531,7 +559,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", note.getUuid())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNoContent());
 
     // Then
@@ -539,7 +567,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     assertEquals(1, tagRepository.count());
     assertTrue(
         tagRepository
-            .findByUuidAndAppUserFetchNotes(tag.getUuid(), APP_USER)
+            .findByUuidAndAppUserFetchNotes(tag.getUuid(), appUser)
             .get()
             .getNotes()
             .isEmpty());
@@ -549,7 +577,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should delete note")
   void test30() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
 
     // When
     mockMvc
@@ -557,7 +586,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}", note.getUuid())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNoContent());
 
     // Then
@@ -568,6 +597,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when add tag to note with wrong uuid")
   void test31() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -576,7 +606,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -584,6 +614,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when add tag to note with wrong tagUuid")
   void test32() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String tagUuid = "not-a-uuid";
 
     // When & then
@@ -592,7 +623,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -600,6 +631,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when add tag to note with wrong uuid and tagUuid")
   void test33() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
     String tagUuid = "not-a-uuid";
 
@@ -609,7 +641,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -617,6 +649,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when add tag to note and note does not exist")
   void test34() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
     // When & then
@@ -625,7 +658,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -633,7 +666,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when add tag to note and tag does not exist")
   void test35() throws Exception {
     // Given
-    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
     UUID tagUuid = UUID.randomUUID();
 
     // When & then
@@ -642,7 +676,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -650,8 +684,10 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when add tag to note and note is of another app user")
   void test36() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
     UUID uuid =
-        noteRepository.save(createNote(TEXT, Collections.emptySet(), OTHER_APP_USER)).getUuid();
+        noteRepository.save(createNote(TEXT, Collections.emptySet(), otherAppUser)).getUuid();
 
     // When & then
     mockMvc
@@ -659,7 +695,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -667,10 +703,12 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when add tag to note and tag is of another app user")
   void test37() throws Exception {
     // Given
-    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
     UUID tagUuid =
         tagRepository
-            .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), OTHER_APP_USER))
+            .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), otherAppUser))
             .getUuid();
 
     // When & then
@@ -679,7 +717,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -687,9 +725,10 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should add tag to note")
   void test38() throws Exception {
     // Given
-    UUID uuid = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER)).getUuid();
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    UUID uuid = noteRepository.save(createNote(TEXT, new HashSet<>(), appUser)).getUuid();
     UUID tagUuid =
-        tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER)).getUuid();
+        tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser)).getUuid();
 
     // When
     mockMvc
@@ -697,12 +736,12 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNoContent());
 
     // Then
-    Note note = noteRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER).get();
-    Tag tag = tagRepository.findByUuidAndAppUserFetchNotes(tagUuid, APP_USER).get();
+    Note note = noteRepository.findByUuidAndAppUserFetchTags(uuid, appUser).get();
+    Tag tag = tagRepository.findByUuidAndAppUserFetchNotes(tagUuid, appUser).get();
     assertEquals(1, note.getTags().size());
     assertTrue(note.getTags().contains(tag));
     assertEquals(1, tag.getNotes().size());
@@ -713,6 +752,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when remove tag from note with wrong uuid")
   void test39() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -721,7 +761,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -729,6 +769,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when remove tag from note with wrong tagUuid")
   void test40() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String tagUuid = "not-a-uuid";
 
     // When & then
@@ -737,7 +778,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -745,6 +786,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when remove tag from note with wrong uuid and tagUuid")
   void test41() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
     String tagUuid = "not-a-uuid";
 
@@ -754,7 +796,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -762,6 +804,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when remove tag from note and note does not exist")
   void test42() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
     // When & then
@@ -770,7 +813,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -778,7 +821,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when remove tag from note and tag does not exist")
   void test43() throws Exception {
     // Given
-    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
     UUID tagUuid = UUID.randomUUID();
 
     // When & then
@@ -787,7 +831,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -795,8 +839,10 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when remove tag from note and note is of another app user")
   void test44() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
     UUID uuid =
-        noteRepository.save(createNote(TEXT, Collections.emptySet(), OTHER_APP_USER)).getUuid();
+        noteRepository.save(createNote(TEXT, Collections.emptySet(), otherAppUser)).getUuid();
 
     // When & then
     mockMvc
@@ -804,7 +850,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -812,10 +858,12 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when remove tag from note and tag is of another app user")
   void test45() throws Exception {
     // Given
-    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
     UUID tagUuid =
         tagRepository
-            .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), OTHER_APP_USER))
+            .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), otherAppUser))
             .getUuid();
 
     // When & then
@@ -824,7 +872,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -832,8 +880,9 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should remove tag from note")
   void test46() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), appUser));
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
     tag.addToNote(note);
     noteRepository.save(note);
     assertTrue(note.getTags().contains(tag));
@@ -845,12 +894,12 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", note.getUuid(), tag.getUuid())
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf())
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNoContent());
 
     // Then
-    note = noteRepository.findByUuidAndAppUserFetchTags(note.getUuid(), APP_USER).get();
-    tag = tagRepository.findByUuidAndAppUserFetchNotes(tag.getUuid(), APP_USER).get();
+    note = noteRepository.findByUuidAndAppUserFetchTags(note.getUuid(), appUser).get();
+    tag = tagRepository.findByUuidAndAppUserFetchNotes(tag.getUuid(), appUser).get();
     assertEquals(0, note.getTags().size());
     assertFalse(note.getTags().contains(tag));
     assertEquals(0, tag.getNotes().size());
@@ -861,6 +910,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return bad request when read note tags with wrong uuid")
   void test47() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
     // When & then
@@ -868,7 +918,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         .perform(
             get(BASE_URL + "/{uuid}/tags", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isBadRequest());
   }
 
@@ -876,6 +926,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when read note tags and note does not exist")
   void test48() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
     // When & then
@@ -883,7 +934,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         .perform(
             get(BASE_URL + "/{uuid}/tags", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(APP_USER)))
+                .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -891,14 +942,16 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return not found when read note tags and note is of another app user")
   void test49() throws Exception {
     // Given
-    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER)).getUuid();
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
+    UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
 
     // When & then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}/tags", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(loginOf(OTHER_APP_USER)))
+                .with(loginOf(otherAppUser, OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
         .andExpect(status().isNotFound());
   }
 
@@ -906,10 +959,10 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should read note tags")
   void test50() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
-    Tag tag1 = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
-    Tag tag2 =
-        tagRepository.save(createTag(OTHER_NAME, OTHER_COLOR_HEX, new HashSet<>(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), appUser));
+    Tag tag1 = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
+    Tag tag2 = tagRepository.save(createTag(OTHER_NAME, OTHER_COLOR_HEX, new HashSet<>(), appUser));
     tag1.addToNote(note);
     tag2.addToNote(note);
     noteRepository.save(note);
@@ -921,7 +974,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .perform(
                     get(BASE_URL + "/{uuid}/tags", note.getUuid())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -942,7 +995,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should have id, createdAt, updatedAt and version when save note")
   void test51() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = createNote(TEXT, Collections.emptySet(), appUser);
     assertNull(note.getCreatedAt());
     assertNull(note.getUpdatedAt());
     assertEquals(0, note.getVersion());
@@ -960,7 +1014,8 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should update version when update note")
   void test52() {
     // Given
-    Note note = createNote(TEXT, Collections.emptySet(), APP_USER);
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = createNote(TEXT, Collections.emptySet(), appUser);
     assertEquals(0, note.getVersion());
 
     // When
@@ -975,8 +1030,9 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should not equal when ids differ")
   void test53() {
     // Given
-    Note note1 = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
-    Note note2 = noteRepository.save(createNote(TEXT, Collections.emptySet(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note1 = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
+    Note note2 = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
 
     // When
     boolean res = note1.equals(note2);
@@ -989,6 +1045,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should not save note when text size exceeds the limits")
   void test54() {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String aTextOf256Chars =
         """
         abcdefghijklmnopqrs
@@ -1011,7 +1068,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
         assertThrows(
             Exception.class,
             () ->
-                noteRepository.save(createNote(aTextOf256Chars, Collections.emptySet(), APP_USER)));
+                noteRepository.save(createNote(aTextOf256Chars, Collections.emptySet(), appUser)));
 
     // Then
     assertNotNull(exception);
@@ -1022,6 +1079,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
       "Should not read notes because of wrong note field name as sort parameter and return bad request")
   void test55() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String nonexistentField = "nonexistent-field";
 
     // When
@@ -1031,7 +1089,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 get(BASE_URL)
                     .contentType(MediaType.APPLICATION_JSON)
                     .param("sort", nonexistentField)
-                    .with(loginOf(APP_USER)))
+                    .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
             .andExpect(status().isBadRequest())
             .andReturn()
             .getResolvedException();
@@ -1045,23 +1103,24 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should not add tag to note because of note tag limits and return conflict")
   void test56() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), appUser));
     UUID uuid = note.getUuid();
     UUID tagUuid =
-        tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER)).getUuid();
+        tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser)).getUuid();
     // Reach the max number of tags for this note
     for (Tag tag :
         List.of(
-            tagRepository.save(createTag("name1", "#123456", new HashSet<>(), APP_USER)),
-            tagRepository.save(createTag("name2", "#234567", new HashSet<>(), APP_USER)),
-            tagRepository.save(createTag("name3", "#345678", new HashSet<>(), APP_USER)),
-            tagRepository.save(createTag("name4", "#456789", new HashSet<>(), APP_USER)),
-            tagRepository.save(createTag("name5", "#567890", new HashSet<>(), APP_USER)))) {
+            tagRepository.save(createTag("name1", "#123456", new HashSet<>(), appUser)),
+            tagRepository.save(createTag("name2", "#234567", new HashSet<>(), appUser)),
+            tagRepository.save(createTag("name3", "#345678", new HashSet<>(), appUser)),
+            tagRepository.save(createTag("name4", "#456789", new HashSet<>(), appUser)),
+            tagRepository.save(createTag("name5", "#567890", new HashSet<>(), appUser)))) {
       mockMvc.perform(
           put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tag.getUuid())
               .contentType(MediaType.APPLICATION_JSON)
               .with(csrf())
-              .with(loginOf(APP_USER)));
+              .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)));
     }
 
     // When
@@ -1071,7 +1130,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
                     .contentType(MediaType.APPLICATION_JSON)
                     .with(csrf())
-                    .with(loginOf(APP_USER)))
+                    .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
             .andExpect(status().isConflict())
             .andReturn()
             .getResolvedException();
@@ -1085,6 +1144,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should ignore uuid, createdAt and updatedAt from NoteDto when create note")
   void test57() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
     LocalDateTime createdAt = A_LOCALDATETIME_IN_THE_PAST;
     LocalDateTime updatedAt = A_LOCALDATETIME_IN_THE_PAST;
@@ -1101,7 +1161,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(noteDto))
                         .with(csrf())
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
@@ -1120,6 +1180,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should ignore uuid, createdAt and updatedAt from NoteDto when update note")
   void test58() throws Exception {
     // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
     LocalDateTime createdAt = A_LOCALDATETIME_IN_THE_PAST;
     LocalDateTime updatedAt = A_LOCALDATETIME_IN_THE_PAST;
@@ -1137,7 +1198,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createNoteDto(null, TEXT)))
                             .with(csrf())
-                            .with(loginOf(APP_USER)))
+                            .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                     .andReturn()
                     .getResponse()
                     .getContentAsString(),
@@ -1152,7 +1213,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(noteDto))
                         .with(csrf())
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
@@ -1171,8 +1232,9 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should cache when read note tags")
   void test59() throws Exception {
     // Given
-    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), APP_USER));
-    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    Note note = noteRepository.save(createNote(TEXT, new HashSet<>(), appUser));
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
     tag.addToNote(note);
     noteRepository.save(note);
     Set<TagDto> tagDtos =
@@ -1181,7 +1243,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
                 .perform(
                     get(BASE_URL + "/{uuid}/tags", note.getUuid())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(loginOf(APP_USER)))
+                        .with(loginOf(appUser, APP_USER_FULLNAME, APP_USER_EMAIL)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
@@ -1194,7 +1256,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             .map(
                 r ->
                     r.get(
-                        "appUser:" + APP_USER + ":" + note.getUuid().toString() + ":tags",
+                        "appUser:" + appUser + ":" + note.getUuid().toString() + ":tags",
                         Set.class));
 
     // Then

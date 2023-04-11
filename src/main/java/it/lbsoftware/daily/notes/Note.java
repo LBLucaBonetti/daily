@@ -12,8 +12,10 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,10 +53,10 @@ public class Note extends BaseEntity {
   */
   private Set<Tag> tags = new HashSet<>();
 
-  @Column(name = "app_user", nullable = false)
-  @NotBlank
+  @Column(name = "app_user", updatable = false, nullable = false)
+  @NotNull
   /*
   Unique user id
   */
-  private String appUser;
+  private UUID appUser;
 }

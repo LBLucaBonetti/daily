@@ -36,7 +36,7 @@ import org.springframework.data.domain.Pageable;
 class TagServiceImplTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
-  private static final String APP_USER = "appUser";
+  private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");
   private static final String OTHER_NAME = "otherText";
   private static final String OTHER_COLOR_HEX = "#654321";
   @Mock private TagRepository tagRepository;
@@ -254,35 +254,35 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when create tag with null argument")
-  void test10(TagDto tag, String appUser) {
+  void test10(TagDto tag, UUID appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.createTag(tag, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when read tag with null argument")
-  void test11(UUID uuid, String appUser) {
+  void test11(UUID uuid, UUID appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.readTag(uuid, appUser));
   }
 
   @ParameterizedTest
   @NullSource
   @DisplayName("Should throw when read tags with null argument")
-  void test12(String appUser) {
+  void test12(UUID appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.readTags(pageable, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when update tag with null argument")
-  void test13(UUID uuid, TagDto tag, String appUser) {
+  void test13(UUID uuid, TagDto tag, UUID appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.updateTag(uuid, tag, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when delete tag with null argument")
-  void test14(UUID uuid, String appUser) {
+  void test14(UUID uuid, UUID appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.deleteTag(uuid, appUser));
   }
 }
