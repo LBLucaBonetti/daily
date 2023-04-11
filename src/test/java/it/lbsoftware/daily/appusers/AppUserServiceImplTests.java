@@ -21,7 +21,6 @@ import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusersettings.AppUserSettingDto;
 import it.lbsoftware.daily.appusersettings.AppUserSettingService;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,7 +36,6 @@ import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.BindingResultUtils;
 
 @DisplayName("AppUserServiceImpl unit tests")
 class AppUserServiceImplTests extends DailyAbstractUnitTests {
@@ -50,8 +48,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
   private static Stream<Arguments> test15() {
     // AppUsedDto, bindingResult
     AppUserDto appUserDto = new AppUserDto();
-    BindingResult bindingResult =
-        BindingResultUtils.getBindingResult(Map.of("key", "value"), "name");
+    BindingResult bindingResult = mock(BindingResult.class);
     return Stream.of(
         arguments(null, null), arguments(null, bindingResult), arguments(appUserDto, null));
   }
