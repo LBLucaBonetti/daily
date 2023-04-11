@@ -21,7 +21,7 @@
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
-    "@intlify/vite-plugin-vue-i18n": "^6.0.3",
+    "@intlify/vite-plugin-vue-i18n": "^7.0.0",
     "@quasar/app-vite": "^1.2.1",
     "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
