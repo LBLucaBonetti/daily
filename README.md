@@ -45,9 +45,8 @@ Follow these instructions:
 [![GitHub license](https://img.shields.io/github/license/LBLucaBonetti/daily)](https://github.com/LBLucaBonetti/daily/blob/main/LICENSE)
 [![CodeFactor](https://www.codefactor.io/repository/github/lblucabonetti/daily/badge)](https://www.codefactor.io/repository/github/lblucabonetti/daily)
 [![Daily production deploy](https://github.com/LBLucaBonetti/daily/actions/workflows/daily-production-deploy.yml/badge.svg?branch=main)](https://github.com/LBLucaBonetti/daily/actions/workflows/daily-production-deploy.yml)
-![Security Headers](https://img.shields.io/security-headers?url=https%3A%2F%2Fwww.trydaily.click)
-Badge for Security Headers is broken? Scan
-daily [here](https://securityheaders.com/?q=https%3A%2F%2Ftrydaily.click&followRedirects=on)
+<br>
+[Security Headers](https://securityheaders.com/?q=https%3A%2F%2Ftrydaily.click&followRedirects=on)
 
 #### Frontend
 
