@@ -230,6 +230,10 @@
       <artifactId>thymeleaf-extras-springsecurity6</artifactId>
       <groupId>org.thymeleaf.extras</groupId>
     </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-mail</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
