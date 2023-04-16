@@ -26,3 +26,9 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+  email:
+    image: 'mailhog/mailhog'
+    container_name: email
+    ports:
+      - "8025:8025"
+      - "1025:1025"

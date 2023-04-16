@@ -20,6 +20,10 @@ public non-sealed abstract class DailyAbstractIntegrationTests extends DailyAbst
     redis.start();
     System.setProperty("spring.data.redis.host", redis.getHost());
     System.setProperty("spring.data.redis.port", redis.getMappedPort(6379).toString());
+    GenericContainer<?> mailhog = new GenericContainer<>(DockerImageName.parse("mailhog/mailhog")).withExposedPorts(1025);
+    mailhog.start();
+    System.setProperty("spring.mail.host",mailhog.getHost());
+    System.setProperty("spring.mail.port",mailhog.getMappedPort(1025).toString());
   }
 
   @Autowired protected WebApplicationContext webApplicationContext;
