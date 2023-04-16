@@ -7,7 +7,7 @@ frontend.
 <br>
 The backend exposes both the frontend assets, routed by serving the index file for each request, and
 a set
-of APIs under a specific context.
+of APIs under a specific context. The login and sign up routes are the only public ones.
 
 #### Build & run with Docker
 
