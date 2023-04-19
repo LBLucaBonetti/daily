@@ -21,7 +21,7 @@ import org.springframework.validation.BindingResult;
 @DisplayName("ViewController unit tests")
 class ViewControllerTests extends DailyAbstractUnitTests {
 
-  private static final String REDIRECT_HOME = "redirect:/";
+  private static final String REDIRECT = "redirect:/";
   @Mock private AppUserService appUserService;
   private ViewController viewController;
 
@@ -41,7 +41,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     var res = viewController.signup(model, authentication);
 
     // Then
-    assertEquals(REDIRECT_HOME, res);
+    assertEquals(REDIRECT, res);
   }
 
   @Test
@@ -54,7 +54,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     var res = viewController.login(authentication);
 
     // Then
-    assertEquals(REDIRECT_HOME, res);
+    assertEquals(REDIRECT, res);
   }
 
   @Test
@@ -69,7 +69,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     var res = viewController.signup(appUserDto, bindingResult, authentication);
 
     // Then
-    assertEquals(REDIRECT_HOME, res);
+    assertEquals(REDIRECT, res);
   }
 
   @Test
@@ -105,7 +105,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     // Given
     AppUserDto appUserDto = mock(AppUserDto.class);
     BindingResult bindingResult = mock(BindingResult.class);
-    Authentication authentication = mock(Authentication.class);
+    Authentication authentication = null;
 
     // When
     var res = viewController.signup(appUserDto, bindingResult, authentication);

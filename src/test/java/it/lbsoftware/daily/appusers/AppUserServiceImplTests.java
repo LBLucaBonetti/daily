@@ -3,6 +3,7 @@ package it.lbsoftware.daily.appusers;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_EMAIL;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_FULLNAME;
 import static it.lbsoftware.daily.config.Constants.LOGIN_VIEW;
+import static it.lbsoftware.daily.config.Constants.REDIRECT;
 import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -239,7 +240,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     var res = appUserService.signup(appUserDto, bindingResult);
 
     // Then
-    assertEquals(LOGIN_VIEW, res);
+    assertEquals(REDIRECT + LOGIN_VIEW, res);
   }
 
   @Test
