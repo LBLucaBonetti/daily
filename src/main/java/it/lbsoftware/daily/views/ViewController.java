@@ -1,5 +1,7 @@
 package it.lbsoftware.daily.views;
 
+import static it.lbsoftware.daily.config.Constants.REDIRECT;
+
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.config.Constants;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequiredArgsConstructor
 class ViewController {
 
-  private static final String REDIRECT_HOME = "redirect:/";
   private static final String APP_USER_DTO_PARAMETER = "appUserDto";
   private final AppUserService appUserService;
 
@@ -43,10 +44,10 @@ class ViewController {
       BindingResult result,
       Authentication authentication) {
     return redirectIfAuthenticated(authentication)
-        .orElse(appUserService.signup(appUserDto, result));
+        .orElseGet(() -> appUserService.signup(appUserDto, result));
   }
 
   private Optional<String> redirectIfAuthenticated(final Authentication authentication) {
-    return Optional.ofNullable(authentication).map(auth -> REDIRECT_HOME);
+    return Optional.ofNullable(authentication).map(auth -> REDIRECT);
   }
 }

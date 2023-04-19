@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
+import static it.lbsoftware.daily.config.Constants.REDIRECT;
 import static it.lbsoftware.daily.views.ViewUtils.addErrorToView;
 import static it.lbsoftware.daily.views.ViewUtils.getOauth2AuthProvider;
 
@@ -90,7 +91,7 @@ public class AppUserServiceImpl implements AppUserService {
             () -> {
               // 4. Sign up the new AppUser
               createDailyAppUser(appUserDto);
-              return Constants.LOGIN_VIEW;
+              return REDIRECT + Constants.LOGIN_VIEW;
             });
   }
 

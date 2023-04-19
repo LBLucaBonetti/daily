@@ -4,6 +4,7 @@ import java.util.List;
 
 public final class Constants {
 
+  public static final String REDIRECT = "redirect:/";
   public static final String COOKIE_CSRF_TOKEN_REPOSITORY_BEAN_NAME = "cookieCsrfTokenRepository";
   public static final String CSRF_TOKEN_NAME = "XSRF-TOKEN";
   // Allow everything but only from the same origin & Bootstrap CDN & Bunny Fonts CDN
