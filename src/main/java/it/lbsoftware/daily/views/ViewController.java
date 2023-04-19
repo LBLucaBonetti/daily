@@ -43,7 +43,7 @@ class ViewController {
       BindingResult result,
       Authentication authentication) {
     return redirectIfAuthenticated(authentication)
-        .orElse(appUserService.signup(appUserDto, result));
+        .orElseGet(() -> appUserService.signup(appUserDto, result));
   }
 
   private Optional<String> redirectIfAuthenticated(final Authentication authentication) {
