@@ -22,7 +22,8 @@ Follow these instructions:
 
 - From the root of the project, run ```docker-compose -f daily-docker-compose.yml up --build```
   to download and build the required environment
-- When Postgres and Redis are ready to accept connections and Keycloak has started, run the
+- When Postgres and Redis are ready to accept connections, Keycloak has started and MailHog is up
+  and running, run the
   following Maven
   command to start the
   app: ```mvn clean spring-boot:run "-Dspring-boot.run.jvmArguments=-DGOOGLE_OAUTH2_CLIENT_SECRET=nz754EdKFuBI8kJFF9fYqucW91q6mJV1 -DGOOGLE_OAUTH2_CLIENT_ID=daily -Dspring.security.oauth2.client.registration.google.scope=openid,profile,email -Dspring.security.oauth2.client.provider.google.issuer-uri=http://localhost:8081/realms/daily -Dspring.datasource.url=jdbc:postgresql://localhost:5433/daily_develop" -Duser.timezone=Etc/UTC```

@@ -5,6 +5,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,12 +15,13 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
   private final AppUserSettingDtoMapper appUserSettingDtoMapper;
 
   @Override
+  @Transactional
   public AppUserSettingDto createAppUserSettings(
       @NonNull AppUserSettingDto appUserSettings, @NonNull UUID appUser) {
     AppUserSetting appUserSettingsEntity =
         AppUserSetting.builder().appUser(appUser).lang(appUserSettings.getLang()).build();
     AppUserSetting savedAppUserSettingsEntity =
-        appUserSettingRepository.save(appUserSettingsEntity);
+        appUserSettingRepository.saveAndFlush(appUserSettingsEntity);
 
     return appUserSettingDtoMapper.convertToDto(savedAppUserSettingsEntity);
   }

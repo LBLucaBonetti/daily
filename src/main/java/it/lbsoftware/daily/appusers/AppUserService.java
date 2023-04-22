@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.appusers;
 
 import java.util.UUID;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 public interface AppUserService {
@@ -26,12 +27,15 @@ public interface AppUserService {
    *
    * @param appUserDto The AppUser data
    * @param bindingResult The result of validating the provided AppUser data
+   * @param model The ui model
    * @return The view name to show
    */
-  String signup(AppUserDto appUserDto, BindingResult bindingResult);
+  String signup(AppUserDto appUserDto, BindingResult bindingResult, Model model);
 
   /**
-   * Creates a new AppUser with the provided information; its auth provider will be DAILY
+   * Creates a new AppUser with the provided information; its auth provider will be DAILY. This
+   * method also creates a record for the settings and sends an email to perform the activation; it
+   * is not meant to be used without an active HttpServletRequest (i.e.: by an @Async method)
    *
    * @param appUserDto The AppUser data
    */
@@ -49,4 +53,12 @@ public interface AppUserService {
    */
   void createOauth2AppUser(
       AppUserDto appUserDto, AppUser.AuthProvider authProvider, String authProviderId);
+
+  /**
+   * Activates an appUser
+   *
+   * @param activationCode The activation code provided
+   * @return True if activated or false otherwise
+   */
+  boolean activate(UUID activationCode);
 }

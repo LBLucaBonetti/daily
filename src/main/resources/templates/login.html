@@ -30,11 +30,19 @@
           <img alt="daily" class="daily-logo" th:src="@{/img/daily-logo.svg}">
         </div>
 
+        <div class="alert alert-danger" id="activation-failure-alert" role="alert"
+             th:if="${activationCodeFailure}" th:text="${activationCodeFailure}">
+        </div>
+
+        <div class="alert alert-success" id="activation-success-alert" role="alert"
+             th:if="${activationCodeSuccess}" th:text="${activationCodeSuccess}">
+        </div>
+
         <form id="login-form" method="post" th:action="@{/login}">
 
           <div class="alert alert-danger" id="invalid-credentials-alert" role="alert"
                th:if="${param.error}">
-            Invalid username and password
+            Invalid email or password
           </div>
           <div class="alert alert-success" id="logout-alert" role="alert" th:if="${param.logout}">
             You have been logged out

@@ -37,6 +37,10 @@
           </div>
         </div>
 
+        <div class="alert alert-success" id="signup-success-alert" role="alert"
+             th:if="${signupSuccess}" th:text="${signupSuccess}">
+        </div>
+
         <form id="signup-form" method="post" th:action="@{/signup}" th:object="${appUserDto}">
 
           <div class="alert alert-danger" id="global-errors-alert" role="alert"

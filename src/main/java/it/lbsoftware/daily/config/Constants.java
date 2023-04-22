@@ -42,7 +42,12 @@ public final class Constants {
   public static final String SIGNUP_PATH = "/" + SIGNUP_VIEW;
   public static final String ERROR_VIEW = "error";
   public static final String ERROR_PATH = "/" + ERROR_VIEW;
-  public static final List<String> ALLOWED_STATIC_TEMPLATES = List.of(SIGNUP_PATH, ERROR_PATH);
+  public static final String ACTIVATIONS_VIEW = "activations";
+  public static final String ACTIVATION_CODE = "activationCode";
+  public static final String ACTIVATION_PATH =
+      "/" + ACTIVATIONS_VIEW + "/" + "{" + ACTIVATION_CODE + "}";
+  public static final List<String> ALLOWED_STATIC_TEMPLATES =
+      List.of(SIGNUP_PATH, ERROR_PATH, ACTIVATION_PATH);
   public static final List<String> ALLOWED_STATIC_ASSETS =
       List.of(
           "/public-style.css",
@@ -53,6 +58,12 @@ public final class Constants {
           "/public-signup.js",
           "/img/logo.svg");
   public static final String NOT_BLANK_MESSAGE = "Please fill out this field";
+  public static final String EMAIL_SUBJECT_PREFIX = "daily | ";
+  public static final String EMAIL_PATH_PREFIX = "/emails/";
+  public static final String EMAIL_APP_USER_ACTIVATION_PATH =
+      EMAIL_PATH_PREFIX + "app_user_activation.html";
+  public static final String EMAIL_APP_USER_ACTIVATION_SUBJECT =
+      EMAIL_SUBJECT_PREFIX + "Activate your account";
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");

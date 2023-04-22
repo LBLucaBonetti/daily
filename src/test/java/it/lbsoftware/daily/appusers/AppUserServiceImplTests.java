@@ -20,8 +20,10 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
+import it.lbsoftware.daily.appusersactivations.AppUserActivationService;
 import it.lbsoftware.daily.appusersettings.AppUserSettingDto;
 import it.lbsoftware.daily.appusersettings.AppUserSettingService;
+import it.lbsoftware.daily.emails.EmailService;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +38,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 @DisplayName("AppUserServiceImpl unit tests")
@@ -44,14 +47,23 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
   @Mock private AppUserRepository appUserRepository;
   @Mock private PasswordEncoder passwordEncoder;
   @Mock private AppUserSettingService appUserSettingService;
+  @Mock private EmailService emailService;
+  @Mock private AppUserActivationService appUserActivationService;
   private AppUserServiceImpl appUserService;
 
   private static Stream<Arguments> test15() {
-    // AppUsedDto, bindingResult
+    // AppUsedDto, bindingResult, model
     AppUserDto appUserDto = new AppUserDto();
     BindingResult bindingResult = mock(BindingResult.class);
+    Model model = mock(Model.class);
     return Stream.of(
-        arguments(null, null), arguments(null, bindingResult), arguments(appUserDto, null));
+        arguments(null, null, null),
+        arguments(null, null, model),
+        arguments(null, bindingResult, null),
+        arguments(null, bindingResult, model),
+        arguments(appUserDto, null, null),
+        arguments(appUserDto, null, model),
+        arguments(appUserDto, bindingResult, null));
   }
 
   private static Stream<Arguments> test17() {
@@ -72,7 +84,12 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
   @BeforeEach
   void beforeEach() {
     appUserService =
-        new AppUserServiceImpl(appUserRepository, passwordEncoder, appUserSettingService);
+        new AppUserServiceImpl(
+            appUserRepository,
+            passwordEncoder,
+            appUserSettingService,
+            emailService,
+            appUserActivationService);
   }
 
   @Test
@@ -150,10 +167,11 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     // Given
     AppUserDto appUserDto = mock(AppUserDto.class);
     BindingResult bindingResult = mock(BindingResult.class);
+    Model model = mock(Model.class);
     given(bindingResult.hasErrors()).willReturn(true);
 
     // When
-    var res = appUserService.signup(appUserDto, bindingResult);
+    var res = appUserService.signup(appUserDto, bindingResult, model);
 
     // Then
     assertEquals(SIGNUP_VIEW, res);
@@ -167,10 +185,11 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     appUserDto.setPassword("password");
     appUserDto.setPasswordConfirmation("differentPassword");
     BindingResult bindingResult = mock(BindingResult.class);
+    Model model = mock(Model.class);
     given(bindingResult.hasErrors()).willReturn(false);
 
     // When
-    var res = appUserService.signup(appUserDto, bindingResult);
+    var res = appUserService.signup(appUserDto, bindingResult, model);
 
     // Then
     assertEquals(SIGNUP_VIEW, res);
@@ -184,11 +203,12 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     appUserDto.setPassword("password");
     appUserDto.setPasswordConfirmation("password");
     BindingResult bindingResult = mock(BindingResult.class);
+    Model model = mock(Model.class);
     given(bindingResult.hasErrors()).willReturn(false);
     appUserDto.setEmail("email@gmail.com");
 
     // When
-    var res = appUserService.signup(appUserDto, bindingResult);
+    var res = appUserService.signup(appUserDto, bindingResult, model);
 
     // Then
     assertEquals(SIGNUP_VIEW, res);
@@ -202,6 +222,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     appUserDto.setPassword("password");
     appUserDto.setPasswordConfirmation("password");
     BindingResult bindingResult = mock(BindingResult.class);
+    Model model = mock(Model.class);
     given(bindingResult.hasErrors()).willReturn(false);
     String email = "email@email.com";
     appUserDto.setEmail(email);
@@ -209,7 +230,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     given(appUserRepository.findByEmailIgnoreCase(email)).willReturn(Optional.of(appUser));
 
     // When
-    var res = appUserService.signup(appUserDto, bindingResult);
+    var res = appUserService.signup(appUserDto, bindingResult, model);
 
     // Then
     assertEquals(SIGNUP_VIEW, res);
@@ -224,6 +245,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     appUserDto.setPassword(password);
     appUserDto.setPasswordConfirmation(password);
     BindingResult bindingResult = mock(BindingResult.class);
+    Model model = mock(Model.class);
     given(bindingResult.hasErrors()).willReturn(false);
     String email = "email@email.com";
     appUserDto.setEmail(email);
@@ -237,7 +259,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
         .willReturn(new AppUserSettingDto());
 
     // When
-    var res = appUserService.signup(appUserDto, bindingResult);
+    var res = appUserService.signup(appUserDto, bindingResult, model);
 
     // Then
     assertEquals(REDIRECT + LOGIN_VIEW, res);
@@ -307,9 +329,10 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when signup with null argument")
-  void test15(AppUserDto appUserDto, BindingResult bindingResult) {
+  void test15(AppUserDto appUserDto, BindingResult bindingResult, Model model) {
     assertThrows(
-        IllegalArgumentException.class, () -> appUserService.signup(appUserDto, bindingResult));
+        IllegalArgumentException.class,
+        () -> appUserService.signup(appUserDto, bindingResult, model));
   }
 
   @ParameterizedTest

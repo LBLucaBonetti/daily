@@ -63,10 +63,11 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     // Given
     AppUserDto appUserDto = mock(AppUserDto.class);
     BindingResult bindingResult = mock(BindingResult.class);
+    Model model = mock(Model.class);
     Authentication authentication = mock(Authentication.class);
 
     // When
-    var res = viewController.signup(appUserDto, bindingResult, authentication);
+    var res = viewController.signup(appUserDto, bindingResult, model, authentication);
 
     // Then
     assertEquals(REDIRECT, res);
@@ -105,12 +106,13 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     // Given
     AppUserDto appUserDto = mock(AppUserDto.class);
     BindingResult bindingResult = mock(BindingResult.class);
+    Model model = mock(Model.class);
     Authentication authentication = null;
 
     // When
-    var res = viewController.signup(appUserDto, bindingResult, authentication);
+    var res = viewController.signup(appUserDto, bindingResult, model, authentication);
 
     // Then
-    verify(appUserService, times(1)).signup(appUserDto, bindingResult);
+    verify(appUserService, times(1)).signup(appUserDto, bindingResult, model);
   }
 }
