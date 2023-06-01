@@ -264,7 +264,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>lblucabonetti</sonar.organization>
     <sonar.sources>src/main/java,src/main/resources</sonar.sources>
-    <testcontainers.version>1.18.1</testcontainers.version>
+    <testcontainers.version>1.18.3</testcontainers.version>
   </properties>
 
   <version>0.4.0</version>
