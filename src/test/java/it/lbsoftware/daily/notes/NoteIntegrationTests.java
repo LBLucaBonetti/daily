@@ -1020,6 +1020,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
 
     // When
     noteRepository.save(note);
+    note.setText(note.getText() + "1");
     Note res = noteRepository.save(note);
 
     // Then

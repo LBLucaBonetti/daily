@@ -653,6 +653,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
 
     // When
     tagRepository.save(tag);
+    tag.setName(tag.getName() + "1");
     Tag res = tagRepository.save(tag);
 
     // Then

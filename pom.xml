@@ -193,8 +193,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <artifactId>spring-security-test</artifactId>
-      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <groupId>org.springframework.boot</groupId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -205,6 +205,11 @@
     <dependency>
       <artifactId>postgresql</artifactId>
       <groupId>org.testcontainers</groupId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>spring-security-test</artifactId>
+      <groupId>org.springframework.security</groupId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -231,17 +236,6 @@
       <groupId>org.thymeleaf.extras</groupId>
     </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <artifactId>testcontainers-bom</artifactId>
-        <groupId>org.testcontainers</groupId>
-        <scope>import</scope>
-        <type>pom</type>
-        <version>${testcontainers.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <description>Daily</description>
   <groupId>it.lbsoftware</groupId>
   <modelVersion>4.0.0</modelVersion>
@@ -250,7 +244,7 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <groupId>org.springframework.boot</groupId>
     <relativePath/>
-    <version>3.0.6</version> <!-- lookup parent from repository -->
+    <version>3.1.1</version> <!-- lookup parent from repository -->
   </parent>
   <properties>
     <apache-commons-lang3.version>3.12.0</apache-commons-lang3.version>
@@ -264,7 +258,6 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>lblucabonetti</sonar.organization>
     <sonar.sources>src/main/java,src/main/resources</sonar.sources>
-    <testcontainers.version>1.18.1</testcontainers.version>
   </properties>
 
   <version>0.4.0</version>
