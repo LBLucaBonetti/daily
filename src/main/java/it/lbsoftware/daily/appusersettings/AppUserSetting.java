@@ -36,5 +36,6 @@ public class AppUserSetting extends BaseEntity {
   @Column(name = "lang", nullable = false)
   @NotBlank
   @Pattern(regexp = Constants.APP_USER_LANG_REGEXP)
+  @Builder.Default
   private String lang = "en-US";
 }
