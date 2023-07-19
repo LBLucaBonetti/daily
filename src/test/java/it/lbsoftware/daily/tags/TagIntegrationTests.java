@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -653,6 +654,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
 
     // When
     tagRepository.save(tag);
+    tag.setName(tag.getName() + "1");
     Tag res = tagRepository.save(tag);
 
     // Then
@@ -851,5 +853,46 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertTrue(res.isPresent());
     assertEquals(tagDto, res.get());
+  }
+
+  @Test
+  @DisplayName("Should not save tag when name size exceeds the limits")
+  void test36() {
+    // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    String aNameOf31Chars = """
+        abcdefghijklmnopqrs
+        abcdefghij
+        """;
+
+    // When
+    Exception exception =
+        assertThrows(
+            Exception.class,
+            () ->
+                tagRepository.save(
+                    createTag(aNameOf31Chars, COLOR_HEX, Collections.emptySet(), appUser)));
+
+    // Then
+    assertNotNull(exception);
+  }
+
+  @Test
+  @DisplayName("Should not save tag when colorHex size exceeds the limits")
+  void test37() {
+    // Given
+    final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
+    String aColorHexOf8Chars = "#1122334";
+
+    // When
+    Exception exception =
+        assertThrows(
+            Exception.class,
+            () ->
+                tagRepository.save(
+                    createTag(NAME, aColorHexOf8Chars, Collections.emptySet(), appUser)));
+
+    // Then
+    assertNotNull(exception);
   }
 }

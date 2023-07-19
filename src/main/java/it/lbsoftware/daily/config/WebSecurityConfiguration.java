@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -67,24 +68,29 @@ public class WebSecurityConfiguration {
                 .anyRequest()
                 .authenticated());
     // The /logout endpoint is automatically permitted but the /login?logout one is not
-    http.logout().permitAll();
-    http.exceptionHandling()
-        .defaultAuthenticationEntryPointFor(
-            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-            new AntPathRequestMatcher("/api/**"));
+    http.logout(LogoutConfigurer::permitAll);
+    http.exceptionHandling(
+        exceptionHandling ->
+            exceptionHandling.defaultAuthenticationEntryPointFor(
+                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                new AntPathRequestMatcher("/api/**")));
     // Form login
-    http.formLogin()
-        .usernameParameter("email")
-        .defaultSuccessUrl("/", true)
-        .loginPage(Constants.LOGIN_PATH)
-        .permitAll();
+    http.formLogin(
+        formLogin ->
+            formLogin
+                .usernameParameter("email")
+                .defaultSuccessUrl("/", true)
+                .loginPage(Constants.LOGIN_PATH)
+                .permitAll());
     // OAuth2 login
-    http.oauth2Login()
-        .defaultSuccessUrl("/", true)
-        .loginPage(Constants.LOGIN_PATH)
-        .permitAll()
-        .userInfoEndpoint()
-        .oidcUserService(appUserOidcUserService);
+    http.oauth2Login(
+        oauth2Login ->
+            oauth2Login
+                .defaultSuccessUrl("/", true)
+                .loginPage(Constants.LOGIN_PATH)
+                .permitAll()
+                .userInfoEndpoint(
+                    userInfoEndpoint -> userInfoEndpoint.oidcUserService(appUserOidcUserService)));
     return http.build();
   }
 

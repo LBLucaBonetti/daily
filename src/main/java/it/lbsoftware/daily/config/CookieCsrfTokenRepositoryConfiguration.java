@@ -28,9 +28,9 @@ public class CookieCsrfTokenRepositoryConfiguration {
   @Bean(name = COOKIE_CSRF_TOKEN_REPOSITORY_BEAN_NAME)
   @ConditionalOnProperty(name = DAILY_COOKIE_CSRF_SECURE_KEY, havingValue = "true")
   public CookieCsrfTokenRepository cookieCsrfTokenRepositoryWithHttpOnlyFalseAndSecure() {
-    final CookieCsrfTokenRepository cookieCsrfTokenRepository =
-        CookieCsrfTokenRepository.withHttpOnlyFalse();
-    cookieCsrfTokenRepository.setSecure(true);
+    final CookieCsrfTokenRepository cookieCsrfTokenRepository = new CookieCsrfTokenRepository();
+    cookieCsrfTokenRepository.setCookieCustomizer(
+        cookieCustomizer -> cookieCustomizer.httpOnly(false).secure(true));
     log.info(
         "Building a CookieCsrfTokenRepository bean with HttpOnly set to false and Secure set to true");
     return cookieCsrfTokenRepository;
