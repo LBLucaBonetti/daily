@@ -10,8 +10,7 @@
       name="viewport">
   <title th:text="${title}"></title>
 
-  <link href="https://fonts.bunny.net" rel="preconnect">
-  <link href="https://fonts.bunny.net/css?family=inter:400" rel="stylesheet"/>
+  <link th:replace="~{common-fragments :: fonts-bunny}">
   <style>
 
     body {
