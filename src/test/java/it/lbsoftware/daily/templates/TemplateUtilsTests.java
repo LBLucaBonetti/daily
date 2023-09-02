@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.views;
+package it.lbsoftware.daily.templates;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,8 +19,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.validation.BindingResult;
 
-@DisplayName("ViewUtils unit tests")
-class ViewUtilsTests extends DailyAbstractUnitTests {
+@DisplayName("TemplateUtils unit tests")
+class TemplateUtilsTests extends DailyAbstractUnitTests {
 
   static Stream<Arguments> test2() {
     // BindingResult, errorMessage
@@ -34,7 +34,7 @@ class ViewUtilsTests extends DailyAbstractUnitTests {
   @DisplayName("Should not instantiate the class")
   void test1() throws NoSuchMethodException {
     // Given
-    Constructor<ViewUtils> viewUtilsConstructor = ViewUtils.class.getDeclaredConstructor();
+    Constructor<TemplateUtils> viewUtilsConstructor = TemplateUtils.class.getDeclaredConstructor();
     assertTrue(Modifier.isPrivate(viewUtilsConstructor.getModifiers()));
     viewUtilsConstructor.setAccessible(true);
 
@@ -53,13 +53,13 @@ class ViewUtilsTests extends DailyAbstractUnitTests {
   void test2(BindingResult bindingResult, String errorMessage) {
     assertThrows(
         IllegalArgumentException.class,
-        () -> ViewUtils.addErrorToView(bindingResult, errorMessage));
+        () -> TemplateUtils.addErrorToView(bindingResult, errorMessage));
   }
 
   @ParameterizedTest
   @NullSource
   @DisplayName("Should throw when get oauth2 auth provider with null argument")
   void test3(String email) {
-    assertThrows(IllegalArgumentException.class, () -> ViewUtils.getOauth2AuthProvider(email));
+    assertThrows(IllegalArgumentException.class, () -> TemplateUtils.getOauth2AuthProvider(email));
   }
 }

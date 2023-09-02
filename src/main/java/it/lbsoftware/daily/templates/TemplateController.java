@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.views;
+package it.lbsoftware.daily.templates;
 
 import static it.lbsoftware.daily.config.Constants.REDIRECT;
 
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @RequiredArgsConstructor
 @CommonsLog
-class ViewController {
+class TemplateController {
 
   private static final String APP_USER_DTO_PARAMETER = "appUserDto";
   private final AppUserService appUserService;

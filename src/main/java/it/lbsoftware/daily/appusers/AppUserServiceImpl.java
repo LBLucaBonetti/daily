@@ -1,7 +1,7 @@
 package it.lbsoftware.daily.appusers;
 
-import static it.lbsoftware.daily.views.ViewUtils.addErrorToView;
-import static it.lbsoftware.daily.views.ViewUtils.getOauth2AuthProvider;
+import static it.lbsoftware.daily.templates.TemplateUtils.addErrorToView;
+import static it.lbsoftware.daily.templates.TemplateUtils.getOauth2AuthProvider;
 
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusersactivations.AppUserActivation;

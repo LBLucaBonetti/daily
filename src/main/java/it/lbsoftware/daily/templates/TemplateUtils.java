@@ -1,15 +1,15 @@
-package it.lbsoftware.daily.views;
+package it.lbsoftware.daily.templates;
 
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
-public final class ViewUtils {
+public final class TemplateUtils {
 
   private static final String GLOBAL_ERRORS_KEY = "globalError";
 
-  private ViewUtils() {
+  private TemplateUtils() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
   }
 

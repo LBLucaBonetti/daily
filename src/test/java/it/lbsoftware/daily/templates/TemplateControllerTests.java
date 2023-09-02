@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.views;
+package it.lbsoftware.daily.templates;
 
 import static it.lbsoftware.daily.config.Constants.LOGIN_VIEW;
 import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;
@@ -18,16 +18,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-@DisplayName("ViewController unit tests")
-class ViewControllerTests extends DailyAbstractUnitTests {
+@DisplayName("TemplateController unit tests")
+class TemplateControllerTests extends DailyAbstractUnitTests {
 
   private static final String REDIRECT = "redirect:/";
   @Mock private AppUserService appUserService;
-  private ViewController viewController;
+  private TemplateController templateController;
 
   @BeforeEach
   void beforeEach() {
-    viewController = new ViewController(appUserService);
+    templateController = new TemplateController(appUserService);
   }
 
   @Test
@@ -38,7 +38,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = mock(Authentication.class);
 
     // When
-    var res = viewController.signup(model, authentication);
+    var res = templateController.signup(model, authentication);
 
     // Then
     assertEquals(REDIRECT, res);
@@ -51,7 +51,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = mock(Authentication.class);
 
     // When
-    var res = viewController.login(authentication);
+    var res = templateController.login(authentication);
 
     // Then
     assertEquals(REDIRECT, res);
@@ -67,7 +67,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = mock(Authentication.class);
 
     // When
-    var res = viewController.signup(appUserDto, bindingResult, model, authentication);
+    var res = templateController.signup(appUserDto, bindingResult, model, authentication);
 
     // Then
     assertEquals(REDIRECT, res);
@@ -81,7 +81,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = null;
 
     // When
-    var res = viewController.signup(model, authentication);
+    var res = templateController.signup(model, authentication);
 
     // Then
     assertEquals(SIGNUP_VIEW, res);
@@ -94,7 +94,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = null;
 
     // When
-    var res = viewController.login(authentication);
+    var res = templateController.login(authentication);
 
     // Then
     assertEquals(LOGIN_VIEW, res);
@@ -110,7 +110,7 @@ class ViewControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = null;
 
     // When
-    var res = viewController.signup(appUserDto, bindingResult, model, authentication);
+    var res = templateController.signup(appUserDto, bindingResult, model, authentication);
 
     // Then
     verify(appUserService, times(1)).signup(appUserDto, bindingResult, model);
