@@ -247,7 +247,7 @@
     <version>3.1.5</version> <!-- lookup parent from repository -->
   </parent>
   <properties>
-    <apache-commons-lang3.version>3.13.0</apache-commons-lang3.version>
+    <apache-commons-lang3.version>3.14.0</apache-commons-lang3.version>
     <frontend-maven-plugin.version>1.14.2</frontend-maven-plugin.version>
     <jacoco.version>0.8.11</jacoco.version>
     <java.version>17</java.version>
