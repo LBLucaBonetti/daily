@@ -32,7 +32,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-@DisplayName("TagServiceImpl unit tests")
 class TagServiceImplTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";

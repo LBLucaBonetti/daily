@@ -18,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-@DisplayName("TemplateController unit tests")
 class TemplateControllerTests extends DailyAbstractUnitTests {
 
   private static final String REDIRECT = "redirect:/";

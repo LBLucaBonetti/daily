@@ -19,7 +19,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.validation.BindingResult;
 
-@DisplayName("TemplateUtils unit tests")
 class TemplateUtilsTests extends DailyAbstractUnitTests {
 
   static Stream<Arguments> test2() {

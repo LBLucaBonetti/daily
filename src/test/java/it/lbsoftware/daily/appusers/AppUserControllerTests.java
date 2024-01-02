@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-@DisplayName("AppUserController unit tests")
 class AppUserControllerTests extends DailyAbstractUnitTests {
 
   private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");

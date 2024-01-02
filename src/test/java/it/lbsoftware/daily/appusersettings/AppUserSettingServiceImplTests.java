@@ -24,7 +24,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 
-@DisplayName("AppUserSettingServiceImpl unit tests")
 class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
 
   private static final String LANG = "en-US";

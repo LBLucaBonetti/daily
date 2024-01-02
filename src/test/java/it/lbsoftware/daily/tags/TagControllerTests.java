@@ -31,7 +31,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-@DisplayName("TagController unit tests")
 class TagControllerTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";

@@ -41,7 +41,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
-@DisplayName("AppUserServiceImpl unit tests")
 class AppUserServiceImplTests extends DailyAbstractUnitTests {
 
   @Mock private AppUserRepository appUserRepository;

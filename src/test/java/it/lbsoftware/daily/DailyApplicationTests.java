@@ -3,9 +3,10 @@ package it.lbsoftware.daily;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("DailyApplication tests")
+@DisplayNameGeneration(TestUtils.DailyDisplayNameGenerator.class)
 class DailyApplicationTests {
 
   @Test

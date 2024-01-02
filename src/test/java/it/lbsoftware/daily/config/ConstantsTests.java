@@ -11,7 +11,6 @@ import java.lang.reflect.Modifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Constants unit tests")
 class ConstantsTests extends DailyAbstractUnitTests {
 
   @Test

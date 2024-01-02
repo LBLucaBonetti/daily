@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -82,5 +83,31 @@ public final class TestUtils {
         .map(cacheManager::getCache)
         .filter(Objects::nonNull)
         .forEach(Cache::clear);
+  }
+
+  /**
+   * A {@code DisplayNameGenerator} that displays the name of the class and its test type; if the
+   * test class extends {@code DailyAbstractUnitTests}, it is considered a unit tests class; if the
+   * test class extends {@code DailyAbstractIntegrationTests}, it is considered an integration tests
+   * class. Note that if the test class name does not correspond to the class it refers to (and
+   * tests methods of), the displayed name could be inappropriate. The default display name will be
+   * composed of the test class name without the {@code SUFFIX} and a generic suffix
+   */
+  public static class DailyDisplayNameGenerator extends DisplayNameGenerator.Standard {
+
+    private static final String SUFFIX = "Tests";
+
+    @Override
+    public String generateDisplayNameForClass(Class<?> testClass) {
+      var classNameWithoutSuffix =
+          super.generateDisplayNameForClass(testClass).replace(SUFFIX, StringUtils.EMPTY);
+      if (DailyAbstractUnitTests.class.isAssignableFrom(testClass)) {
+        return classNameWithoutSuffix + " unit tests";
+      } else if (DailyAbstractIntegrationTests.class.isAssignableFrom(testClass)) {
+        return classNameWithoutSuffix + " integration tests";
+      } else {
+        return classNameWithoutSuffix + " tests";
+      }
+    }
   }
 }

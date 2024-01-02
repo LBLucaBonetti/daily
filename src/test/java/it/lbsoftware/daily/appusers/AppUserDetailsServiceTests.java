@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-@DisplayName("AppUserDetailsService unit tests")
 class AppUserDetailsServiceTests extends DailyAbstractUnitTests {
 
   @Mock private AppUserRepository appUserRepository;

@@ -10,7 +10,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Tag unit tests")
 class TagTests extends DailyAbstractUnitTests {
 
   private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");

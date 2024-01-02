@@ -25,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
-@DisplayName("DailyErrorController unit tests")
 class DailyErrorControllerTests extends DailyAbstractUnitTests {
 
   private static final String ERROR_KEY = "error";

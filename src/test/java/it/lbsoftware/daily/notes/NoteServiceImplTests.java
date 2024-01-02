@@ -43,7 +43,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-@DisplayName("NoteServiceImpl unit tests")
 class NoteServiceImplTests extends DailyAbstractUnitTests {
 
   private static final String TEXT = "text";

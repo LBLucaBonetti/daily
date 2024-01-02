@@ -35,7 +35,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-@DisplayName("NoteController unit tests")
 class NoteControllerTests extends DailyAbstractUnitTests {
 
   private static final String TEXT = "text";
