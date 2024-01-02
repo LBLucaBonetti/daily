@@ -33,7 +33,7 @@ public class AppUserActivationServiceImpl implements AppUserActivationService {
 
   @Override
   public Optional<AppUserActivation> readAppUserActivation(@NonNull UUID activationCode) {
-    return appUserActivationRepository.findByActivationCode(activationCode);
+    return appUserActivationRepository.findByActivationCodeFetchAppUser(activationCode);
   }
 
   @Override
