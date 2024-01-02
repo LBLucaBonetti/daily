@@ -11,7 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
 
 @Service
@@ -21,7 +21,7 @@ public class EmailServiceImpl implements EmailService {
 
   private static final String FROM = "daily@trydaily.click";
   private static final String TITLE_KEY = "title";
-  private final TemplateEngine templateEngine;
+  private final ITemplateEngine templateEngine;
   private final JavaMailSender javaMailSender;
 
   @Override
