@@ -2,7 +2,7 @@ package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
-import it.lbsoftware.daily.exception.DailyBadRequestException;
+import it.lbsoftware.daily.exceptions.DailyBadRequestException;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

@@ -5,8 +5,8 @@ import static it.lbsoftware.daily.config.Constants.NOTE_CACHE;
 import static it.lbsoftware.daily.config.Constants.NOTE_TAGS_CACHE_KEY_SPEL;
 
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyConflictException;
-import it.lbsoftware.daily.exception.DailyNotFoundException;
+import it.lbsoftware.daily.exceptions.DailyConflictException;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;

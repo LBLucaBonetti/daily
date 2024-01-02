@@ -6,7 +6,7 @@ import static it.lbsoftware.daily.config.Constants.NOTE_CACHE;
 import static it.lbsoftware.daily.config.Constants.TAG_CACHE;
 
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyNotFoundException;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.notes.Note;
 import java.util.Optional;
 import java.util.UUID;

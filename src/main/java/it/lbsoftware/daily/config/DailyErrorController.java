@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.config;
 
-import it.lbsoftware.daily.exception.DailyExceptionHandler;
+import it.lbsoftware.daily.exceptions.DailyExceptionHandler;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

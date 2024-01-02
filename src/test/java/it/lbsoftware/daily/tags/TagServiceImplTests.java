@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyNotFoundException;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

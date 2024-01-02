@@ -2,7 +2,7 @@ package it.lbsoftware.daily.notes;
 
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
-import it.lbsoftware.daily.exception.DailyBadRequestException;
+import it.lbsoftware.daily.exceptions.DailyBadRequestException;
 import it.lbsoftware.daily.tags.TagDto;
 import jakarta.validation.Valid;
 import java.util.Set;
