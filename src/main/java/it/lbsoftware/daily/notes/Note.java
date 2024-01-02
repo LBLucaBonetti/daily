@@ -59,4 +59,14 @@ public class Note extends BaseEntity {
   Unique user id
   */
   private UUID appUser;
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
 }

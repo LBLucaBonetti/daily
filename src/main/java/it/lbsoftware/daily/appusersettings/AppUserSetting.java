@@ -38,4 +38,14 @@ public class AppUserSetting extends BaseEntity {
   @Pattern(regexp = Constants.APP_USER_LANG_REGEXP)
   @Builder.Default
   private String lang = "en-US";
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
 }
