@@ -1,5 +1,8 @@
 package it.lbsoftware.daily.templates;
 
+import static it.lbsoftware.daily.config.Constants.REDIRECT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,6 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 
 class TemplateUtilsTests extends DailyAbstractUnitTests {
@@ -43,7 +47,7 @@ class TemplateUtilsTests extends DailyAbstractUnitTests {
 
     // Then
     assertNotNull(res);
-    assertTrue(res.getCause() instanceof UnsupportedOperationException);
+    assertInstanceOf(UnsupportedOperationException.class, res.getCause());
   }
 
   @ParameterizedTest
@@ -60,5 +64,32 @@ class TemplateUtilsTests extends DailyAbstractUnitTests {
   @DisplayName("Should throw when get oauth2 auth provider with null argument")
   void test3(String email) {
     assertThrows(IllegalArgumentException.class, () -> TemplateUtils.getOauth2AuthProvider(email));
+  }
+
+  @Test
+  @DisplayName("Should not redirect and return empty optional")
+  void test4() {
+    // Given
+    Authentication authentication = null;
+
+    // When
+    var res = TemplateUtils.redirectIfAuthenticated(authentication);
+
+    // Then
+    assertTrue(res.isEmpty());
+  }
+
+  @Test
+  @DisplayName("Should redirect and return redirect optional")
+  void test5() {
+    // Given
+    Authentication authentication = mock(Authentication.class);
+
+    // When
+    var res = TemplateUtils.redirectIfAuthenticated(authentication);
+
+    // Then
+    assertTrue(res.isPresent());
+    assertEquals(REDIRECT, res.get());
   }
 }
