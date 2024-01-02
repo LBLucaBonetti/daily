@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.templates;
 
 import static it.lbsoftware.daily.config.Constants.LOGIN_VIEW;
+import static it.lbsoftware.daily.config.Constants.REDIRECT;
 import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -20,7 +21,6 @@ import org.springframework.validation.BindingResult;
 
 class TemplateControllerTests extends DailyAbstractUnitTests {
 
-  private static final String REDIRECT = "redirect:/";
   @Mock private AppUserService appUserService;
   private TemplateController templateController;
 

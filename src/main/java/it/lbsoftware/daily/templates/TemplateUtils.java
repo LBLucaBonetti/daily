@@ -1,7 +1,11 @@
 package it.lbsoftware.daily.templates;
 
+import static it.lbsoftware.daily.config.Constants.REDIRECT;
+
+import java.util.Optional;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
@@ -20,5 +24,9 @@ public final class TemplateUtils {
 
   public static String getOauth2AuthProvider(@NonNull final String email) {
     return email.endsWith("@gmail.com") ? "Google" : StringUtils.EMPTY;
+  }
+
+  public static Optional<String> redirectIfAuthenticated(final Authentication authentication) {
+    return Optional.ofNullable(authentication).map(auth -> REDIRECT);
   }
 }

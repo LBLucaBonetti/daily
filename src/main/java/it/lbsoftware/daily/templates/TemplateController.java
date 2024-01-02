@@ -1,13 +1,11 @@
 package it.lbsoftware.daily.templates;
 
-import static it.lbsoftware.daily.config.Constants.REDIRECT;
+import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
 
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.config.Constants;
 import jakarta.validation.Valid;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.security.core.Authentication;
@@ -16,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -50,28 +47,5 @@ class TemplateController {
       Authentication authentication) {
     return redirectIfAuthenticated(authentication)
         .orElseGet(() -> appUserService.signup(appUserDto, result, model));
-  }
-
-  @GetMapping(value = Constants.ACTIVATION_PATH)
-  public String activate(
-      @PathVariable(Constants.ACTIVATION_CODE) UUID activationCode,
-      Authentication authentication,
-      Model model) {
-    return redirectIfAuthenticated(authentication)
-        .orElseGet(
-            () -> {
-              if (appUserService.activate(activationCode)) {
-                model.addAttribute(
-                    "activationCodeSuccess", "Your account has been activated! You can now log in");
-              } else {
-                log.info("Found an invalid activation code " + activationCode);
-                model.addAttribute("activationCodeFailure", "Invalid activation code");
-              }
-              return Constants.LOGIN_VIEW;
-            });
-  }
-
-  private Optional<String> redirectIfAuthenticated(final Authentication authentication) {
-    return Optional.ofNullable(authentication).map(auth -> REDIRECT);
   }
 }

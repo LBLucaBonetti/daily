@@ -48,6 +48,8 @@ public final class Constants {
       "/" + ACTIVATIONS_VIEW + "/" + "{" + ACTIVATION_CODE + "}";
   public static final List<String> ALLOWED_STATIC_TEMPLATES =
       List.of(SIGNUP_PATH, ERROR_PATH, ACTIVATION_PATH);
+  public static final String ACTIVATION_CODE_SUCCESS = "activationCodeSuccess";
+  public static final String ACTIVATION_CODE_FAILURE = "activationCodeFailure";
   public static final List<String> ALLOWED_STATIC_ASSETS =
       List.of(
           "/public-style.css",
