@@ -19,8 +19,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
-import it.lbsoftware.daily.appusersactivations.AppUserActivationService;
 import it.lbsoftware.daily.appusersettings.AppUserSettingDto;
 import it.lbsoftware.daily.appusersettings.AppUserSettingService;
 import it.lbsoftware.daily.emails.EmailService;

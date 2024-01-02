@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.appusersactivations;
+package it.lbsoftware.daily.appuseractivations;
 
 import java.util.Optional;
 import java.util.UUID;

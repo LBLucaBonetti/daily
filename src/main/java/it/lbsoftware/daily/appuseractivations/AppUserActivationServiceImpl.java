@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.appusersactivations;
+package it.lbsoftware.daily.appuseractivations;
 
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;

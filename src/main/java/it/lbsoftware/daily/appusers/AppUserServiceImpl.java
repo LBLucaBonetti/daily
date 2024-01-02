@@ -3,9 +3,9 @@ package it.lbsoftware.daily.appusers;
 import static it.lbsoftware.daily.templates.TemplateUtils.addErrorToView;
 import static it.lbsoftware.daily.templates.TemplateUtils.getOauth2AuthProvider;
 
+import it.lbsoftware.daily.appuseractivations.AppUserActivation;
+import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
-import it.lbsoftware.daily.appusersactivations.AppUserActivation;
-import it.lbsoftware.daily.appusersactivations.AppUserActivationService;
 import it.lbsoftware.daily.appusersettings.AppUserSettingDto;
 import it.lbsoftware.daily.appusersettings.AppUserSettingService;
 import it.lbsoftware.daily.bases.BaseEntity;
