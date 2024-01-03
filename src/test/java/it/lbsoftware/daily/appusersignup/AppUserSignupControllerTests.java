@@ -3,6 +3,7 @@ package it.lbsoftware.daily.appusersignup;
 import static it.lbsoftware.daily.config.Constants.REDIRECT;
 import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,6 +56,7 @@ class AppUserSignupControllerTests extends DailyAbstractUnitTests {
 
     // Then
     assertEquals(REDIRECT, res);
+    verify(appUserSignupService, times(0)).signup(any(), any(), any());
   }
 
   @Test
