@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Table(
+    name = "app_user_setting",
     indexes = {
       @Index(name = "idx_app_user_setting_uuid", columnList = "uuid"),
       @Index(name = "idx_app_user_setting_appuser", columnList = "app_user")
