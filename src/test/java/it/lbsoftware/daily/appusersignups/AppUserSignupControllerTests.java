@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.appusersignup;
+package it.lbsoftware.daily.appusersignups;
 
 import static it.lbsoftware.daily.config.Constants.REDIRECT;
 import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;

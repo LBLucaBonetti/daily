@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.appusersignup;
+package it.lbsoftware.daily.appusersignups;
 
 import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
 

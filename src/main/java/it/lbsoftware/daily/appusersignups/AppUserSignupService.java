@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.appusersignup;
+package it.lbsoftware.daily.appusersignups;
 
 import it.lbsoftware.daily.appusers.AppUserDto;
 import org.springframework.ui.Model;
