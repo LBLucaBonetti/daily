@@ -14,8 +14,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping(value = Constants.SIGNUP_PATH)
 @RequiredArgsConstructor
 @CommonsLog
 class AppUserSignupController {
@@ -23,7 +25,7 @@ class AppUserSignupController {
   private static final String APP_USER_DTO_PARAMETER = "appUserDto";
   private final AppUserSignupService appUserSignupService;
 
-  @GetMapping(path = Constants.SIGNUP_PATH)
+  @GetMapping
   public String signup(Model model, Authentication authentication) {
     return redirectIfAuthenticated(authentication)
         .orElseGet(
@@ -33,7 +35,7 @@ class AppUserSignupController {
             });
   }
 
-  @PostMapping(path = Constants.SIGNUP_PATH)
+  @PostMapping
   public String signup(
       @ModelAttribute(APP_USER_DTO_PARAMETER) @Valid AppUserDto appUserDto,
       BindingResult result,
