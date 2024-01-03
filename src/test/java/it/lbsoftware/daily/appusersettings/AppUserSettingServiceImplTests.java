@@ -60,7 +60,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
     AppUserSettingDto appUserSettings = createAppUserSettingDto(null, LANG);
     AppUserSetting savedAppUserSettingEntity = createAppUserSetting(LANG, APP_USER);
     AppUserSettingDto appUserSettingDto = createAppUserSettingDto(UUID.randomUUID(), LANG);
-    given(appUserSettingRepository.save(any())).willReturn(savedAppUserSettingEntity);
+    given(appUserSettingRepository.saveAndFlush(any())).willReturn(savedAppUserSettingEntity);
     given(appUserSettingDtoMapper.convertToDto(savedAppUserSettingEntity))
         .willReturn(appUserSettingDto);
 
@@ -68,7 +68,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
     AppUserSettingDto res = appUserSettingService.createAppUserSettings(appUserSettings, APP_USER);
 
     // Then
-    verify(appUserSettingRepository, times(1)).save(any());
+    verify(appUserSettingRepository, times(1)).saveAndFlush(any());
     verify(appUserSettingDtoMapper, times(1)).convertToDto(savedAppUserSettingEntity);
     assertEquals(LANG, res.getLang());
     assertNotNull(res.getUuid());

@@ -35,7 +35,7 @@ class AppUserSettingControllerTests extends DailyAbstractUnitTests {
 
   @Test
   @DisplayName("Should not read app user settings and return not found")
-  void test2() {
+  void test1() {
     // Given
     Optional<AppUserSettingDto> readAppUserSettings = Optional.empty();
     given(appUserService.getUuid(appUser)).willReturn(APP_USER);
@@ -53,7 +53,7 @@ class AppUserSettingControllerTests extends DailyAbstractUnitTests {
 
   @Test
   @DisplayName("Should read app user settings and return ok")
-  void test3() {
+  void test2() {
     // Given
     Optional<AppUserSettingDto> readAppUserSettings =
         Optional.of(createAppUserSettingDto(UUID.randomUUID(), LANG));
@@ -72,7 +72,7 @@ class AppUserSettingControllerTests extends DailyAbstractUnitTests {
 
   @Test
   @DisplayName("Should not update app user settings and return not found")
-  void test4() {
+  void test3() {
     // Given
     AppUserSettingDto appUserSettings = createAppUserSettingDto(UUID.randomUUID(), LANG);
     Optional<AppUserSettingDto> updatedAppUserSettings = Optional.empty();
@@ -93,7 +93,7 @@ class AppUserSettingControllerTests extends DailyAbstractUnitTests {
 
   @Test
   @DisplayName("Should update app user settings and return ok")
-  void test5() {
+  void test4() {
     // Given
     AppUserSettingDto appUserSettings = createAppUserSettingDto(UUID.randomUUID(), LANG);
     Optional<AppUserSettingDto> updatedAppUserSettings = Optional.of(appUserSettings);

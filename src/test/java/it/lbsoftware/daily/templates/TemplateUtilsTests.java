@@ -37,13 +37,13 @@ class TemplateUtilsTests extends DailyAbstractUnitTests {
   @DisplayName("Should not instantiate the class")
   void test1() throws NoSuchMethodException {
     // Given
-    Constructor<TemplateUtils> viewUtilsConstructor = TemplateUtils.class.getDeclaredConstructor();
-    assertTrue(Modifier.isPrivate(viewUtilsConstructor.getModifiers()));
-    viewUtilsConstructor.setAccessible(true);
+    Constructor<TemplateUtils> utils = TemplateUtils.class.getDeclaredConstructor();
+    assertTrue(Modifier.isPrivate(utils.getModifiers()));
+    utils.setAccessible(true);
 
     // When
     InvocationTargetException res =
-        assertThrows(InvocationTargetException.class, viewUtilsConstructor::newInstance);
+        assertThrows(InvocationTargetException.class, utils::newInstance);
 
     // Then
     assertNotNull(res);
