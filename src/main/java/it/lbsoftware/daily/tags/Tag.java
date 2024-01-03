@@ -63,7 +63,7 @@ public class Tag extends BaseEntity {
   private UUID appUser;
 
   /**
-   * Adds a tag to the specified note and vice-versa
+   * Adds a tag to the specified note and vise versa
    *
    * @param note Note object to link
    */
@@ -73,7 +73,7 @@ public class Tag extends BaseEntity {
   }
 
   /**
-   * Removes a tag from the specified note and vice-versa
+   * Removes a tag from the specified note and vise versa
    *
    * @param note Note object to unlink
    */

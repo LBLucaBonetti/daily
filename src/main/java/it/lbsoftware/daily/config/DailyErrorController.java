@@ -36,7 +36,7 @@ class DailyErrorController implements ErrorController {
               httpServletResponse.setStatus(HttpServletResponse.SC_OK);
               return "forward:/";
             })
-        .orElseGet(() -> Constants.ERROR_VIEW);
+        .orElse(Constants.ERROR_VIEW);
   }
 
   @RequestMapping
