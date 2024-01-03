@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.templates;
+package it.lbsoftware.daily.appuserlogins;
 
 import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 @CommonsLog
-class TemplateController {
+class AppUserLoginController {
 
   @GetMapping(path = Constants.LOGIN_PATH)
   public String login(Authentication authentication) {

@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.templates;
+package it.lbsoftware.daily.appuserlogins;
 
 import static it.lbsoftware.daily.config.Constants.LOGIN_VIEW;
 import static it.lbsoftware.daily.config.Constants.REDIRECT;
@@ -11,13 +11,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 
-class TemplateControllerTests extends DailyAbstractUnitTests {
+class AppUserLoginControllerTests extends DailyAbstractUnitTests {
 
-  private TemplateController templateController;
+  private AppUserLoginController appUserLoginController;
 
   @BeforeEach
   void beforeEach() {
-    templateController = new TemplateController();
+    appUserLoginController = new AppUserLoginController();
   }
 
   @Test
@@ -27,7 +27,7 @@ class TemplateControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = mock(Authentication.class);
 
     // When
-    var res = templateController.login(authentication);
+    var res = appUserLoginController.login(authentication);
 
     // Then
     assertEquals(REDIRECT, res);
@@ -40,7 +40,7 @@ class TemplateControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = null;
 
     // When
-    var res = templateController.login(authentication);
+    var res = appUserLoginController.login(authentication);
 
     // Then
     assertEquals(LOGIN_VIEW, res);
