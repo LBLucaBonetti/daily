@@ -46,4 +46,14 @@ public interface AppUserActivationService {
    * @return True if the AppUserActivation is valid or false otherwise
    */
   boolean isValid(AppUserActivation appUserActivation);
+
+  /**
+   * Creates the complete URI of the activation URI based on the provided activation code
+   *
+   * @param activationCode The activation code to create the activation URI with
+   * @return The complete URI of the activation URI, ready to be sent to the user
+   * @implNote The caller should make sure an active request is being processed, so that a {@code
+   *     RequestAttributes} can be found
+   */
+  String getActivationUri(String activationCode);
 }
