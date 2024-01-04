@@ -45,7 +45,7 @@ class AppUserActivationControllerTests extends DailyAbstractUnitTests {
 
     // Then
     assertEquals(REDIRECT, res);
-    verify(appUserActivationController, times(0)).activate(any(), any(), any());
+    verify(appUserService, times(0)).activate(any());
   }
 
   @Test
