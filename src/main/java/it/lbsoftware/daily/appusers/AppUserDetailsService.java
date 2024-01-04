@@ -31,7 +31,7 @@ public class AppUserDetailsService implements UserDetailsService {
             .orElseThrow(
                 () ->
                     new UsernameNotFoundException(
-                        "AppUser with email " + usernameToSearch + " not found!"));
+                        "AppUser with e-mail " + usernameToSearch + " not found!"));
 
     return new AppUserDetails(appUser);
   }
