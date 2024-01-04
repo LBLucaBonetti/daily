@@ -74,7 +74,7 @@ class AppUserSignupControllerTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should call signup service when post signup")
+  @DisplayName("Should return signup when post signup")
   void test4() {
     // Given
     AppUserDto appUserDto = mock(AppUserDto.class);
@@ -83,9 +83,10 @@ class AppUserSignupControllerTests extends DailyAbstractUnitTests {
     Authentication authentication = null;
 
     // When
-    appUserSignupController.signup(appUserDto, bindingResult, model, authentication);
+    var res = appUserSignupController.signup(appUserDto, bindingResult, model, authentication);
 
     // Then
+    assertEquals(SIGNUP_VIEW, res);
     verify(appUserSignupService, times(1)).signup(appUserDto, bindingResult, model);
   }
 }

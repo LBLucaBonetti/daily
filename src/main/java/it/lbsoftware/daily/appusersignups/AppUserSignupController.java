@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusersignups;
 
+import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;
 import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
 
 import it.lbsoftware.daily.appusers.AppUserDto;
@@ -31,7 +32,7 @@ class AppUserSignupController {
         .orElseGet(
             () -> {
               model.addAttribute(APP_USER_DTO_PARAMETER, new AppUserDto());
-              return Constants.SIGNUP_VIEW;
+              return SIGNUP_VIEW;
             });
   }
 
@@ -42,6 +43,10 @@ class AppUserSignupController {
       Model model,
       Authentication authentication) {
     return redirectIfAuthenticated(authentication)
-        .orElseGet(() -> appUserSignupService.signup(appUserDto, result, model));
+        .orElseGet(
+            () -> {
+              appUserSignupService.signup(appUserDto, result, model);
+              return SIGNUP_VIEW;
+            });
   }
 }
