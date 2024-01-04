@@ -29,7 +29,7 @@ public class AppUserOidcUserService extends OidcUserService {
             .orElseThrow(
                 () ->
                     new OAuth2AuthenticationException(
-                        "The OAuth2 user did not provide an email address"));
+                        "The OAuth2 user did not provide an e-mail address"));
     AppUserDto appUserDto = new AppUserDto();
     appUserDto.setEmail(email);
     // The subject coming from OAuth2 is the unique key of the user in the OAuth2 provider realm
@@ -43,7 +43,7 @@ public class AppUserOidcUserService extends OidcUserService {
                 appUser.setEmail(email);
                 appUserRepository.save(appUser);
                 log.info(
-                    "The OAuth2 AppUser user has changed email address from "
+                    "The OAuth2 AppUser user has changed e-mail address from "
                         + previousEmail
                         + " to "
                         + email);

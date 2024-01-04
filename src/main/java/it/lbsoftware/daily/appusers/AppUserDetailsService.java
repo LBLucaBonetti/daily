@@ -23,7 +23,7 @@ public class AppUserDetailsService implements UserDetailsService {
             .orElseThrow(
                 () ->
                     new UsernameNotFoundException(
-                        "AppUser with a null or blank email does not exist"));
+                        "AppUser with a null or blank e-mail does not exist"));
 
     AppUser appUser =
         appUserRepository

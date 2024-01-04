@@ -45,9 +45,9 @@ public class EmailServiceImpl implements EmailService {
       mimeMessageHelper.setText(processedTemplate, true);
     } catch (MessagingException messagingException) {
       log.error(
-          "Problems configuring email with the template "
+          "Problems configuring e-mail with the template "
               + emailInfo.templatePath()
-              + "; no email will be sent",
+              + "; no e-mail will be sent",
           messagingException);
       return;
     }
@@ -55,13 +55,13 @@ public class EmailServiceImpl implements EmailService {
     try {
       javaMailSender.send(mimeMessage);
       log.info(
-          "Successfully sent email with the template "
+          "Successfully sent e-mail with the template "
               + emailInfo.templatePath()
               + " to "
               + emailInfo.to());
     } catch (MailException mailException) {
       log.error(
-          "Could not send email with the template " + emailInfo.templatePath(), mailException);
+          "Could not send e-mail with the template " + emailInfo.templatePath(), mailException);
     }
   }
 }
