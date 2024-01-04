@@ -1,23 +1,21 @@
 package it.lbsoftware.daily.appusersignups;
 
-import static it.lbsoftware.daily.config.Constants.LOGIN_VIEW;
-import static it.lbsoftware.daily.config.Constants.REDIRECT;
-import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static it.lbsoftware.daily.config.Constants.ACTIVATIONS_VIEW;
+import static it.lbsoftware.daily.config.Constants.SIGNUP_SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
-import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.appusercreations.AppUserCreationService;
 import it.lbsoftware.daily.appusers.AppUserDto;
-import it.lbsoftware.daily.appusers.AppUserRepository;
-import it.lbsoftware.daily.appusersettings.AppUserSettingDto;
-import it.lbsoftware.daily.appusersettings.AppUserSettingService;
 import it.lbsoftware.daily.emails.EmailService;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,20 +27,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
 
-  @Mock private AppUserRepository appUserRepository;
-  @Mock private AppUserSettingService appUserSettingService;
-  @Mock private AppUserActivationService appUserActivationService;
-  @Mock private PasswordEncoder passwordEncoder;
+  @Mock private AppUserCreationService appUserCreationService;
   @Mock private EmailService emailService;
+  @Mock private AppUserActivationService appUserActivationService;
   private AppUserSignupServiceImpl appUserSignupService;
 
-  private static Stream<Arguments> test6() {
+  private static Stream<Arguments> test1() {
     // AppUsedDto, bindingResult, model
     AppUserDto appUserDto = new AppUserDto();
     BindingResult bindingResult = mock(BindingResult.class);
@@ -61,147 +56,126 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
   void beforeEach() {
     appUserSignupService =
         new AppUserSignupServiceImpl(
-            appUserRepository,
-            appUserSettingService,
-            appUserActivationService,
-            passwordEncoder,
-            emailService);
+            appUserCreationService, emailService, appUserActivationService);
   }
-
-  @Test
-  @DisplayName("Should return signup when binding result has errors")
-  void test1() {
-    // Given
-    AppUserDto appUserDto = mock(AppUserDto.class);
-    BindingResult bindingResult = mock(BindingResult.class);
-    Model model = mock(Model.class);
-    given(bindingResult.hasErrors()).willReturn(true);
-
-    // When
-    var res = appUserSignupService.signup(appUserDto, bindingResult, model);
-
-    // Then
-    assertEquals(SIGNUP_VIEW, res);
-  }
-
-  @Test
-  @DisplayName("Should return signup when passwords do not match")
-  void test2() {
-    // Given
-    AppUserDto appUserDto = new AppUserDto();
-    appUserDto.setPassword("password");
-    appUserDto.setPasswordConfirmation("differentPassword");
-    BindingResult bindingResult = mock(BindingResult.class);
-    Model model = mock(Model.class);
-    given(bindingResult.hasErrors()).willReturn(false);
-
-    // When
-    var res = appUserSignupService.signup(appUserDto, bindingResult, model);
-
-    // Then
-    assertEquals(SIGNUP_VIEW, res);
-  }
-
-  @Test
-  @DisplayName("Should return signup when email is oauth2")
-  void test3() {
-    // Given
-    AppUserDto appUserDto = new AppUserDto();
-    appUserDto.setPassword("password");
-    appUserDto.setPasswordConfirmation("password");
-    BindingResult bindingResult = mock(BindingResult.class);
-    Model model = mock(Model.class);
-    given(bindingResult.hasErrors()).willReturn(false);
-    appUserDto.setEmail("email@gmail.com");
-
-    // When
-    var res = appUserSignupService.signup(appUserDto, bindingResult, model);
-
-    // Then
-    assertEquals(SIGNUP_VIEW, res);
-  }
-
-  @Test
-  @DisplayName("Should return signup when email is taken")
-  void test4() {
-    // Given
-    AppUserDto appUserDto = new AppUserDto();
-    appUserDto.setPassword("password");
-    appUserDto.setPasswordConfirmation("password");
-    BindingResult bindingResult = mock(BindingResult.class);
-    Model model = mock(Model.class);
-    given(bindingResult.hasErrors()).willReturn(false);
-    String email = "email@email.com";
-    appUserDto.setEmail(email);
-    AppUser appUser = AppUser.builder().email(email).build();
-    given(appUserRepository.findByEmailIgnoreCase(email)).willReturn(Optional.of(appUser));
-
-    // When
-    var res = appUserSignupService.signup(appUserDto, bindingResult, model);
-
-    // Then
-    assertEquals(SIGNUP_VIEW, res);
-  }
-
-  @Test
-  @DisplayName("Should return login when signup is performed")
-  void test5() {
-    // Given
-    AppUserDto appUserDto = new AppUserDto();
-    String password = "password";
-    appUserDto.setPassword(password);
-    appUserDto.setPasswordConfirmation(password);
-    BindingResult bindingResult = mock(BindingResult.class);
-    Model model = mock(Model.class);
-    given(bindingResult.hasErrors()).willReturn(false);
-    String email = "email@email.com";
-    appUserDto.setEmail(email);
-    given(appUserRepository.findByEmailIgnoreCase(email)).willReturn(Optional.empty());
-    given(passwordEncoder.encode(password)).willReturn("encodedPassword");
-    AppUser appUser = mock(AppUser.class);
-    UUID uuid = UUID.randomUUID();
-    given(appUser.getUuid()).willReturn(uuid);
-    given(appUserRepository.saveAndFlush(any())).willReturn(appUser);
-    given(appUserSettingService.createAppUserSettings(any(), eq(uuid)))
-        .willReturn(new AppUserSettingDto());
-
-    // When
-    var res = appUserSignupService.signup(appUserDto, bindingResult, model);
-
-    // Then
-    assertEquals(REDIRECT + LOGIN_VIEW, res);
-  }
-
-  //  @Test
-  //  @DisplayName("Should create daily app user")
-  //  void test10() {
-  //    // Given
-  //    AppUserDto appUserDto = new AppUserDto();
-  //    appUserDto.setPassword("password");
-  //    given(passwordEncoder.encode(appUserDto.getPassword())).willReturn("encodedPassword");
-  //    AppUser appUser = mock(AppUser.class);
-  //    given(appUser.getUuid()).willReturn(UUID.randomUUID());
-  //    given(appUserRepository.save(any())).willReturn(appUser);
-  //
-  //    // When & then
-  //    assertDoesNotThrow(() -> appUserSignupService.createDailyAppUser(appUserDto));
-  //  }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when signup with null argument")
-  void test6(AppUserDto appUserDto, BindingResult bindingResult, Model model) {
+  void test1(AppUserDto appUserDto, BindingResult bindingResult, Model model) {
     assertThrows(
         IllegalArgumentException.class,
         () -> appUserSignupService.signup(appUserDto, bindingResult, model));
   }
 
-  //  @ParameterizedTest
-  //  @NullSource
-  //  @DisplayName("Should throw when create daily app user with null argument")
-  //  void test16(AppUserDto appUserDto) {
-  //    assertThrows(
-  //        IllegalArgumentException.class, () ->
-  // appUserSignupService.createDailyAppUser(appUserDto));
-  //  }
+  @Test
+  @DisplayName("Should return early when binding result has errors")
+  void test2() {
+    // Given
+    var appUserDto = mock(AppUserDto.class);
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    when(bindingResult.hasErrors()).thenReturn(true);
+
+    // When
+    appUserSignupService.signup(appUserDto, bindingResult, model);
+
+    // Then
+    verify(bindingResult, times(1)).hasErrors();
+    verify(appUserDto, times(0)).getPassword();
+    verify(appUserDto, times(0)).getPasswordConfirmation();
+  }
+
+  @Test
+  @DisplayName("Should return early when passwords do not match")
+  void test3() {
+    // Given
+    var appUserDto = mock(AppUserDto.class);
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    when(appUserDto.getPassword()).thenReturn("password1");
+    when(appUserDto.getPasswordConfirmation()).thenReturn("password2");
+    when(bindingResult.hasErrors()).thenReturn(false);
+
+    // When
+    appUserSignupService.signup(appUserDto, bindingResult, model);
+
+    // Then
+    verify(appUserDto, times(1)).getPassword();
+    verify(appUserDto, times(1)).getPasswordConfirmation();
+    verify(appUserDto, times(0)).getEmail();
+  }
+
+  @Test
+  @DisplayName("Should return early when e-mail is from an OAuth2 provider")
+  void test4() {
+    // Given
+    var appUserDto = mock(AppUserDto.class);
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    when(bindingResult.hasErrors()).thenReturn(false);
+    when(appUserDto.getPassword()).thenReturn("password");
+    when(appUserDto.getPasswordConfirmation()).thenReturn("password");
+    when(appUserDto.getEmail()).thenReturn("appuser@gmail.com");
+
+    // When
+    appUserSignupService.signup(appUserDto, bindingResult, model);
+
+    // Then
+    verify(appUserDto, times(1)).getEmail();
+    verify(appUserCreationService, times(0)).createDailyAppUser(appUserDto);
+  }
+
+  @Test
+  @DisplayName("Should add error to view when daily app user creation fails")
+  void test5() {
+    // Given
+    var appUserDto = mock(AppUserDto.class);
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    when(bindingResult.hasErrors()).thenReturn(false);
+    when(appUserDto.getPassword()).thenReturn("password");
+    when(appUserDto.getPasswordConfirmation()).thenReturn("password");
+    when(appUserDto.getEmail()).thenReturn("appuser@email.com");
+    when(appUserCreationService.createDailyAppUser(appUserDto)).thenReturn(Optional.empty());
+
+    // When
+    appUserSignupService.signup(appUserDto, bindingResult, model);
+
+    // Then
+    verify(appUserCreationService, times(1)).createDailyAppUser(appUserDto);
+    verify(bindingResult, times(1)).addError(any());
+    verify(model, times(0)).addAttribute(eq(SIGNUP_SUCCESS), anyString());
+    verify(appUserActivationService, times(0)).getActivationUri(anyString());
+    verify(emailService, times(0)).send(any(), any());
+  }
+
+  @Test
+  @DisplayName("Should send activation e-mail when daily app user creation succeeds")
+  void test6() {
+    // Given
+    var appUserDto = mock(AppUserDto.class);
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    when(bindingResult.hasErrors()).thenReturn(false);
+    when(appUserDto.getPassword()).thenReturn("password");
+    when(appUserDto.getPasswordConfirmation()).thenReturn("password");
+    when(appUserDto.getEmail()).thenReturn("appuser@email.com");
+    when(appUserDto.getFirstName()).thenReturn("First name");
+    var activationCode = UUID.randomUUID().toString();
+    when(appUserCreationService.createDailyAppUser(appUserDto))
+        .thenReturn(Optional.of(activationCode));
+    var activationUri = "http://localhost/daily/" + ACTIVATIONS_VIEW + "/" + activationCode;
+    when(appUserActivationService.getActivationUri(activationCode)).thenReturn(activationUri);
+
+    // When
+    appUserSignupService.signup(appUserDto, bindingResult, model);
+
+    // Then
+    verify(appUserCreationService, times(1)).createDailyAppUser(appUserDto);
+    verify(bindingResult, times(0)).addError(any());
+    verify(model, times(1)).addAttribute(eq(SIGNUP_SUCCESS), anyString());
+    verify(appUserActivationService, times(1)).getActivationUri(activationCode);
+    verify(emailService, times(1)).send(any(), any());
+  }
 }

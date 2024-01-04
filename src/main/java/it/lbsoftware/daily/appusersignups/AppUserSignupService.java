@@ -7,12 +7,11 @@ import org.springframework.validation.BindingResult;
 public interface AppUserSignupService {
 
   /**
-   * Tries to sign a new AppUser up with the auth provider DAILY
+   * Tries to sign a new {@code AppUser} up with the auth provider {@code DAILY}
    *
-   * @param appUserDto The AppUser data
-   * @param bindingResult The result of validating the provided AppUser data
+   * @param appUserDto The {@code AppUser} data
+   * @param bindingResult The result of validating the provided {@code AppUser} data
    * @param model The ui model
-   * @return The view name to show
    */
-  String signup(AppUserDto appUserDto, BindingResult bindingResult, Model model);
+  void signup(AppUserDto appUserDto, BindingResult bindingResult, Model model);
 }
