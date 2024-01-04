@@ -56,4 +56,24 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
         .email(appUserDto.getEmail())
         .build();
   }
+
+  @Override
+  @Transactional
+  public void createOauth2AppUser(
+      @NonNull AppUserDto appUserDto,
+      @NonNull AuthProvider authProvider,
+      @NonNull String authProviderId) {
+    if (AuthProvider.DAILY.equals(authProvider)) {
+      throw new IllegalArgumentException();
+    }
+    AppUser appUser =
+        AppUser.builder()
+            .authProvider(authProvider)
+            .authProviderId(authProviderId)
+            .enabled(true)
+            .email(appUserDto.getEmail())
+            .build();
+    final UUID appUserUuid = appUserRepository.save(appUser).getUuid();
+    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), appUserUuid);
+  }
 }

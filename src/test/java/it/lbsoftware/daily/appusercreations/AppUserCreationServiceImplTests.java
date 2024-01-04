@@ -1,10 +1,14 @@
 package it.lbsoftware.daily.appusercreations;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,16 +16,20 @@ import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appuseractivations.AppUserActivation;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusersettings.AppUserSettingDto;
 import it.lbsoftware.daily.appusersettings.AppUserSettingService;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +41,21 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
   @Mock private AppUserSettingService appUserSettingService;
   @Mock private AppUserActivationService appUserActivationService;
   private AppUserCreationServiceImpl appUserCreationService;
+
+  private static Stream<Arguments> test9() {
+    // AppUserDto, authProvider, authProviderId
+    AppUserDto appUserDto = new AppUserDto();
+    AuthProvider authProvider = AuthProvider.DAILY;
+    String authProviderId = "authProviderId";
+    return Stream.of(
+        arguments(null, null, null),
+        arguments(null, null, authProviderId),
+        arguments(null, authProvider, null),
+        arguments(null, authProvider, authProviderId),
+        arguments(appUserDto, null, null),
+        arguments(appUserDto, null, authProviderId),
+        arguments(appUserDto, authProvider, null));
+  }
 
   @BeforeEach
   void beforeEach() {
@@ -157,5 +180,49 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     // Then
     assertTrue(res.isPresent());
     assertEquals(uuid.toString(), res.get());
+  }
+
+  @Test
+  @DisplayName("Should throw when create oauth2 app user with daily auth provider")
+  void test7() {
+    // Given
+    AuthProvider authProvider = AuthProvider.DAILY;
+    AppUserDto appUserDto = new AppUserDto();
+
+    // When
+    var res =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                appUserCreationService.createOauth2AppUser(
+                    appUserDto, authProvider, "authProviderId"));
+
+    // Then
+    assertNull(res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should create oauth2 app user")
+  void test8() {
+    // Given
+    AppUserDto appUserDto = new AppUserDto();
+    AppUser appUser = mock(AppUser.class);
+    given(appUser.getUuid()).willReturn(UUID.randomUUID());
+    given(appUserRepository.save(any())).willReturn(appUser);
+
+    // When and then
+    assertDoesNotThrow(
+        () ->
+            appUserCreationService.createOauth2AppUser(
+                appUserDto, AuthProvider.GOOGLE, "authProviderId"));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when create oauth2 app user with null argument")
+  void test9(AppUserDto appUserDto, AuthProvider authProvider, String authProviderId) {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> appUserCreationService.createOauth2AppUser(appUserDto, authProvider, authProviderId));
   }
 }

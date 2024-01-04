@@ -259,7 +259,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
@@ -276,7 +276,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
     UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
@@ -292,7 +292,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
@@ -428,7 +428,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}", uuid)
@@ -447,7 +447,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     Note note = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser));
     NoteDto noteDto = createNoteDto(null, OTHER_TEXT);
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}", note.getUuid())
@@ -493,7 +493,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}", uuid)
@@ -531,7 +531,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}", uuid)
@@ -600,7 +600,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
@@ -617,7 +617,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String tagUuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), tagUuid)
@@ -635,7 +635,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     String uuid = "not-a-uuid";
     String tagUuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
@@ -652,7 +652,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
@@ -670,7 +670,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
     UUID tagUuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
@@ -689,7 +689,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     UUID uuid =
         noteRepository.save(createNote(TEXT, Collections.emptySet(), otherAppUser)).getUuid();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
@@ -711,7 +711,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), otherAppUser))
             .getUuid();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
@@ -755,7 +755,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
@@ -772,7 +772,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String tagUuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), tagUuid)
@@ -790,7 +790,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     String uuid = "not-a-uuid";
     String tagUuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
@@ -807,7 +807,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
@@ -825,7 +825,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
     UUID tagUuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
@@ -844,7 +844,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     UUID uuid =
         noteRepository.save(createNote(TEXT, Collections.emptySet(), otherAppUser)).getUuid();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
@@ -866,7 +866,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), otherAppUser))
             .getUuid();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
@@ -913,7 +913,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}/tags", uuid)
@@ -929,7 +929,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}/tags", uuid)
@@ -946,7 +946,7 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID otherAppUser = saveOauth2OtherAppUser(appUserRepository);
     UUID uuid = noteRepository.save(createNote(TEXT, Collections.emptySet(), appUser)).getUuid();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}/tags", uuid)

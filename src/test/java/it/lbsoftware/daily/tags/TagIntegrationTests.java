@@ -238,7 +238,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
@@ -256,7 +256,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     UUID uuid =
         tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser)).getUuid();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
@@ -272,7 +272,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             get(BASE_URL + "/{uuid}", uuid)
@@ -459,7 +459,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}", uuid)
@@ -478,7 +478,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, Collections.emptySet(), appUser));
     TagDto tagDto = createTagDto(null, OTHER_NAME, OTHER_COLOR_HEX);
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             put(BASE_URL + "/{uuid}", tag.getUuid())
@@ -525,7 +525,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     String uuid = "not-a-uuid";
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}", uuid)
@@ -563,7 +563,7 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     final UUID appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
     UUID uuid = UUID.randomUUID();
 
-    // When & then
+    // When and then
     mockMvc
         .perform(
             delete(BASE_URL + "/{uuid}", uuid)

@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
+import it.lbsoftware.daily.appusercreations.AppUserCreationService;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 @CommonsLog
 public class AppUserOidcUserService extends OidcUserService {
 
-  private final AppUserService appUserService;
+  private final AppUserCreationService appUserCreationService;
   private final AppUserRepository appUserRepository;
 
   @Override
@@ -50,7 +51,7 @@ public class AppUserOidcUserService extends OidcUserService {
               }
             },
             () -> {
-              appUserService.createOauth2AppUser(
+              appUserCreationService.createOauth2AppUser(
                   appUserDto, AuthProvider.GOOGLE, oidcUser.getSubject());
               log.info("Login of a new OAuth2 AppUser " + email);
             });

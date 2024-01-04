@@ -1,9 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
-import static it.lbsoftware.daily.appusersettings.AppUserSettingUtils.getAppUserSettings;
-
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
-import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusersettings.AppUserSettingService;
 import it.lbsoftware.daily.bases.BaseEntity;
 import java.util.Optional;
@@ -67,26 +64,5 @@ public class AppUserServiceImpl implements AppUserService {
               return true;
             })
         .orElse(false);
-  }
-
-  @Override
-  @Transactional
-  // TODO muovere questo metodo dove si e' deciso di spostare createDailyAppUser
-  public void createOauth2AppUser(
-      @NonNull AppUserDto appUserDto,
-      @NonNull AuthProvider authProvider,
-      @NonNull String authProviderId) {
-    if (AuthProvider.DAILY.equals(authProvider)) {
-      throw new IllegalArgumentException();
-    }
-    AppUser appUser =
-        AppUser.builder()
-            .authProvider(authProvider)
-            .authProviderId(authProviderId)
-            .enabled(true)
-            .email(appUserDto.getEmail())
-            .build();
-    final UUID appUserUuid = appUserRepository.save(appUser).getUuid();
-    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), appUserUuid);
   }
 }
