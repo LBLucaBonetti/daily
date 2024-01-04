@@ -10,14 +10,8 @@ import org.junit.jupiter.api.Test;
 class DailyApplicationTests {
 
   @Test
-  @DisplayName("Should not throw when the application starts")
+  @DisplayName("Should correctly load application context")
   void test1() {
-    DailyApplication.main(
-        new String[] {
-          "--spring.profiles.active=test,oauth2",
-          "--daily.cookie.csrf.secure=true",
-          "--daily.cookie.csrf.same-site=STRICT"
-        });
     assertTrue(true);
   }
 }

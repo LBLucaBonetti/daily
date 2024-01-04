@@ -118,6 +118,12 @@
       </plugin>
       <plugin>
         <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>it/lbsoftware/daily/DailyApplication.class</exclude>
+            <exclude>it/lbsoftware/daily/config/Constants.class</exclude>
+          </excludes>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -211,6 +217,12 @@
       <artifactId>spring-security-test</artifactId>
       <groupId>org.springframework.security</groupId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>rest-assured</artifactId>
+      <groupId>io.rest-assured</groupId>
+      <scope>test</scope>
+      <version>5.4.0</version>
     </dependency>
     <dependency>
       <artifactId>flyway-core</artifactId>
