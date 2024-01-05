@@ -33,7 +33,7 @@ class TagController {
   @PostMapping
   public ResponseEntity<TagDto> createTag(
       @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal Object principal) {
-    TagDto createdTagDto = tagService.createTag(tagDto, appUserService.getUuid(principal));
+    TagDto createdTagDto = tagService.createTag(tagDto, appUserService.getAppUser(principal));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdTagDto);
   }
@@ -42,7 +42,7 @@ class TagController {
   public ResponseEntity<TagDto> readTag(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
     return tagService
-        .readTag(uuid, appUserService.getUuid(principal))
+        .readTag(uuid, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
@@ -52,7 +52,7 @@ class TagController {
       Pageable pageable, @AuthenticationPrincipal Object principal) {
     Page<TagDto> readTags;
     try {
-      readTags = tagService.readTags(pageable, appUserService.getUuid(principal));
+      readTags = tagService.readTags(pageable, appUserService.getAppUser(principal));
     } catch (Exception e) {
       log.error(e);
       throw new DailyBadRequestException(null);
@@ -68,7 +68,7 @@ class TagController {
       @Valid @RequestBody TagDto tagDto,
       @AuthenticationPrincipal Object principal) {
     return tagService
-        .updateTag(uuid, tagDto, appUserService.getUuid(principal))
+        .updateTag(uuid, tagDto, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
@@ -76,7 +76,7 @@ class TagController {
   @DeleteMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> deleteTag(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
-    tagService.deleteTag(uuid, appUserService.getUuid(principal));
+    tagService.deleteTag(uuid, appUserService.getAppUser(principal));
 
     return ResponseEntity.noContent().build();
   }

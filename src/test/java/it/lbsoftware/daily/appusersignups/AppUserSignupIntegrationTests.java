@@ -76,7 +76,7 @@ class AppUserSignupIntegrationTests extends DailyAbstractIntegrationTests {
             appUserDto.getEmail(), AuthProvider.DAILY);
     assertTrue(appUserOptional.isPresent());
     var appUser = appUserOptional.get();
-    var appUserSettingOptional = appUserSettingService.readAppUserSettings(appUser.getUuid());
+    var appUserSettingOptional = appUserSettingService.readAppUserSettings(appUser);
     assertTrue(appUserSettingOptional.isPresent());
     var appUserSetting = appUserSettingOptional.get();
     assertEquals(appUserDto.getLang(), appUserSetting.getLang());

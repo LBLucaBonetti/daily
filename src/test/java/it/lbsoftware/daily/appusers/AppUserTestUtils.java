@@ -1,6 +1,9 @@
 package it.lbsoftware.daily.appusers;
 
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
+import it.lbsoftware.daily.bases.BaseEntity;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,20 +66,18 @@ public final class AppUserTestUtils {
    * repository
    *
    * @param appUserRepository Repository used to persist the created instance
-   * @return The saved UUID
+   * @return The saved entity
    */
-  public static UUID saveOauth2AppUser(@NonNull final AppUserRepository appUserRepository) {
-    return appUserRepository
-        .save(
-            AppUser.builder()
-                .enabled(true)
-                .authProviderId(APP_USER_AUTH_PROVIDER_ID)
-                .authProvider(AuthProvider.GOOGLE)
-                .firstName(APP_USER_FIRSTNAME)
-                .lastName(APP_USER_LASTNAME)
-                .email(APP_USER_EMAIL)
-                .build())
-        .getUuid();
+  public static AppUser saveOauth2AppUser(@NonNull final AppUserRepository appUserRepository) {
+    return appUserRepository.save(
+        AppUser.builder()
+            .enabled(true)
+            .authProviderId(APP_USER_AUTH_PROVIDER_ID)
+            .authProvider(AuthProvider.GOOGLE)
+            .firstName(APP_USER_FIRSTNAME)
+            .lastName(APP_USER_LASTNAME)
+            .email(APP_USER_EMAIL)
+            .build());
   }
 
   /**
@@ -84,19 +85,43 @@ public final class AppUserTestUtils {
    * provided repository
    *
    * @param appUserRepository Repository used to persist the created instance
-   * @return The saved UUID
+   * @return The saved entity
    */
-  public static UUID saveOauth2OtherAppUser(@NonNull final AppUserRepository appUserRepository) {
-    return appUserRepository
-        .save(
-            AppUser.builder()
-                .enabled(true)
-                .authProviderId(OTHER_APP_USER_AUTH_PROVIDER_ID)
-                .authProvider(AuthProvider.GOOGLE)
-                .firstName(OTHER_APP_USER_FIRSTNAME)
-                .lastName(OTHER_APP_USER_LASTNAME)
-                .email(OTHER_APP_USER_EMAIL)
-                .build())
-        .getUuid();
+  public static AppUser saveOauth2OtherAppUser(@NonNull final AppUserRepository appUserRepository) {
+    return appUserRepository.save(
+        AppUser.builder()
+            .enabled(true)
+            .authProviderId(OTHER_APP_USER_AUTH_PROVIDER_ID)
+            .authProvider(AuthProvider.GOOGLE)
+            .firstName(OTHER_APP_USER_FIRSTNAME)
+            .lastName(OTHER_APP_USER_LASTNAME)
+            .email(OTHER_APP_USER_EMAIL)
+            .build());
+  }
+
+  /**
+   * AppUser generator; the created instance is not persisted
+   *
+   * @param uuid The entity UUID
+   * @param email The e-mail
+   * @return The created AppUser
+   */
+  public static AppUser createAppUser(@NonNull final UUID uuid, @NonNull final String email) {
+    var appUser = new AppUser();
+    Method setUuidMethod;
+    try {
+      setUuidMethod = BaseEntity.class.getDeclaredMethod("setUuid", UUID.class);
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException(e);
+    }
+    setUuidMethod.setAccessible(true);
+    try {
+      setUuidMethod.invoke(appUser, uuid);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+    setUuidMethod.setAccessible(false);
+    appUser.setEmail(email);
+    return appUser;
   }
 }

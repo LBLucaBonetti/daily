@@ -1,7 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
-import it.lbsoftware.daily.bases.BaseEntity;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -18,14 +17,6 @@ public class AppUserServiceImpl implements AppUserService {
 
   private final AppUserRepository appUserRepository;
   private final AppUserActivationService appUserActivationService;
-
-  @Override
-  public UUID getUuid(@NonNull Object principal) {
-    return Optional.ofNullable(getAppUserInfo(principal).email())
-        .flatMap(appUserRepository::findByEmailIgnoreCase)
-        .map(BaseEntity::getUuid)
-        .orElseThrow();
-  }
 
   @Override
   public InfoDto getAppUserInfo(@NonNull Object principal) {
@@ -62,5 +53,12 @@ public class AppUserServiceImpl implements AppUserService {
               return true;
             })
         .orElse(false);
+  }
+
+  @Override
+  public AppUser getAppUser(@NonNull final Object principal) {
+    return Optional.ofNullable(getAppUserInfo(principal).email())
+        .flatMap(appUserRepository::findByEmailIgnoreCase)
+        .orElseThrow();
   }
 }

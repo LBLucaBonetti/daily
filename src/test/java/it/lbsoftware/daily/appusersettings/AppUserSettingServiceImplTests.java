@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusersettings;
 
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.appusersettings.AppUserSettingTestUtils.createAppUserSetting;
 import static it.lbsoftware.daily.appusersettings.AppUserSettingTestUtils.createAppUserSettingDto;
 import static org.junit.Assert.assertThrows;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUser;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -27,7 +29,9 @@ import org.mockito.Mock;
 class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
 
   private static final String LANG = "en-US";
-  private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final String EMAIL = "appuser@email.com";
+  private static final UUID UNIQUE_ID = UUID.randomUUID();
+  private static final AppUser APP_USER = createAppUser(UNIQUE_ID, EMAIL);
   private static final String OTHER_LANG = "it";
   @Mock private AppUserSettingRepository appUserSettingRepository;
   @Mock private AppUserSettingDtoMapper appUserSettingDtoMapper;
@@ -153,7 +157,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when create app user settings with null argument")
-  void test6(AppUserSettingDto appUserSettings, UUID appUser) {
+  void test6(AppUserSettingDto appUserSettings, AppUser appUser) {
     assertThrows(
         IllegalArgumentException.class,
         () -> appUserSettingService.createAppUserSettings(appUserSettings, appUser));
@@ -162,7 +166,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @NullSource
   @DisplayName("Should throw when read app user settings with null argument")
-  void test7(UUID appUser) {
+  void test7(AppUser appUser) {
     assertThrows(
         IllegalArgumentException.class, () -> appUserSettingService.readAppUserSettings(appUser));
   }
@@ -170,7 +174,7 @@ class AppUserSettingServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when update app user settings with null argument")
-  void test8(AppUserSettingDto appUserSettings, UUID appUser) {
+  void test8(AppUserSettingDto appUserSettings, AppUser appUser) {
     assertThrows(
         IllegalArgumentException.class,
         () -> appUserSettingService.updateAppUserSettings(appUserSettings, appUser));

@@ -34,11 +34,11 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
     if (appUserRepository.findByEmailIgnoreCase(appUserDto.getEmail()).isPresent()) {
       return Optional.empty();
     }
-    var appUser = createAppUser(appUserDto);
+    var appUser = buildDailyAppUser(appUserDto);
     // Save the AppUser
-    var appUserUuid = appUserRepository.saveAndFlush(appUser).getUuid();
+    var savedAppUser = appUserRepository.saveAndFlush(appUser);
     // Create settings
-    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), appUserUuid);
+    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), savedAppUser);
     // Create the activation link
     return appUserActivationService
         .createAppUserActivation(appUser)
@@ -46,7 +46,7 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
         .map(UUID::toString);
   }
 
-  private AppUser createAppUser(final AppUserDto appUserDto) {
+  private AppUser buildDailyAppUser(final AppUserDto appUserDto) {
     return AppUser.builder()
         .authProvider(AuthProvider.DAILY)
         .enabled(false)
@@ -66,14 +66,18 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
     if (AuthProvider.DAILY.equals(authProvider)) {
       throw new IllegalArgumentException();
     }
-    AppUser appUser =
-        AppUser.builder()
-            .authProvider(authProvider)
-            .authProviderId(authProviderId)
-            .enabled(true)
-            .email(appUserDto.getEmail())
-            .build();
-    final UUID appUserUuid = appUserRepository.save(appUser).getUuid();
-    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), appUserUuid);
+    AppUser appUser = buildOauth2AppUser(appUserDto, authProvider, authProviderId);
+    var savedAppUser = appUserRepository.save(appUser);
+    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), savedAppUser);
+  }
+
+  private AppUser buildOauth2AppUser(
+      final AppUserDto appUserDto, final AuthProvider authProvider, final String authProviderId) {
+    return AppUser.builder()
+        .authProvider(authProvider)
+        .authProviderId(authProviderId)
+        .enabled(true)
+        .email(appUserDto.getEmail())
+        .build();
   }
 }

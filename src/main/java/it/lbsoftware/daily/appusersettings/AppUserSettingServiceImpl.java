@@ -1,7 +1,7 @@
 package it.lbsoftware.daily.appusersettings;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
   @Override
   @Transactional
   public AppUserSettingDto createAppUserSettings(
-      @NonNull AppUserSettingDto appUserSettings, @NonNull UUID appUser) {
+      @NonNull AppUserSettingDto appUserSettings, @NonNull AppUser appUser) {
     AppUserSetting appUserSettingsEntity =
         AppUserSetting.builder().appUser(appUser).lang(appUserSettings.getLang()).build();
     AppUserSetting savedAppUserSettingsEntity =
@@ -27,7 +27,7 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
   }
 
   @Override
-  public Optional<AppUserSettingDto> readAppUserSettings(@NonNull UUID appUser) {
+  public Optional<AppUserSettingDto> readAppUserSettings(@NonNull AppUser appUser) {
     return appUserSettingRepository
         .findByAppUser(appUser)
         .map(appUserSettingDtoMapper::convertToDto);
@@ -35,7 +35,7 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
 
   @Override
   public Optional<AppUserSettingDto> updateAppUserSettings(
-      @NonNull AppUserSettingDto appUserSettings, @NonNull UUID appUser) {
+      @NonNull AppUserSettingDto appUserSettings, @NonNull AppUser appUser) {
     return appUserSettingRepository
         .findByAppUser(appUser)
         .map(

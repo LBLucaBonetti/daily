@@ -109,14 +109,13 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
   void test4() {
     // Given
     var appUserDto = new AppUserDto();
-    var uuid = UUID.randomUUID();
-    appUserDto.setEmail("appuser@email.com");
+    var email = "appuser@email.com";
+    appUserDto.setEmail(email);
     var appUser = mock(AppUser.class);
-    when(appUser.getUuid()).thenReturn(uuid);
     when(appUserRepository.findByEmailIgnoreCase(appUserDto.getEmail()))
         .thenReturn(Optional.empty());
     when(appUserRepository.saveAndFlush(any())).thenReturn(appUser);
-    when(appUserSettingService.createAppUserSettings(any(), eq(uuid)))
+    when(appUserSettingService.createAppUserSettings(any(), eq(appUser)))
         .thenThrow(RuntimeException.class);
 
     // When and then
@@ -130,18 +129,17 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
   void test5() {
     // Given
     var appUserDto = new AppUserDto();
-    var uuid = UUID.randomUUID();
+    var email = "appuser@gmail.com";
     var lang = "en-US";
-    appUserDto.setEmail("appuser@gmail.com");
+    appUserDto.setEmail(email);
     appUserDto.setLang(lang);
     var appUser = mock(AppUser.class);
-    when(appUser.getUuid()).thenReturn(uuid);
     when(appUserRepository.findByEmailIgnoreCase(appUserDto.getEmail()))
         .thenReturn(Optional.empty());
     when(appUserRepository.saveAndFlush(any())).thenReturn(appUser);
     var appUserSettingDto = new AppUserSettingDto();
     appUserSettingDto.setLang(lang);
-    when(appUserSettingService.createAppUserSettings(any(), eq(uuid)))
+    when(appUserSettingService.createAppUserSettings(any(), eq(appUser)))
         .thenReturn(appUserSettingDto);
     when(appUserActivationService.createAppUserActivation(any())).thenReturn(Optional.empty());
 
@@ -158,17 +156,17 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     // Given
     var appUserDto = new AppUserDto();
     var uuid = UUID.randomUUID();
+    var email = "appuser@gmail.com";
     var lang = "en-US";
-    appUserDto.setEmail("appuser@email.com");
+    appUserDto.setEmail(email);
     appUserDto.setLang(lang);
     var appUser = mock(AppUser.class);
-    when(appUser.getUuid()).thenReturn(uuid);
     when(appUserRepository.findByEmailIgnoreCase(appUserDto.getEmail()))
         .thenReturn(Optional.empty());
     when(appUserRepository.saveAndFlush(any())).thenReturn(appUser);
     var appUserSettingDto = new AppUserSettingDto();
     appUserSettingDto.setLang(lang);
-    when(appUserSettingService.createAppUserSettings(any(), eq(uuid)))
+    when(appUserSettingService.createAppUserSettings(any(), eq(appUser)))
         .thenReturn(appUserSettingDto);
     var appUserActivation = AppUserActivation.builder().activationCode(uuid).build();
     when(appUserActivationService.createAppUserActivation(any()))
@@ -207,7 +205,6 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     // Given
     AppUserDto appUserDto = new AppUserDto();
     AppUser appUser = mock(AppUser.class);
-    given(appUser.getUuid()).willReturn(UUID.randomUUID());
     given(appUserRepository.save(any())).willReturn(appUser);
 
     // When and then

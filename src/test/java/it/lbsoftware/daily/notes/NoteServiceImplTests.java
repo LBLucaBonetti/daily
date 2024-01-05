@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.notes;
 
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNote;
 import static it.lbsoftware.daily.notes.NoteTestUtils.createNoteDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exceptions.DailyConflictException;
 import it.lbsoftware.daily.exceptions.DailyNotFoundException;
@@ -46,7 +48,9 @@ import org.springframework.data.domain.Pageable;
 class NoteServiceImplTests extends DailyAbstractUnitTests {
 
   private static final String TEXT = "text";
-  private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final String EMAIL = "appuser@email.com";
+  private static final UUID UNIQUE_ID = UUID.randomUUID();
+  private static final AppUser APP_USER = createAppUser(UNIQUE_ID, EMAIL);
   private static final String OTHER_TEXT = "otherText";
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
@@ -164,7 +168,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(noteDtoMapper, times(0)).convertToDto((Note) any());
+    verify(noteDtoMapper, times(0)).convertToDto(any());
     assertEquals(Optional.empty(), res);
   }
 
@@ -199,7 +203,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByAppUser(pageable, APP_USER);
-    verify(noteDtoMapper, times(0)).convertToDto((Note) any());
+    verify(noteDtoMapper, times(0)).convertToDto(any());
     assertEquals(Page.empty(), res);
   }
 
@@ -472,42 +476,42 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when create note with null argument")
-  void test18(NoteDto note, UUID appUser) {
+  void test18(NoteDto note, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.createNote(note, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when read note with null argument")
-  void test19(UUID uuid, UUID appUser) {
+  void test19(UUID uuid, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.readNote(uuid, appUser));
   }
 
   @ParameterizedTest
   @NullSource
   @DisplayName("Should throw when read notes with null argument")
-  void test20(UUID appUser) {
+  void test20(AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.readNotes(pageable, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when update note with null argument")
-  void test21(UUID uuid, NoteDto note, UUID appUser) {
+  void test21(UUID uuid, NoteDto note, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.updateNote(uuid, note, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when delete note with null argument")
-  void test22(UUID uuid, UUID appUser) {
+  void test22(UUID uuid, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.deleteNote(uuid, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when add tag to note with null argument")
-  void test23(UUID uuid, UUID tagUuid, UUID appUser) {
+  void test23(UUID uuid, UUID tagUuid, AppUser appUser) {
     assertThrows(
         IllegalArgumentException.class, () -> noteService.addTagToNote(uuid, tagUuid, appUser));
   }
@@ -515,7 +519,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when remove tag from note with null argument")
-  void test24(UUID uuid, UUID tagUuid, UUID appUser) {
+  void test24(UUID uuid, UUID tagUuid, AppUser appUser) {
     assertThrows(
         IllegalArgumentException.class,
         () -> noteService.removeTagFromNote(uuid, tagUuid, appUser));
@@ -524,7 +528,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when read note tags with null argument")
-  void test25(UUID uuid, UUID appUser) {
+  void test25(UUID uuid, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> noteService.readNoteTags(uuid, appUser));
   }
 

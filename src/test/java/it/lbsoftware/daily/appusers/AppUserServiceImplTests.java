@@ -14,7 +14,6 @@ import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not get uuid and throw")
+  @DisplayName("Should not get app user and throw")
   void test1() {
     // Given
     OidcUser principal = mock(OidcUser.class);
@@ -44,7 +43,8 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     given(appUserRepository.findByEmailIgnoreCase(APP_USER_EMAIL)).willReturn(Optional.empty());
 
     // When
-    var res = assertThrows(NoSuchElementException.class, () -> appUserService.getUuid(principal));
+    var res =
+        assertThrows(NoSuchElementException.class, () -> appUserService.getAppUser(principal));
 
     // Then
     verify(appUserRepository, times(1)).findByEmailIgnoreCase(APP_USER_EMAIL);
@@ -52,23 +52,21 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should get uuid and return uuid")
+  @DisplayName("Should get app user and return it")
   void test2() {
     // Given
     OidcUser principal = mock(OidcUser.class);
     AppUser appUser = mock(AppUser.class);
-    UUID uuid = UUID.randomUUID();
     given(principal.getEmail()).willReturn(APP_USER_EMAIL);
     given(principal.getFullName()).willReturn(APP_USER_FULLNAME);
     given(appUserRepository.findByEmailIgnoreCase(APP_USER_EMAIL)).willReturn(Optional.of(appUser));
-    given(appUser.getUuid()).willReturn(uuid);
 
     // When
-    var res = appUserService.getUuid(principal);
+    var res = appUserService.getAppUser(principal);
 
     // Then
     verify(appUserRepository, times(1)).findByEmailIgnoreCase(APP_USER_EMAIL);
-    assertEquals(uuid, res);
+    assertEquals(appUser, res);
   }
 
   @Test
@@ -105,9 +103,9 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
 
   @ParameterizedTest
   @NullSource
-  @DisplayName("Should throw when get uuid with null argument")
+  @DisplayName("Should throw when get app user with null argument")
   void test5(Object principal) {
-    assertThrows(IllegalArgumentException.class, () -> appUserService.getUuid(principal));
+    assertThrows(IllegalArgumentException.class, () -> appUserService.getAppUser(principal));
   }
 
   @ParameterizedTest

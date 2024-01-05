@@ -23,7 +23,7 @@ class AppUserSettingController {
   public ResponseEntity<AppUserSettingDto> readAppUserSettings(
       @AuthenticationPrincipal Object principal) {
     return appUserSettingService
-        .readAppUserSettings(appUserService.getUuid(principal))
+        .readAppUserSettings(appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
@@ -33,7 +33,7 @@ class AppUserSettingController {
       @Valid @RequestBody AppUserSettingDto appUserSettings,
       @AuthenticationPrincipal Object principal) {
     return appUserSettingService
-        .updateAppUserSettings(appUserSettings, appUserService.getUuid(principal))
+        .updateAppUserSettings(appUserSettings, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }

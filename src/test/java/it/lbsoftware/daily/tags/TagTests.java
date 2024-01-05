@@ -1,10 +1,12 @@
 package it.lbsoftware.daily.tags;
 
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUser;
 import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 class TagTests extends DailyAbstractUnitTests {
 
-  private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final AppUser APP_USER = createAppUser(UUID.randomUUID(), "appuser@email.com");
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
 

@@ -1,19 +1,22 @@
 package it.lbsoftware.daily.tags;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.bases.BaseEntity;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.notes.Note;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +26,6 @@ import lombok.Setter;
 @Table(
     indexes = {
       @Index(name = "idx_tag_uuid", columnList = "uuid"),
-      @Index(name = "idx_tag_appuser", columnList = "app_user")
     })
 @Entity
 @NoArgsConstructor
@@ -55,12 +57,14 @@ public class Tag extends BaseEntity {
   */
   private Set<Note> notes = new HashSet<>();
 
-  @Column(name = "app_user", updatable = false, nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(
+      name = "app_user_id",
+      updatable = false,
+      nullable = false,
+      referencedColumnName = "id")
   @NotNull
-  /*
-  Unique user id
-  */
-  private UUID appUser;
+  private AppUser appUser;
 
   /**
    * Adds a tag to the specified note and vise versa

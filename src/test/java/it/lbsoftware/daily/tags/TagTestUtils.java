@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.tags;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.notes.Note;
 import java.util.Set;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public final class TagTestUtils {
    * @return The created Tag
    */
   public static Tag createTag(
-      final String name, final String colorHex, final Set<Note> notes, final UUID appUser) {
+      final String name, final String colorHex, final Set<Note> notes, final AppUser appUser) {
     return Tag.builder().name(name).colorHex(colorHex).notes(notes).appUser(appUser).build();
   }
 }

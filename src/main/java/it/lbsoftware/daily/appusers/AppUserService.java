@@ -5,14 +5,6 @@ import java.util.UUID;
 public interface AppUserService {
 
   /**
-   * Retrieves the unique id of the user in the daily realm
-   *
-   * @param principal The injected principal containing the required information
-   * @return The unique id of the user in the daily realm
-   */
-  UUID getUuid(Object principal);
-
-  /**
    * Retrieves the information to display for the current principal
    *
    * @param principal The current principal, either from Daily or OAuth2/OIDC
@@ -27,4 +19,12 @@ public interface AppUserService {
    * @return True if activated or false otherwise
    */
   boolean activate(UUID activationCode);
+
+  /**
+   * Retrieves the appUser
+   *
+   * @param principal The injected principal containing the required information
+   * @return The unique appUser in the daily realm
+   */
+  AppUser getAppUser(Object principal);
 }
