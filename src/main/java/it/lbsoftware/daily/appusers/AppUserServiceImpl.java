@@ -1,7 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
-import it.lbsoftware.daily.appusersettings.AppUserSettingService;
 import it.lbsoftware.daily.bases.BaseEntity;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AppUserServiceImpl implements AppUserService {
 
   private final AppUserRepository appUserRepository;
-  private final AppUserSettingService appUserSettingService;
   private final AppUserActivationService appUserActivationService;
 
   @Override
