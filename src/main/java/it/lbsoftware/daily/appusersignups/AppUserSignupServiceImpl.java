@@ -1,8 +1,9 @@
 package it.lbsoftware.daily.appusersignups;
 
+import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.DAILY;
+import static it.lbsoftware.daily.appusers.AppUserUtils.getOauth2AuthProvider;
 import static it.lbsoftware.daily.config.Constants.SIGNUP_SUCCESS;
 import static it.lbsoftware.daily.templates.TemplateUtils.addErrorToView;
-import static it.lbsoftware.daily.templates.TemplateUtils.getOauth2AuthProvider;
 
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
 import it.lbsoftware.daily.appusercreations.AppUserCreationService;
@@ -15,7 +16,6 @@ import java.util.Objects;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -43,11 +43,11 @@ public class AppUserSignupServiceImpl implements AppUserSignupService {
     }
     // 3. E-mail should not be OAuth2 (users should use the login screen link to perform login with
     // their OAuth2 e-mail address)
-    String oauth2Provider = getOauth2AuthProvider(appUserDto.getEmail());
-    if (StringUtils.isNotBlank(oauth2Provider)) {
+    var oauth2Provider = getOauth2AuthProvider(appUserDto.getEmail());
+    if (DAILY != oauth2Provider) {
       addErrorToView(
           bindingResult,
-          "You are not allowed to sign up with the provided email address. Go back to the login page and use the "
+          "You are not allowed to sign up with the provided e-mail address. Go back to the login page and use the "
               + oauth2Provider
               + " link to log in");
       return;

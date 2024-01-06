@@ -2,7 +2,7 @@ package it.lbsoftware.daily.appusercreations;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -192,11 +192,11 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
         assertThrows(
             IllegalArgumentException.class,
             () ->
-                appUserCreationService.createOauth2AppUser(
+                appUserCreationService.createOrUpdateOauth2AppUser(
                     appUserDto, authProvider, "authProviderId"));
 
     // Then
-    assertNull(res.getMessage());
+    assertNotNull(res.getMessage());
   }
 
   @Test
@@ -210,7 +210,7 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     // When and then
     assertDoesNotThrow(
         () ->
-            appUserCreationService.createOauth2AppUser(
+            appUserCreationService.createOrUpdateOauth2AppUser(
                 appUserDto, AuthProvider.GOOGLE, "authProviderId"));
   }
 
@@ -220,6 +220,8 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
   void test9(AppUserDto appUserDto, AuthProvider authProvider, String authProviderId) {
     assertThrows(
         IllegalArgumentException.class,
-        () -> appUserCreationService.createOauth2AppUser(appUserDto, authProvider, authProviderId));
+        () ->
+            appUserCreationService.createOrUpdateOauth2AppUser(
+                appUserDto, authProvider, authProviderId));
   }
 }

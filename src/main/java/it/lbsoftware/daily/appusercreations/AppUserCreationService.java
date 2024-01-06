@@ -19,7 +19,8 @@ public interface AppUserCreationService {
 
   /**
    * Creates a new {@code AppUser} with the provided information; its auth provider will be assigned
-   * according to the authProvider parameter
+   * according to the authProvider parameter; if the {@code AppUser} is already present, it will be
+   * updated with the provided data
    *
    * @param appUserDto The {@code AppUser} data
    * @param authProvider The auth provider to assign
@@ -27,6 +28,6 @@ public interface AppUserCreationService {
    *     the specific OAuth2 domain; there should not be multiple users with the same authProviderId
    *     within that OAuth2 provider
    */
-  void createOauth2AppUser(
+  void createOrUpdateOauth2AppUser(
       AppUserDto appUserDto, AppUser.AuthProvider authProvider, String authProviderId);
 }

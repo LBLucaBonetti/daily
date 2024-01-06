@@ -59,16 +59,19 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
 
   @Override
   @Transactional
-  public void createOauth2AppUser(
-      @NonNull AppUserDto appUserDto,
-      @NonNull AuthProvider authProvider,
-      @NonNull String authProviderId) {
+  public void createOrUpdateOauth2AppUser(
+      @NonNull final AppUserDto appUserDto,
+      @NonNull final AuthProvider authProvider,
+      @NonNull final String authProviderId) {
     if (AuthProvider.DAILY.equals(authProvider)) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException(
+          "Invalid auth provider for OAuth2 flow: " + AuthProvider.DAILY);
     }
-    AppUser appUser = buildOauth2AppUser(appUserDto, authProvider, authProviderId);
-    var savedAppUser = appUserRepository.save(appUser);
-    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), savedAppUser);
+    appUserRepository
+        .findByAuthProviderIdAndAuthProvider(authProviderId, authProvider)
+        .ifPresentOrElse(
+            (AppUser appUser) -> updateOauth2AppUser(appUser, appUserDto),
+            () -> createOauth2AppUser(appUserDto, authProvider, authProviderId));
   }
 
   private AppUser buildOauth2AppUser(
@@ -79,5 +82,29 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
         .enabled(true)
         .email(appUserDto.getEmail())
         .build();
+  }
+
+  /**
+   * Updates an OAuth2 {@code AppUser} with the provided data; this method assumes the {@code
+   * AppUser} already existed and update data has already been validated
+   *
+   * @param appUser The {@code AppUser} to update
+   * @param appUserDto The new data to update the {@code AppUser} with
+   */
+  private void updateOauth2AppUser(final AppUser appUser, final AppUserDto appUserDto) {
+    var previousEmail = appUser.getEmail();
+    var newEmail = appUserDto.getEmail();
+    if (!previousEmail.equals(newEmail)) {
+      appUser.setEmail(newEmail);
+      log.info(
+          "The OAuth2 AppUser changed e-mail address from " + previousEmail + " to " + newEmail);
+    }
+  }
+
+  private void createOauth2AppUser(
+      final AppUserDto appUserDto, final AuthProvider authProvider, final String authProviderId) {
+    var appUser = buildOauth2AppUser(appUserDto, authProvider, authProviderId);
+    var savedAppUser = appUserRepository.save(appUser);
+    appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), savedAppUser);
   }
 }
