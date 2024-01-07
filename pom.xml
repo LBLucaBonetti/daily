@@ -122,6 +122,7 @@
           <excludes>
             <exclude>it/lbsoftware/daily/DailyApplication.class</exclude>
             <exclude>it/lbsoftware/daily/config/Constants.class</exclude>
+            <exclude>**/*DtoMapperImpl.class</exclude>
           </excludes>
         </configuration>
         <executions>
