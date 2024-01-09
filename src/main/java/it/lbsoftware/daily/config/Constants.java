@@ -12,8 +12,9 @@ public final class Constants {
       "default-src 'self' https://cdn.jsdelivr.net/npm/ https://fonts.bunny.net/";
   public static final String PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
   public static final String LOCALDATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-  public static final String DAILY_COOKIE_CSRF_SECURE_KEY = "daily.cookie.csrf.secure";
-  public static final String DAILY_COOKIE_CSRF_SAME_SITE_KEY = "daily.cookie.csrf.same-site";
+  public static final String DAILY_COOKIE_CSRF_ENHANCED_SECURITY_KEY =
+      "daily.cookie.csrf.enhanced.security";
+  public static final String DAILY_ASYNC_ENABLED = "daily.async.enabled";
   public static final String ERROR_KEY = "error";
   public static final String ERROR_PREFIX = "daily.error.";
   public static final String ERROR_DEFAULT = ERROR_PREFIX + "default";
@@ -67,6 +68,12 @@ public final class Constants {
       EMAIL_PATH_PREFIX + "app_user_activation.html";
   public static final String EMAIL_APP_USER_ACTIVATION_SUBJECT =
       EMAIL_SUBJECT_PREFIX + "Activate your account";
+  public static final String EMAIL_FROM = "daily@trydaily.click";
+  public static final String EMAIL_TITLE_KEY = "title";
+  public static final String EMAIL_CONTEXT_RESERVED_KEY_MESSAGE =
+      "The context key %s is reserved and will be ignored";
+  public static final String EMAIL_SEND_ERROR_MESSAGE =
+      "Could not send e-mail with the template %s";
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");

@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusercreations;
 
+import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.GOOGLE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,6 +11,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
@@ -211,7 +214,7 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     assertDoesNotThrow(
         () ->
             appUserCreationService.createOrUpdateOauth2AppUser(
-                appUserDto, AuthProvider.GOOGLE, "authProviderId"));
+                appUserDto, GOOGLE, "authProviderId"));
   }
 
   @ParameterizedTest
@@ -223,5 +226,48 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
         () ->
             appUserCreationService.createOrUpdateOauth2AppUser(
                 appUserDto, authProvider, authProviderId));
+  }
+
+  @Test
+  @DisplayName("Should update oauth2 app user with new data")
+  void test10() {
+    // Given
+    var newEmail = "newemail@gmail.com";
+    var appUserDto = new AppUserDto();
+    appUserDto.setEmail(newEmail);
+    var oldEmail = "oldemail@gmail.com";
+    var appUser = AppUser.builder().email(oldEmail).build();
+    var authProviderId = UUID.randomUUID().toString();
+    var authProvider = GOOGLE;
+    given(appUserRepository.findByAuthProviderIdAndAuthProvider(authProviderId, authProvider))
+        .willReturn(Optional.of(appUser));
+
+    // When
+    appUserCreationService.createOrUpdateOauth2AppUser(appUserDto, authProvider, authProviderId);
+
+    // Then
+    assertEquals(newEmail, appUser.getEmail());
+  }
+
+  @Test
+  @DisplayName("Should not update oauth2 app user with new data")
+  void test11() {
+    // Given
+    var email = "newemail@gmail.com";
+    var appUserDto = new AppUserDto();
+    appUserDto.setEmail(email);
+    var appUser = mock(AppUser.class);
+    given(appUser.getEmail()).willReturn(email);
+    var authProviderId = UUID.randomUUID().toString();
+    var authProvider = GOOGLE;
+    given(appUserRepository.findByAuthProviderIdAndAuthProvider(authProviderId, authProvider))
+        .willReturn(Optional.of(appUser));
+
+    // When
+    appUserCreationService.createOrUpdateOauth2AppUser(appUserDto, authProvider, authProviderId);
+
+    // Then
+    assertEquals(email, appUser.getEmail());
+    verify(appUser, times(0)).setEmail(any());
   }
 }

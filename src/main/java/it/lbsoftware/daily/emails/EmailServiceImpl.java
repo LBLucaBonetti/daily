@@ -1,5 +1,10 @@
 package it.lbsoftware.daily.emails;
 
+import static it.lbsoftware.daily.config.Constants.EMAIL_CONTEXT_RESERVED_KEY_MESSAGE;
+import static it.lbsoftware.daily.config.Constants.EMAIL_FROM;
+import static it.lbsoftware.daily.config.Constants.EMAIL_SEND_ERROR_MESSAGE;
+import static it.lbsoftware.daily.config.Constants.EMAIL_TITLE_KEY;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Map;
@@ -19,8 +24,6 @@ import org.thymeleaf.context.Context;
 @CommonsLog
 public class EmailServiceImpl implements EmailService {
 
-  private static final String FROM = "daily@trydaily.click";
-  private static final String TITLE_KEY = "title";
   private final ITemplateEngine templateEngine;
   private final JavaMailSender javaMailSender;
 
@@ -28,11 +31,11 @@ public class EmailServiceImpl implements EmailService {
   @Async
   public void send(@NonNull EmailInfo emailInfo, @NonNull Map<String, Object> context) {
     Context templateContext = new Context();
-    if (context.containsKey(TITLE_KEY)) {
-      log.warn("The context key " + TITLE_KEY + " is reserved and will be ignored");
+    if (context.containsKey(EMAIL_TITLE_KEY)) {
+      log.warn(EMAIL_CONTEXT_RESERVED_KEY_MESSAGE.formatted(EMAIL_TITLE_KEY));
     }
     templateContext.setVariables(context);
-    templateContext.setVariable(TITLE_KEY, emailInfo.subject());
+    templateContext.setVariable(EMAIL_TITLE_KEY, emailInfo.subject());
 
     String processedTemplate = templateEngine.process(emailInfo.templatePath(), templateContext);
     MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -41,14 +44,14 @@ public class EmailServiceImpl implements EmailService {
     try {
       mimeMessageHelper.setSubject(emailInfo.subject());
       mimeMessageHelper.setTo(emailInfo.to());
-      mimeMessageHelper.setFrom(FROM);
+      mimeMessageHelper.setFrom(EMAIL_FROM);
       mimeMessageHelper.setText(processedTemplate, true);
-    } catch (MessagingException messagingException) {
+    } catch (IllegalArgumentException | MessagingException configurationException) {
       log.error(
           "Problems configuring e-mail with the template "
               + emailInfo.templatePath()
               + "; no e-mail will be sent",
-          messagingException);
+          configurationException);
       return;
     }
 
@@ -60,8 +63,7 @@ public class EmailServiceImpl implements EmailService {
               + " to "
               + emailInfo.to());
     } catch (MailException mailException) {
-      log.error(
-          "Could not send e-mail with the template " + emailInfo.templatePath(), mailException);
+      log.error(EMAIL_SEND_ERROR_MESSAGE.formatted(emailInfo.templatePath()), mailException);
     }
   }
 }

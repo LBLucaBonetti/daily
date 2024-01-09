@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.Test;
 
 @DisplayNameGeneration(TestUtils.DailyDisplayNameGenerator.class)
-class DailyApplicationTests {
+class DailyApplicationTests extends DailyAbstractIntegrationTests {
 
   @Test
   @DisplayName("Should correctly load application context")

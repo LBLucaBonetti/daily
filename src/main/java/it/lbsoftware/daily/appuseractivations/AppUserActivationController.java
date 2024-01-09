@@ -2,7 +2,6 @@ package it.lbsoftware.daily.appuseractivations;
 
 import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
 
-import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.config.Constants;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @CommonsLog
 class AppUserActivationController {
 
-  private final AppUserService appUserService;
+  private final AppUserActivationService appUserActivationService;
 
   @GetMapping
   public String activate(
@@ -30,7 +29,8 @@ class AppUserActivationController {
     return redirectIfAuthenticated(authentication)
         .orElseGet(
             () -> {
-              if (appUserService.activate(activationCode)) {
+              if (appUserActivationService.setNonActivatedAndStillValidAppUserActivationActivated(
+                  activationCode)) {
                 model.addAttribute(
                     Constants.ACTIVATION_CODE_SUCCESS,
                     "Your account has been activated! You can now log in");

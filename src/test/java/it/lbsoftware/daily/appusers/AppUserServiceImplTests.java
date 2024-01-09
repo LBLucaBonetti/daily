@@ -11,7 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
-import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +24,11 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 class AppUserServiceImplTests extends DailyAbstractUnitTests {
 
   @Mock private AppUserRepository appUserRepository;
-  @Mock private AppUserActivationService appUserActivationService;
   private AppUserServiceImpl appUserService;
 
   @BeforeEach
   void beforeEach() {
-    appUserService = new AppUserServiceImpl(appUserRepository, appUserActivationService);
+    appUserService = new AppUserServiceImpl(appUserRepository);
   }
 
   @Test

@@ -17,35 +17,13 @@ public interface AppUserActivationService {
   Optional<AppUserActivation> createAppUserActivation(AppUser appUser);
 
   /**
-   * Reads an appUserActivation
+   * Sets an appUserActivation to activated now if it is not activated and is still valid for being
+   * activated
    *
    * @param activationCode Activation code of the appUserActivation
-   * @return Read appUserActivation or empty value
+   * @return True if the appUserActivation is successfully activated, false otherwise
    */
-  Optional<AppUserActivation> readAppUserActivation(UUID activationCode);
-
-  /**
-   * Sets the appUserActivation as activated now
-   *
-   * @param appUserActivation The appUserActivation to activate
-   */
-  void setActivated(AppUserActivation appUserActivation);
-
-  /**
-   * Returns whether the appUserActivation is activated
-   *
-   * @param appUserActivation The AppUserActivation to check
-   * @return True if the AppUserActivation is activated or false otherwise
-   */
-  boolean isActivated(AppUserActivation appUserActivation);
-
-  /**
-   * Returns whether the appUserActivation is valid
-   *
-   * @param appUserActivation The AppUserActivation to check
-   * @return True if the AppUserActivation is valid or false otherwise
-   */
-  boolean isValid(AppUserActivation appUserActivation);
+  boolean setNonActivatedAndStillValidAppUserActivationActivated(UUID activationCode);
 
   /**
    * Creates the complete URI of the activation URI based on the provided activation code

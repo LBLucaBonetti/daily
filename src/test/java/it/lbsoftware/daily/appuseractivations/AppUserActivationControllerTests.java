@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
-import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.config.Constants;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,12 +23,12 @@ import org.springframework.ui.Model;
 
 class AppUserActivationControllerTests extends DailyAbstractUnitTests {
 
-  @Mock private AppUserService appUserService;
+  @Mock private AppUserActivationService appUserActivationService;
   private AppUserActivationController appUserActivationController;
 
   @BeforeEach
   void beforeEach() {
-    appUserActivationController = new AppUserActivationController(appUserService);
+    appUserActivationController = new AppUserActivationController(appUserActivationService);
   }
 
   @Test
@@ -45,7 +44,8 @@ class AppUserActivationControllerTests extends DailyAbstractUnitTests {
 
     // Then
     assertEquals(REDIRECT, res);
-    verify(appUserService, times(0)).activate(any());
+    verify(appUserActivationService, times(0))
+        .setNonActivatedAndStillValidAppUserActivationActivated(any());
   }
 
   @Test
@@ -55,7 +55,9 @@ class AppUserActivationControllerTests extends DailyAbstractUnitTests {
     UUID activationCode = UUID.randomUUID();
     Model model = mock(Model.class);
     Authentication authentication = null;
-    when(appUserService.activate(activationCode)).thenReturn(false);
+    when(appUserActivationService.setNonActivatedAndStillValidAppUserActivationActivated(
+            activationCode))
+        .thenReturn(false);
 
     // When
     var res = appUserActivationController.activate(activationCode, model, authentication);
@@ -72,7 +74,9 @@ class AppUserActivationControllerTests extends DailyAbstractUnitTests {
     UUID activationCode = UUID.randomUUID();
     Model model = mock(Model.class);
     Authentication authentication = null;
-    when(appUserService.activate(activationCode)).thenReturn(true);
+    when(appUserActivationService.setNonActivatedAndStillValidAppUserActivationActivated(
+            activationCode))
+        .thenReturn(true);
 
     // When
     var res = appUserActivationController.activate(activationCode, model, authentication);

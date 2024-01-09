@@ -37,26 +37,18 @@ public class AppUserActivationServiceImpl implements AppUserActivationService {
   }
 
   @Override
-  public Optional<AppUserActivation> readAppUserActivation(@NonNull UUID activationCode) {
-    return appUserActivationRepository.findByActivationCodeFetchAppUser(activationCode);
-  }
-
-  @Override
-  public void setActivated(@NonNull AppUserActivation appUserActivation) {
-    appUserActivation.setActivatedAt(LocalDateTime.now());
-
-    appUserActivationRepository.save(appUserActivation);
-  }
-
-  @Override
-  public boolean isActivated(@NonNull AppUserActivation appUserActivation) {
-    return appUserActivation.getActivatedAt() != null;
-  }
-
-  @Override
-  public boolean isValid(@NonNull AppUserActivation appUserActivation) {
-    return Optional.ofNullable(appUserActivation.getExpiredAt())
-        .map(expiredAt -> LocalDateTime.now().isBefore(expiredAt))
+  @Transactional
+  public boolean setNonActivatedAndStillValidAppUserActivationActivated(
+      @NonNull UUID activationCode) {
+    return appUserActivationRepository
+        .findNonActivatedAndStillValidAppUserActivationFetchAppUser(activationCode)
+        .map(
+            appUserActivation -> {
+              appUserActivation.setActivatedAt(LocalDateTime.now());
+              AppUser appUser = appUserActivation.getAppUser();
+              appUser.setEnabled(true);
+              return true;
+            })
         .orElse(false);
   }
 

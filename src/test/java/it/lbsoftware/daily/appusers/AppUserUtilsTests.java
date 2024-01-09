@@ -62,6 +62,7 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
     // When
     InvocationTargetException res =
         assertThrows(InvocationTargetException.class, utils::newInstance);
+    utils.setAccessible(false);
 
     // Then
     assertNotNull(res);

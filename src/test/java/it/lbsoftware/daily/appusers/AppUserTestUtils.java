@@ -107,6 +107,23 @@ public final class AppUserTestUtils {
    * @return The created AppUser
    */
   public static AppUser createAppUser(@NonNull final UUID uuid, @NonNull final String email) {
+    return createAppUser(uuid, email, null, null);
+  }
+
+  /**
+   * AppUser generator; the created instance is not persisted
+   *
+   * @param uuid The entity UUID
+   * @param email The e-mail
+   * @param authProvider The auth provider
+   * @param authProviderId The auth provider id
+   * @return The created AppUser
+   */
+  public static AppUser createAppUser(
+      @NonNull final UUID uuid,
+      @NonNull final String email,
+      final AuthProvider authProvider,
+      final String authProviderId) {
     var appUser = new AppUser();
     Method setUuidMethod;
     try {
@@ -122,6 +139,8 @@ public final class AppUserTestUtils {
     }
     setUuidMethod.setAccessible(false);
     appUser.setEmail(email);
+    appUser.setAuthProvider(authProvider);
+    appUser.setAuthProviderId(authProviderId);
     return appUser;
   }
 }

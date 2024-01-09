@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface AppUserActivationRepository extends JpaRepository<AppUserActivation, Long> {
 
   @Query(
-      "select aua from AppUserActivation aua join fetch aua.appUser where aua.activationCode = :activationCode")
-  Optional<AppUserActivation> findByActivationCodeFetchAppUser(
+      "select aua from AppUserActivation aua join fetch aua.appUser where aua.activationCode = :activationCode and aua.activatedAt is null and current_timestamp < aua.expiredAt")
+  Optional<AppUserActivation> findNonActivatedAndStillValidAppUserActivationFetchAppUser(
       @Param("activationCode") UUID activationCode);
 }

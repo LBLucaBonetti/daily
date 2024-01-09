@@ -1,7 +1,5 @@
 package it.lbsoftware.daily.appusers;
 
-import java.util.UUID;
-
 public interface AppUserService {
 
   /**
@@ -11,14 +9,6 @@ public interface AppUserService {
    * @return Information about the current principal
    */
   InfoDto getAppUserInfo(Object principal);
-
-  /**
-   * Activates an appUser
-   *
-   * @param activationCode The activation code provided
-   * @return True if activated or false otherwise
-   */
-  boolean activate(UUID activationCode);
 
   /**
    * Retrieves the appUser

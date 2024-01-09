@@ -1,14 +1,11 @@
 package it.lbsoftware.daily.appusers;
 
-import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AppUserServiceImpl implements AppUserService {
 
   private final AppUserRepository appUserRepository;
-  private final AppUserActivationService appUserActivationService;
 
   @Override
   public InfoDto getAppUserInfo(@NonNull Object principal) {
@@ -33,26 +29,6 @@ public class AppUserServiceImpl implements AppUserService {
       throw new IllegalStateException();
     }
     return new InfoDto(fullName, email);
-  }
-
-  @Override
-  @Transactional
-  public boolean activate(UUID activationCode) {
-    return appUserActivationService
-        .readAppUserActivation(activationCode)
-        .filter(
-            appUserActivation ->
-                !appUserActivationService.isActivated(appUserActivation)
-                    && appUserActivationService.isValid(appUserActivation))
-        .map(
-            appUserActivation -> {
-              appUserActivationService.setActivated(appUserActivation);
-              AppUser appUser = appUserActivation.getAppUser();
-              appUser.setEnabled(true);
-              appUserRepository.save(appUser);
-              return true;
-            })
-        .orElse(false);
   }
 
   @Override
