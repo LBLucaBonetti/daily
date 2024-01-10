@@ -22,11 +22,13 @@ public non-sealed abstract class DailyAbstractIntegrationTests extends DailyAbst
   private static final String MAILHOG_HOST_ADDRESS;
 
   static {
+    // Initialize Redis
     GenericContainer<?> redis =
         new GenericContainer<>(DockerImageName.parse("redis")).withExposedPorts(6379);
     redis.start();
     System.setProperty("spring.data.redis.host", redis.getHost());
     System.setProperty("spring.data.redis.port", redis.getMappedPort(6379).toString());
+    // Initialize MailHog
     GenericContainer<?> mailhog = new GenericContainer<>(DockerImageName.parse("mailhog/mailhog"))
         .withExposedPorts(1025, 8025);
     mailhog.start();
