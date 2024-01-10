@@ -12,7 +12,7 @@ of APIs under a specific context. The login and signup routes are the only publi
 
 #### Build & run with Docker
 
-In order to build and run the app, the following requirements are needed:
+To build and run the app, the following requirements are needed:
 
 - Java 17+
 - Maven
@@ -20,19 +20,18 @@ In order to build and run the app, the following requirements are needed:
 
 Follow these instructions:
 
-- From the root of the project, run ```docker-compose -f daily-docker-compose.yml up --build```
-  to download and build the required environment
-- When Postgres and Redis are ready to accept connections, Keycloak has started and MailHog is up
-  and running, run the
-  following Maven
-  command to start the
+- From the root of the project, run ```docker compose -f daily-docker-compose.yml up --build -d```
+  to download, build and run the required environment
+- Check the status of the containers with ```docker compose -f daily-docker-compose.yml ps``` and
+  wait until every listed item is ```healthy``` (this may take a while), then run the following
+  Maven command to start the
   app: ```mvn clean spring-boot:run "-Dspring-boot.run.jvmArguments=-DGOOGLE_OAUTH2_CLIENT_SECRET=nz754EdKFuBI8kJFF9fYqucW91q6mJV1 -DGOOGLE_OAUTH2_CLIENT_ID=daily -DSPRING_MAIL_HOST=localhost -DSPRING_MAIL_PORT=1025 -Dspring.security.oauth2.client.registration.google.scope=openid,profile,email -Dspring.security.oauth2.client.provider.google.issuer-uri=http://localhost:8081/realms/daily -Dspring.datasource.url=jdbc:postgresql://localhost:5433/daily_develop -Duser.timezone=Etc/UTC"```
-- Visit http://localhost:8080 and use ```user1@gmail.com``` or ```user2@gmail.com``` for
-  the username and ```strongpass``` for the password. Just remember the changes will not be
-  persisted
-  to the
-  Postgres instance unless you modify the ```daily-docker-compose.yml``` file to mount an auxiliary
-  volume
+- Visit http://localhost:8080 and use ```user1@gmail.com``` or ```user2@gmail.com``` for the
+  username and ```strongpass``` for the password; you can also sign a new app user up, if you want;
+  in that case, be aware that every e-mail sent is locally redirected to the MailHog instance, and
+  you can check http://localhost:8025 to open the local e-mail client. Remember the changes will not
+  be persisted to the Postgres instance unless you modify the ```daily-docker-compose.yml``` file to
+  mount an auxiliary volume
 - Hit ```CTRL+C``` to stop the app from running; you can optionally
   run ```docker-compose -f daily-docker-compose.yml down -v --rmi all``` to remove the leftovers
 
