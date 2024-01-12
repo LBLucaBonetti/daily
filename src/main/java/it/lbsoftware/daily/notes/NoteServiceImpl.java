@@ -36,10 +36,11 @@ public class NoteServiceImpl implements NoteService {
   private final TagDtoMapper tagDtoMapper;
 
   @Override
+  @Transactional
   public NoteDto createNote(@NonNull NoteDto note, @NonNull AppUser appUser) {
     Note noteEntity = noteDtoMapper.convertToEntity(note);
     noteEntity.setAppUser(appUser);
-    Note savedNoteEntity = noteRepository.save(noteEntity);
+    Note savedNoteEntity = noteRepository.saveAndFlush(noteEntity);
 
     return noteDtoMapper.convertToDto(savedNoteEntity);
   }

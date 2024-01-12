@@ -141,7 +141,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     Note savedNoteEntity = createNote(TEXT, Collections.emptySet(), APP_USER);
     NoteDto noteDto = createNoteDto(UUID.randomUUID(), TEXT);
     given(noteDtoMapper.convertToEntity(note)).willReturn(noteEntity);
-    given(noteRepository.save(noteEntity)).willReturn(savedNoteEntity);
+    given(noteRepository.saveAndFlush(noteEntity)).willReturn(savedNoteEntity);
     given(noteDtoMapper.convertToDto(savedNoteEntity)).willReturn(noteDto);
 
     // When
@@ -149,7 +149,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteDtoMapper, times(1)).convertToEntity(note);
-    verify(noteRepository, times(1)).save(noteEntity);
+    verify(noteRepository, times(1)).saveAndFlush(noteEntity);
     verify(noteDtoMapper, times(1)).convertToDto(savedNoteEntity);
     assertEquals(TEXT, res.getText());
     assertNotNull(res.getUuid());

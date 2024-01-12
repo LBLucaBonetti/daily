@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class AppUserServiceImpl implements AppUserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public AppUser getAppUser(@NonNull final Object principal) {
     return Optional.ofNullable(getAppUserInfo(principal).email())
         .flatMap(appUserRepository::findByEmailIgnoreCase)

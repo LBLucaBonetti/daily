@@ -93,7 +93,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     Tag savedTagEntity = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
     given(tagDtoMapper.convertToEntity(tag)).willReturn(tagEntity);
-    given(tagRepository.save(tagEntity)).willReturn(savedTagEntity);
+    given(tagRepository.saveAndFlush(tagEntity)).willReturn(savedTagEntity);
     given(tagDtoMapper.convertToDto(savedTagEntity)).willReturn(tagDto);
 
     // When
@@ -101,7 +101,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(tagDtoMapper, times(1)).convertToEntity(tag);
-    verify(tagRepository, times(1)).save(tagEntity);
+    verify(tagRepository, times(1)).saveAndFlush(tagEntity);
     verify(tagDtoMapper, times(1)).convertToDto(savedTagEntity);
     assertEquals(NAME, res.getName());
     assertEquals(COLOR_HEX, res.getColorHex());

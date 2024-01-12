@@ -30,10 +30,11 @@ public class TagServiceImpl implements TagService {
   private final TagDtoMapper tagDtoMapper;
 
   @Override
+  @Transactional
   public TagDto createTag(@NonNull TagDto tag, @NonNull AppUser appUser) {
     Tag tagEntity = tagDtoMapper.convertToEntity(tag);
     tagEntity.setAppUser(appUser);
-    Tag savedTagEntity = tagRepository.save(tagEntity);
+    Tag savedTagEntity = tagRepository.saveAndFlush(tagEntity);
 
     return tagDtoMapper.convertToDto(savedTagEntity);
   }

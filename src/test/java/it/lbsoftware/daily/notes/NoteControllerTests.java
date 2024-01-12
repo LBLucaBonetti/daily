@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -194,7 +193,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
   void test8() {
     // Given
     UUID uuid = UUID.randomUUID();
-    doNothing().when(noteService).deleteNote(uuid, APP_USER);
 
     // When
     ResponseEntity<NoteDto> res = noteController.deleteNote(uuid, appUser);
@@ -234,7 +232,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    doNothing().when(noteService).addTagToNote(uuid, tagUuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = noteController.addTagToNote(uuid, tagUuid, appUser);
@@ -274,7 +271,6 @@ class NoteControllerTests extends DailyAbstractUnitTests {
     // Given
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
-    doNothing().when(noteService).removeTagFromNote(uuid, tagUuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = noteController.removeTagFromNote(uuid, tagUuid, appUser);

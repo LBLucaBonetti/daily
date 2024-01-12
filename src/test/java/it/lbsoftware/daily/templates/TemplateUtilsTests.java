@@ -24,7 +24,7 @@ import org.springframework.validation.BindingResult;
 
 class TemplateUtilsTests extends DailyAbstractUnitTests {
 
-  static Stream<Arguments> test2() {
+  private static Stream<Arguments> test2() {
     // BindingResult, errorMessage
     BindingResult bindingResult = mock(BindingResult.class);
     String errorMessage = "errorMessage";

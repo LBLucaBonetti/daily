@@ -27,6 +27,7 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<AppUserSettingDto> readAppUserSettings(@NonNull AppUser appUser) {
     return appUserSettingRepository
         .findByAppUser(appUser)
@@ -34,6 +35,7 @@ public class AppUserSettingServiceImpl implements AppUserSettingService {
   }
 
   @Override
+  @Transactional
   public Optional<AppUserSettingDto> updateAppUserSettings(
       @NonNull AppUserSettingDto appUserSettings, @NonNull AppUser appUser) {
     return appUserSettingRepository

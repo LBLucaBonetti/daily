@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -188,7 +187,6 @@ class TagControllerTests extends DailyAbstractUnitTests {
   void test8() {
     // Given
     UUID uuid = UUID.randomUUID();
-    doNothing().when(tagService).deleteTag(uuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = tagController.deleteTag(uuid, appUser);
