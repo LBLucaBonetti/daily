@@ -42,7 +42,7 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
     appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), savedAppUser);
     // Create the activation link
     return appUserActivationService
-        .createAppUserActivation(appUser)
+        .createAppUserActivation(savedAppUser)
         .map(AppUserActivation::getActivationCode);
   }
 
@@ -104,7 +104,7 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
   private void createOauth2AppUser(
       final AppUserDto appUserDto, final AuthProvider authProvider, final String authProviderId) {
     var appUser = buildOauth2AppUser(appUserDto, authProvider, authProviderId);
-    var savedAppUser = appUserRepository.save(appUser);
+    var savedAppUser = appUserRepository.saveAndFlush(appUser);
     appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), savedAppUser);
   }
 }

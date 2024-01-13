@@ -208,7 +208,7 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     // Given
     AppUserDto appUserDto = new AppUserDto();
     AppUser appUser = mock(AppUser.class);
-    given(appUserRepository.save(any())).willReturn(appUser);
+    given(appUserRepository.saveAndFlush(any())).willReturn(appUser);
 
     // When and then
     assertDoesNotThrow(
