@@ -98,7 +98,6 @@ public class NoteServiceImpl implements NoteService {
       throw new DailyConflictException(Constants.ERROR_NOTE_TAGS_MAX);
     }
     tag.addToNote(note);
-    noteRepository.save(note);
   }
 
   @Override
@@ -115,7 +114,6 @@ public class NoteServiceImpl implements NoteService {
             .findByUuidAndAppUser(tagUuid, appUser)
             .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     tag.removeFromNote(note);
-    noteRepository.save(note);
   }
 
   @Override

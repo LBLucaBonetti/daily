@@ -362,7 +362,6 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
-    verify(noteRepository, times(1)).save(note);
     assertTrue(note.getTags().contains(tag));
     assertTrue(tag.getNotes().contains(note));
   }
@@ -433,7 +432,6 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
-    verify(noteRepository, times(1)).save(note);
     assertFalse(note.getTags().contains(tag));
     assertFalse(tag.getNotes().contains(note));
   }
