@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusercreations;
 
+import static it.lbsoftware.daily.appusers.AppUserUtils.isDailyAuthProvider;
 import static it.lbsoftware.daily.appusersettings.AppUserSettingUtils.getAppUserSettings;
 
 import it.lbsoftware.daily.appuseractivations.AppUserActivation;
@@ -62,7 +63,7 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
       @NonNull final AppUserDto appUserDto,
       @NonNull final AuthProvider authProvider,
       @NonNull final String authProviderId) {
-    if (AuthProvider.DAILY.equals(authProvider)) {
+    if (isDailyAuthProvider(authProvider)) {
       throw new IllegalArgumentException(
           "Invalid auth provider for OAuth2 flow: " + AuthProvider.DAILY);
     }

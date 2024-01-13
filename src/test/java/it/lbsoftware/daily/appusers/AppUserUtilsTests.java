@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.appusers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,7 +23,7 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
   @NullSource
   @DisplayName("Should throw when get oauth2 auth provider with null argument")
   void test1(String email) {
-    assertThrows(IllegalArgumentException.class, () -> AppUserUtils.getOauth2AuthProvider(email));
+    assertThrows(IllegalArgumentException.class, () -> AppUserUtils.getAuthProvider(email));
   }
 
   @Test
@@ -32,7 +33,7 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
     var email = "appuser@gmail.com";
 
     // When
-    var res = AppUserUtils.getOauth2AuthProvider(email);
+    var res = AppUserUtils.getAuthProvider(email);
 
     // Then
     assertEquals(AuthProvider.GOOGLE, res);
@@ -45,7 +46,7 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
     var email = "appuser@email.com";
 
     // When
-    var res = AppUserUtils.getOauth2AuthProvider(email);
+    var res = AppUserUtils.getAuthProvider(email);
 
     // Then
     assertEquals(AuthProvider.DAILY, res);
@@ -67,5 +68,57 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
     // Then
     assertNotNull(res);
     assertInstanceOf(UnsupportedOperationException.class, res.getCause());
+  }
+
+  @Test
+  @DisplayName("Should return true when isDailyAuthProvider checking DAILY auth provider")
+  void test5() {
+    // Given
+    var authProvider = AuthProvider.DAILY;
+
+    // When
+    var res = AppUserUtils.isDailyAuthProvider(authProvider);
+
+    // Then
+    assertTrue(res);
+  }
+
+  @Test
+  @DisplayName("Should return false when isDailyAuthProvider checking non-DAILY auth provider")
+  void test6() {
+    // Given
+    var authProvider = AuthProvider.GOOGLE;
+
+    // When
+    var res = AppUserUtils.isDailyAuthProvider(authProvider);
+
+    // Then
+    assertFalse(res);
+  }
+
+  @Test
+  @DisplayName("Should return true when isOauth2AuthProvider checking Oauth2 auth provider")
+  void test7() {
+    // Given
+    var authProvider = AuthProvider.GOOGLE;
+
+    // When
+    var res = AppUserUtils.isOauth2AuthProvider(authProvider);
+
+    // Then
+    assertTrue(res);
+  }
+
+  @Test
+  @DisplayName("Should return false when isOauth2AuthProvider checking non-Oauth2 auth provider")
+  void test8() {
+    // Given
+    var authProvider = AuthProvider.DAILY;
+
+    // When
+    var res = AppUserUtils.isOauth2AuthProvider(authProvider);
+
+    // Then
+    assertFalse(res);
   }
 }

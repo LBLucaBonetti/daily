@@ -1,7 +1,8 @@
 package it.lbsoftware.daily.appuseractivations;
 
+import static it.lbsoftware.daily.appusers.AppUserUtils.isOauth2AuthProvider;
+
 import it.lbsoftware.daily.appusers.AppUser;
-import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.config.Constants;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -49,10 +50,6 @@ public class AppUserActivationServiceImpl implements AppUserActivationService {
               return true;
             })
         .orElse(false);
-  }
-
-  private boolean isOauth2AuthProvider(AuthProvider authProvider) {
-    return !AuthProvider.DAILY.equals(authProvider);
   }
 
   @Override

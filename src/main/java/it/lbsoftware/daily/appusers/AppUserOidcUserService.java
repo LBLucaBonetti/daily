@@ -1,10 +1,10 @@
 package it.lbsoftware.daily.appusers;
 
 import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.DAILY;
-import static it.lbsoftware.daily.appusers.AppUserUtils.getOauth2AuthProvider;
+import static it.lbsoftware.daily.appusers.AppUserUtils.getAuthProvider;
+import static it.lbsoftware.daily.appusers.AppUserUtils.isDailyAuthProvider;
 
 import it.lbsoftware.daily.appusercreations.AppUserCreationService;
-import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
@@ -29,8 +29,14 @@ public class AppUserOidcUserService implements OAuth2UserService<OidcUserRequest
     OidcUser oidcUser = oidcUserService.loadUser(userRequest);
 
     var email = validateEmail(oidcUser);
-    var authProvider = getOauth2AuthProvider(email);
-    validateOauth2AuthProvider(authProvider, email);
+    var authProvider = getAuthProvider(email);
+    if (isDailyAuthProvider(authProvider)) {
+      throw new OAuth2AuthenticationException(
+          "Invalid OAuth2 provider for AppUser with e-mail "
+              + email
+              + "; detected auth provider: "
+              + DAILY);
+    }
     log.info("Login of OAuth2 AppUser " + email);
 
     // The subject coming from OAuth2 is the unique key of the user in the OAuth2 provider realm
@@ -53,16 +59,5 @@ public class AppUserOidcUserService implements OAuth2UserService<OidcUserRequest
             () ->
                 new OAuth2AuthenticationException(
                     "The OAuth2 user did not provide a valid e-mail address"));
-  }
-
-  private void validateOauth2AuthProvider(
-      final AuthProvider authProvider, final String validatedEmail) {
-    if (DAILY == authProvider) {
-      throw new OAuth2AuthenticationException(
-          "Invalid OAuth2 provider for AppUser with e-mail "
-              + validatedEmail
-              + "; detected auth provider: "
-              + DAILY);
-    }
   }
 }
