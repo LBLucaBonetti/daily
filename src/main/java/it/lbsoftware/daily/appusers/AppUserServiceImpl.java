@@ -4,6 +4,7 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,9 @@ public class AppUserServiceImpl implements AppUserService {
       log.warn("Invalid AppUser instance detected");
       throw new IllegalStateException();
     }
-    return new InfoDto(fullName, email);
+    return new InfoDto(
+        StringUtils.defaultIfBlank(fullName, StringUtils.EMPTY),
+        StringUtils.defaultIfBlank(email, StringUtils.EMPTY));
   }
 
   @Override
