@@ -9,7 +9,6 @@ import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("AppUserDetails unit tests")
 class AppUserDetailsTests extends DailyAbstractUnitTests {
 
   private AppUserDetails appUserDetails;

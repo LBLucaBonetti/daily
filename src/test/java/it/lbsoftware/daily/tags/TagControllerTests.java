@@ -1,22 +1,23 @@
 package it.lbsoftware.daily.tags;
 
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyBadRequestException;
-import it.lbsoftware.daily.exception.DailyNotFoundException;
+import it.lbsoftware.daily.exceptions.DailyBadRequestException;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,11 +32,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-@DisplayName("TagController unit tests")
 class TagControllerTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
-  private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final String EMAIL = "appuser@email.com";
+  private static final UUID UNIQUE_ID = UUID.randomUUID();
+  private static final AppUser APP_USER = createAppUser(UNIQUE_ID, EMAIL);
   @Mock private TagService tagService;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
@@ -45,7 +47,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
   @BeforeEach
   void beforeEach() {
     tagController = new TagController(tagService, appUserService);
-    given(appUserService.getUuid(appUser)).willReturn(APP_USER);
+    given(appUserService.getAppUser(appUser)).willReturn(APP_USER);
   }
 
   @Test
@@ -60,7 +62,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
     ResponseEntity<TagDto> res = tagController.createTag(tagDto, appUser);
 
     // Then
-    verify(appUserService, times(1)).getUuid(appUser);
+    verify(appUserService, times(1)).getAppUser(appUser);
     verify(tagService, times(1)).createTag(tagDto, APP_USER);
     assertEquals(HttpStatus.CREATED, res.getStatusCode());
     assertEquals(createdTagDto, res.getBody());
@@ -78,7 +80,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
     ResponseEntity<TagDto> res = tagController.readTag(uuid, appUser);
 
     // Then
-    verify(appUserService, times(1)).getUuid(appUser);
+    verify(appUserService, times(1)).getAppUser(appUser);
     verify(tagService, times(1)).readTag(uuid, APP_USER);
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
@@ -96,7 +98,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
     ResponseEntity<TagDto> res = tagController.readTag(uuid, appUser);
 
     // Then
-    verify(appUserService, times(1)).getUuid(appUser);
+    verify(appUserService, times(1)).getAppUser(appUser);
     verify(tagService, times(1)).readTag(uuid, APP_USER);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(readTag.get(), res.getBody());
@@ -114,7 +116,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
     ResponseEntity<PageDto<TagDto>> res = tagController.readTags(pageable, appUser);
 
     // Then
-    verify(appUserService, times(1)).getUuid(appUser);
+    verify(appUserService, times(1)).getAppUser(appUser);
     verify(tagService, times(1)).readTags(pageable, APP_USER);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertNotNull(res.getBody());
@@ -136,7 +138,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
     ResponseEntity<TagDto> res = tagController.updateTag(uuid, tagDto, appUser);
 
     // Then
-    verify(appUserService, times(1)).getUuid(appUser);
+    verify(appUserService, times(1)).getAppUser(appUser);
     verify(tagService, times(1)).updateTag(uuid, tagDto, APP_USER);
     assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     assertNull(res.getBody());
@@ -155,7 +157,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
     ResponseEntity<TagDto> res = tagController.updateTag(uuid, tagDto, appUser);
 
     // Then
-    verify(appUserService, times(1)).getUuid(appUser);
+    verify(appUserService, times(1)).getAppUser(appUser);
     verify(tagService, times(1)).updateTag(uuid, tagDto, APP_USER);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(tagDto, res.getBody());
@@ -175,7 +177,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
         assertThrows(DailyNotFoundException.class, () -> tagController.deleteTag(uuid, appUser));
 
     // Then
-    verify(appUserService, times(1)).getUuid(appUser);
+    verify(appUserService, times(1)).getAppUser(appUser);
     verify(tagService, times(1)).deleteTag(uuid, APP_USER);
     assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
   }
@@ -185,13 +187,12 @@ class TagControllerTests extends DailyAbstractUnitTests {
   void test8() {
     // Given
     UUID uuid = UUID.randomUUID();
-    doNothing().when(tagService).deleteTag(uuid, APP_USER);
 
     // When
     ResponseEntity<TagDto> res = tagController.deleteTag(uuid, appUser);
 
     // Then
-    verify(appUserService, times(1)).getUuid(appUser);
+    verify(appUserService, times(1)).getAppUser(appUser);
     verify(tagService, times(1)).deleteTag(uuid, APP_USER);
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());

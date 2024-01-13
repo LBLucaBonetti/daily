@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusersettings;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import java.util.UUID;
 
 public final class AppUserSettingTestUtils {
@@ -28,7 +29,7 @@ public final class AppUserSettingTestUtils {
    * @param appUser The creator
    * @return The created AppUserSetting
    */
-  public static AppUserSetting createAppUserSetting(final String lang, final UUID appUser) {
+  public static AppUserSetting createAppUserSetting(final String lang, final AppUser appUser) {
     return AppUserSetting.builder().lang(lang).appUser(appUser).build();
   }
 }

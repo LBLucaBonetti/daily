@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.config;
 
-import it.lbsoftware.daily.exception.DailyExceptionHandler;
+import it.lbsoftware.daily.exceptions.DailyExceptionHandler;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +36,7 @@ class DailyErrorController implements ErrorController {
               httpServletResponse.setStatus(HttpServletResponse.SC_OK);
               return "forward:/";
             })
-        .orElseGet(() -> Constants.ERROR_VIEW);
+        .orElse(Constants.ERROR_VIEW);
   }
 
   @RequestMapping

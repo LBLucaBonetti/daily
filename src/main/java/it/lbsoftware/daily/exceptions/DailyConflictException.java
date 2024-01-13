@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.exception;
+package it.lbsoftware.daily.exceptions;
 
 public class DailyConflictException extends RuntimeException {
   public DailyConflictException(final String errorCode) {

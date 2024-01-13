@@ -1,14 +1,14 @@
 package it.lbsoftware.daily.appusersettings;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface AppUserSettingService {
 
-  AppUserSettingDto createAppUserSettings(AppUserSettingDto appUserSettings, UUID appUser);
+  AppUserSettingDto createAppUserSettings(AppUserSettingDto appUserSettings, AppUser appUser);
 
-  Optional<AppUserSettingDto> readAppUserSettings(UUID appUser);
+  Optional<AppUserSettingDto> readAppUserSettings(AppUser appUser);
 
   Optional<AppUserSettingDto> updateAppUserSettings(
-      AppUserSettingDto appUserSettings, UUID appUser);
+      AppUserSettingDto appUserSettings, AppUser appUser);
 }

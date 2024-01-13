@@ -1,0 +1,25 @@
+name: daily test
+
+on:
+  push:
+    branches-ignore: [ main ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Test and analyze backend (bundle with frontend)
+        env:
+          TEST_SPRING_DATASOURCE_URL: jdbc:tc:postgresql:latest:///daily_develop
+          GOOGLE_OAUTH2_CLIENT_ID: fakeId
+          GOOGLE_OAUTH2_CLIENT_SECRET: fakeSecret
+        run: mvn verify

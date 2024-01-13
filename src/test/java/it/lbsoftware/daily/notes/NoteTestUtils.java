@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.notes;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.tags.Tag;
 import java.util.Set;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public final class NoteTestUtils {
    * @param appUser The creator
    * @return The created Note
    */
-  public static Note createNote(final String text, final Set<Tag> tags, final UUID appUser) {
+  public static Note createNote(final String text, final Set<Tag> tags, final AppUser appUser) {
     return Note.builder().text(text).tags(tags).appUser(appUser).build();
   }
 }

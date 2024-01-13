@@ -12,8 +12,9 @@ public final class Constants {
       "default-src 'self' https://cdn.jsdelivr.net/npm/ https://fonts.bunny.net/";
   public static final String PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
   public static final String LOCALDATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-  public static final String DAILY_COOKIE_CSRF_SECURE_KEY = "daily.cookie.csrf.secure";
-  public static final String DAILY_COOKIE_CSRF_SAME_SITE_KEY = "daily.cookie.csrf.same-site";
+  public static final String DAILY_COOKIE_CSRF_ENHANCED_SECURITY_KEY =
+      "daily.cookie.csrf.enhanced.security";
+  public static final String DAILY_ASYNC_ENABLED = "daily.async.enabled";
   public static final String ERROR_KEY = "error";
   public static final String ERROR_PREFIX = "daily.error.";
   public static final String ERROR_DEFAULT = ERROR_PREFIX + "default";
@@ -42,7 +43,15 @@ public final class Constants {
   public static final String SIGNUP_PATH = "/" + SIGNUP_VIEW;
   public static final String ERROR_VIEW = "error";
   public static final String ERROR_PATH = "/" + ERROR_VIEW;
-  public static final List<String> ALLOWED_STATIC_TEMPLATES = List.of(SIGNUP_PATH, ERROR_PATH);
+  public static final String ACTIVATIONS_VIEW = "activations";
+  public static final String ACTIVATION_CODE = "activationCode";
+  public static final String ACTIVATION_PATH =
+      "/" + ACTIVATIONS_VIEW + "/" + "{" + ACTIVATION_CODE + "}";
+  public static final List<String> ALLOWED_STATIC_TEMPLATES =
+      List.of(SIGNUP_PATH, ERROR_PATH, ACTIVATION_PATH);
+  public static final String ACTIVATION_CODE_SUCCESS = "activationCodeSuccess";
+  public static final String ACTIVATION_CODE_FAILURE = "activationCodeFailure";
+  public static final String SIGNUP_SUCCESS = "signupSuccess";
   public static final List<String> ALLOWED_STATIC_ASSETS =
       List.of(
           "/public-style.css",
@@ -53,6 +62,18 @@ public final class Constants {
           "/public-signup.js",
           "/img/logo.svg");
   public static final String NOT_BLANK_MESSAGE = "Please fill out this field";
+  public static final String EMAIL_SUBJECT_PREFIX = "daily | ";
+  public static final String EMAIL_PATH_PREFIX = "/emails/";
+  public static final String EMAIL_APP_USER_ACTIVATION_PATH =
+      EMAIL_PATH_PREFIX + "app_user_activation.html";
+  public static final String EMAIL_APP_USER_ACTIVATION_SUBJECT =
+      EMAIL_SUBJECT_PREFIX + "Activate your account";
+  public static final String EMAIL_FROM = "daily@trydaily.click";
+  public static final String EMAIL_TITLE_KEY = "title";
+  public static final String EMAIL_CONTEXT_RESERVED_KEY_MESSAGE =
+      "The context key %s is reserved and will be ignored";
+  public static final String EMAIL_SEND_ERROR_MESSAGE =
+      "Could not send e-mail with the template %s";
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
