@@ -146,7 +146,7 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
     verify(appUserCreationService, times(1)).createDailyAppUser(appUserDto);
     verify(bindingResult, times(1)).addError(any());
     verify(model, times(0)).addAttribute(eq(SIGNUP_SUCCESS), anyString());
-    verify(appUserActivationService, times(0)).getActivationUri(anyString());
+    verify(appUserActivationService, times(0)).getActivationUri(any());
     verify(emailService, times(0)).send(any(), any());
   }
 
@@ -162,7 +162,7 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
     when(appUserDto.getPasswordConfirmation()).thenReturn("password");
     when(appUserDto.getEmail()).thenReturn("appuser@email.com");
     when(appUserDto.getFirstName()).thenReturn("First name");
-    var activationCode = UUID.randomUUID().toString();
+    var activationCode = UUID.randomUUID();
     when(appUserCreationService.createDailyAppUser(appUserDto))
         .thenReturn(Optional.of(activationCode));
     var activationUri = "http://localhost/daily/" + ACTIVATIONS_VIEW + "/" + activationCode;

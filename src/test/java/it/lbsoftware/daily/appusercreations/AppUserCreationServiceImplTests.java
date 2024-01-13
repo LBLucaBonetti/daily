@@ -180,7 +180,7 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     assertTrue(res.isPresent());
-    assertEquals(uuid.toString(), res.get());
+    assertEquals(uuid, res.get());
   }
 
   @Test

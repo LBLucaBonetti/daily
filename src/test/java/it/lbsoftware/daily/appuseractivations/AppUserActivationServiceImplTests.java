@@ -19,9 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -38,10 +36,9 @@ class AppUserActivationServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @ParameterizedTest
-  @NullAndEmptySource
-  @ValueSource(strings = {"   ", "abc"})
+  @NullSource
   @DisplayName("Should throw when get activation uri with invalid activation code")
-  void test1(final String activationCode) {
+  void test1(final UUID activationCode) {
     assertThrows(
         IllegalArgumentException.class,
         () -> appUserActivationService.getActivationUri(activationCode));
@@ -75,7 +72,7 @@ class AppUserActivationServiceImplTests extends DailyAbstractUnitTests {
     var mockHttpServletRequest = new MockHttpServletRequest();
     var prefix = mockHttpServletRequest.getRequestURL();
     var baseUri = "/daily";
-    var activationCode = UUID.randomUUID().toString();
+    var activationCode = UUID.randomUUID();
     mockHttpServletRequest.setContextPath(baseUri);
     var servletRequestAttributes = new ServletRequestAttributes(mockHttpServletRequest);
     RequestContextHolder.setRequestAttributes(servletRequestAttributes);
@@ -84,7 +81,7 @@ class AppUserActivationServiceImplTests extends DailyAbstractUnitTests {
     var res = appUserActivationService.getActivationUri(activationCode);
 
     // Then
-    assertEquals(prefix + baseUri + "/" + ACTIVATIONS_VIEW + "/" + activationCode, res);
+    assertEquals(prefix + baseUri + "/" + ACTIVATIONS_VIEW + "/" + activationCode.toString(), res);
   }
 
   @Test

@@ -30,7 +30,7 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
 
   @Override
   @Transactional
-  public Optional<String> createDailyAppUser(@NonNull final AppUserDto appUserDto) {
+  public Optional<UUID> createDailyAppUser(@NonNull final AppUserDto appUserDto) {
     if (appUserRepository.findByEmailIgnoreCase(appUserDto.getEmail()).isPresent()) {
       return Optional.empty();
     }
@@ -42,8 +42,7 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
     // Create the activation link
     return appUserActivationService
         .createAppUserActivation(appUser)
-        .map(AppUserActivation::getActivationCode)
-        .map(UUID::toString);
+        .map(AppUserActivation::getActivationCode);
   }
 
   private AppUser buildDailyAppUser(final AppUserDto appUserDto) {

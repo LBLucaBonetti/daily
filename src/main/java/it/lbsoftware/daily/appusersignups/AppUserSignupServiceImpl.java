@@ -13,6 +13,7 @@ import it.lbsoftware.daily.emails.EmailInfo;
 import it.lbsoftware.daily.emails.EmailService;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
@@ -56,11 +57,9 @@ public class AppUserSignupServiceImpl implements AppUserSignupService {
     appUserCreationService
         .createDailyAppUser(appUserDto)
         .ifPresentOrElse(
-            (String activationCode) -> {
+            (UUID activationCode) -> {
               // Success, send the activation e-mail
               model.addAttribute(SIGNUP_SUCCESS, "Check your email to activate your account");
-              // The following call to ServletUriComponentsBuilder.fromCurrentContextPath() is not
-              // meant to be used without an active HttpServletRequest (i.e.: from an @Async method)
               emailService.send(
                   new EmailInfo(
                       Constants.EMAIL_APP_USER_ACTIVATION_PATH,
@@ -69,6 +68,9 @@ public class AppUserSignupServiceImpl implements AppUserSignupService {
                   Map.of(
                       "appUserFirstName",
                       appUserDto.getFirstName(),
+                      // We generate the whole URI here instead of building it with the template
+                      // engine because it will be simpler to change it without touching the html
+                      // file
                       "activationUri",
                       appUserActivationService.getActivationUri(activationCode)));
             },

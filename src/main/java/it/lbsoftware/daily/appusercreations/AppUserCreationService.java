@@ -3,6 +3,7 @@ package it.lbsoftware.daily.appusercreations;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserDto;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface AppUserCreationService {
 
@@ -15,7 +16,7 @@ public interface AppUserCreationService {
    * @return When the operation is successful, the activation code that needs to be sent via e-mail
    *     to the user; an empty {@code Optional} on failure
    */
-  Optional<String> createDailyAppUser(AppUserDto appUserDto);
+  Optional<UUID> createDailyAppUser(AppUserDto appUserDto);
 
   /**
    * Creates a new {@code AppUser} with the provided information; its auth provider will be assigned

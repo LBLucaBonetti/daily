@@ -33,5 +33,5 @@ public interface AppUserActivationService {
    * @implNote The caller should make sure an active request is being processed, so that a {@code
    *     RequestAttributes} can be found
    */
-  String getActivationUri(String activationCode);
+  String getActivationUri(UUID activationCode);
 }
