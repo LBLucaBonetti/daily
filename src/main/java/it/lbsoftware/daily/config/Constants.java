@@ -63,7 +63,7 @@ public final class Constants {
           "/img/logo.svg");
   public static final String NOT_BLANK_MESSAGE = "Please fill out this field";
   public static final String EMAIL_SUBJECT_PREFIX = "daily | ";
-  public static final String EMAIL_PATH_PREFIX = "/emails/";
+  public static final String EMAIL_PATH_PREFIX = "emails/";
   public static final String EMAIL_APP_USER_ACTIVATION_PATH =
       EMAIL_PATH_PREFIX + "app_user_activation.html";
   public static final String EMAIL_APP_USER_ACTIVATION_SUBJECT =
