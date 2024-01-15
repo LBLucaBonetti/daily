@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 
-@DisplayName("PageDto unit tests")
 class PageDtoTests extends DailyAbstractUnitTests {
 
   @Test

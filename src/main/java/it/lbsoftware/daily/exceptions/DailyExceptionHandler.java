@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.exception;
+package it.lbsoftware.daily.exceptions;
 
 import it.lbsoftware.daily.config.Constants;
 import java.util.Map;

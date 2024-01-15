@@ -9,7 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
-import it.lbsoftware.daily.exception.DailyExceptionHandler;
+import it.lbsoftware.daily.exceptions.DailyExceptionHandler;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
-@DisplayName("DailyErrorController unit tests")
 class DailyErrorControllerTests extends DailyAbstractUnitTests {
 
   private static final String ERROR_KEY = "error";

@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.notes;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -14,19 +15,19 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
    * Finds a note by its uuid and AppUser
    *
    * @param uuid Note uuid
-   * @param appUser Unique id of the appUser
+   * @param appUser The appUser
    * @return Found note or empty value
    */
-  Optional<Note> findByUuidAndAppUser(UUID uuid, UUID appUser);
+  Optional<Note> findByUuidAndAppUser(UUID uuid, AppUser appUser);
 
   /**
    * Finds notes by their AppUser
    *
    * @param pageable Pagination and sorting object
-   * @param appUser Unique id of the appUser
+   * @param appUser The appUser
    * @return Found notes or empty page
    */
-  Page<Note> findByAppUser(Pageable pageable, UUID appUser);
+  Page<Note> findByAppUser(Pageable pageable, AppUser appUser);
 
   /**
    * Finds a note by its uuid and AppUser fetching the associated tags
@@ -38,5 +39,5 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
   @Query(
       "select n from Note n left join fetch n.tags where n.uuid = :uuid and n.appUser = :appUser")
   Optional<Note> findByUuidAndAppUserFetchTags(
-      @Param("uuid") UUID uuid, @Param("appUser") UUID appUser);
+      @Param("uuid") UUID uuid, @Param("appUser") AppUser appUser);
 }

@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.tags;
 
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -13,8 +14,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyNotFoundException;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +34,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-@DisplayName("TagServiceImpl unit tests")
 class TagServiceImplTests extends DailyAbstractUnitTests {
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
-  private static final UUID APP_USER = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final String EMAIL = "appuser@email.com";
+  private static final UUID UNIQUE_ID = UUID.randomUUID();
+  private static final AppUser APP_USER = createAppUser(UNIQUE_ID, EMAIL);
   private static final String OTHER_NAME = "otherText";
   private static final String OTHER_COLOR_HEX = "#654321";
   @Mock private TagRepository tagRepository;
@@ -90,7 +93,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
     Tag savedTagEntity = createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER);
     TagDto tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
     given(tagDtoMapper.convertToEntity(tag)).willReturn(tagEntity);
-    given(tagRepository.save(tagEntity)).willReturn(savedTagEntity);
+    given(tagRepository.saveAndFlush(tagEntity)).willReturn(savedTagEntity);
     given(tagDtoMapper.convertToDto(savedTagEntity)).willReturn(tagDto);
 
     // When
@@ -98,7 +101,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(tagDtoMapper, times(1)).convertToEntity(tag);
-    verify(tagRepository, times(1)).save(tagEntity);
+    verify(tagRepository, times(1)).saveAndFlush(tagEntity);
     verify(tagDtoMapper, times(1)).convertToDto(savedTagEntity);
     assertEquals(NAME, res.getName());
     assertEquals(COLOR_HEX, res.getColorHex());
@@ -254,35 +257,35 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when create tag with null argument")
-  void test10(TagDto tag, UUID appUser) {
+  void test10(TagDto tag, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.createTag(tag, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when read tag with null argument")
-  void test11(UUID uuid, UUID appUser) {
+  void test11(UUID uuid, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.readTag(uuid, appUser));
   }
 
   @ParameterizedTest
   @NullSource
   @DisplayName("Should throw when read tags with null argument")
-  void test12(UUID appUser) {
+  void test12(AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.readTags(pageable, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when update tag with null argument")
-  void test13(UUID uuid, TagDto tag, UUID appUser) {
+  void test13(UUID uuid, TagDto tag, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.updateTag(uuid, tag, appUser));
   }
 
   @ParameterizedTest
   @MethodSource
   @DisplayName("Should throw when delete tag with null argument")
-  void test14(UUID uuid, UUID appUser) {
+  void test14(UUID uuid, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> tagService.deleteTag(uuid, appUser));
   }
 }

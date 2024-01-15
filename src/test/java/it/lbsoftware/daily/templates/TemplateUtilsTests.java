@@ -1,5 +1,8 @@
-package it.lbsoftware.daily.views;
+package it.lbsoftware.daily.templates;
 
+import static it.lbsoftware.daily.config.Constants.REDIRECT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,13 +19,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullSource;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 
-@DisplayName("ViewUtils unit tests")
-class ViewUtilsTests extends DailyAbstractUnitTests {
+class TemplateUtilsTests extends DailyAbstractUnitTests {
 
-  static Stream<Arguments> test2() {
+  private static Stream<Arguments> test2() {
     // BindingResult, errorMessage
     BindingResult bindingResult = mock(BindingResult.class);
     String errorMessage = "errorMessage";
@@ -34,17 +36,18 @@ class ViewUtilsTests extends DailyAbstractUnitTests {
   @DisplayName("Should not instantiate the class")
   void test1() throws NoSuchMethodException {
     // Given
-    Constructor<ViewUtils> viewUtilsConstructor = ViewUtils.class.getDeclaredConstructor();
-    assertTrue(Modifier.isPrivate(viewUtilsConstructor.getModifiers()));
-    viewUtilsConstructor.setAccessible(true);
+    Constructor<TemplateUtils> utils = TemplateUtils.class.getDeclaredConstructor();
+    assertTrue(Modifier.isPrivate(utils.getModifiers()));
+    utils.setAccessible(true);
 
     // When
     InvocationTargetException res =
-        assertThrows(InvocationTargetException.class, viewUtilsConstructor::newInstance);
+        assertThrows(InvocationTargetException.class, utils::newInstance);
+    utils.setAccessible(false);
 
     // Then
     assertNotNull(res);
-    assertTrue(res.getCause() instanceof UnsupportedOperationException);
+    assertInstanceOf(UnsupportedOperationException.class, res.getCause());
   }
 
   @ParameterizedTest
@@ -53,13 +56,33 @@ class ViewUtilsTests extends DailyAbstractUnitTests {
   void test2(BindingResult bindingResult, String errorMessage) {
     assertThrows(
         IllegalArgumentException.class,
-        () -> ViewUtils.addErrorToView(bindingResult, errorMessage));
+        () -> TemplateUtils.addErrorToView(bindingResult, errorMessage));
   }
 
-  @ParameterizedTest
-  @NullSource
-  @DisplayName("Should throw when get oauth2 auth provider with null argument")
-  void test3(String email) {
-    assertThrows(IllegalArgumentException.class, () -> ViewUtils.getOauth2AuthProvider(email));
+  @Test
+  @DisplayName("Should not redirect and return empty optional")
+  void test3() {
+    // Given
+    Authentication authentication = null;
+
+    // When
+    var res = TemplateUtils.redirectIfAuthenticated(authentication);
+
+    // Then
+    assertTrue(res.isEmpty());
+  }
+
+  @Test
+  @DisplayName("Should redirect and return redirect optional")
+  void test4() {
+    // Given
+    Authentication authentication = mock(Authentication.class);
+
+    // When
+    var res = TemplateUtils.redirectIfAuthenticated(authentication);
+
+    // Then
+    assertTrue(res.isPresent());
+    assertEquals(REDIRECT, res.get());
   }
 }

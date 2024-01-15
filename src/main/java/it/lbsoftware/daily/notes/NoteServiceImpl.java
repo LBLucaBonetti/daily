@@ -4,9 +4,10 @@ import static it.lbsoftware.daily.config.Constants.DO_NOT_STORE_NULL_SPEL;
 import static it.lbsoftware.daily.config.Constants.NOTE_CACHE;
 import static it.lbsoftware.daily.config.Constants.NOTE_TAGS_CACHE_KEY_SPEL;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.exception.DailyConflictException;
-import it.lbsoftware.daily.exception.DailyNotFoundException;
+import it.lbsoftware.daily.exceptions.DailyConflictException;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.tags.Tag;
 import it.lbsoftware.daily.tags.TagDto;
 import it.lbsoftware.daily.tags.TagDtoMapper;
@@ -35,30 +36,31 @@ public class NoteServiceImpl implements NoteService {
   private final TagDtoMapper tagDtoMapper;
 
   @Override
-  public NoteDto createNote(@NonNull NoteDto note, @NonNull UUID appUser) {
+  @Transactional
+  public NoteDto createNote(@NonNull NoteDto note, @NonNull AppUser appUser) {
     Note noteEntity = noteDtoMapper.convertToEntity(note);
     noteEntity.setAppUser(appUser);
-    Note savedNoteEntity = noteRepository.save(noteEntity);
+    Note savedNoteEntity = noteRepository.saveAndFlush(noteEntity);
 
     return noteDtoMapper.convertToDto(savedNoteEntity);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<NoteDto> readNote(@NonNull UUID uuid, @NonNull UUID appUser) {
+  public Optional<NoteDto> readNote(@NonNull UUID uuid, @NonNull AppUser appUser) {
     return noteRepository.findByUuidAndAppUser(uuid, appUser).map(noteDtoMapper::convertToDto);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Page<NoteDto> readNotes(Pageable pageable, @NonNull UUID appUser) {
+  public Page<NoteDto> readNotes(Pageable pageable, @NonNull AppUser appUser) {
     return noteRepository.findByAppUser(pageable, appUser).map(noteDtoMapper::convertToDto);
   }
 
   @Override
   @Transactional
   public Optional<NoteDto> updateNote(
-      @NonNull UUID uuid, @NonNull NoteDto note, @NonNull UUID appUser) {
+      @NonNull UUID uuid, @NonNull NoteDto note, @NonNull AppUser appUser) {
     return noteRepository
         .findByUuidAndAppUser(uuid, appUser)
         .map(
@@ -72,7 +74,7 @@ public class NoteServiceImpl implements NoteService {
   @Override
   @Transactional
   @CacheEvict(key = NOTE_TAGS_CACHE_KEY_SPEL)
-  public void deleteNote(@NonNull UUID uuid, @NonNull UUID appUser) {
+  public void deleteNote(@NonNull UUID uuid, @NonNull AppUser appUser) {
     Note note =
         noteRepository
             .findByUuidAndAppUser(uuid, appUser)
@@ -83,7 +85,7 @@ public class NoteServiceImpl implements NoteService {
   @Override
   @Transactional
   @CacheEvict(key = NOTE_TAGS_CACHE_KEY_SPEL)
-  public void addTagToNote(@NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull UUID appUser) {
+  public void addTagToNote(@NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull AppUser appUser) {
     Note note =
         noteRepository
             .findByUuidAndAppUser(uuid, appUser)
@@ -96,13 +98,13 @@ public class NoteServiceImpl implements NoteService {
       throw new DailyConflictException(Constants.ERROR_NOTE_TAGS_MAX);
     }
     tag.addToNote(note);
-    noteRepository.save(note);
   }
 
   @Override
   @Transactional
   @CacheEvict(key = NOTE_TAGS_CACHE_KEY_SPEL)
-  public void removeTagFromNote(@NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull UUID appUser) {
+  public void removeTagFromNote(
+      @NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull AppUser appUser) {
     Note note =
         noteRepository
             .findByUuidAndAppUser(uuid, appUser)
@@ -112,13 +114,12 @@ public class NoteServiceImpl implements NoteService {
             .findByUuidAndAppUser(tagUuid, appUser)
             .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     tag.removeFromNote(note);
-    noteRepository.save(note);
   }
 
   @Override
   @Transactional(readOnly = true)
   @Cacheable(key = NOTE_TAGS_CACHE_KEY_SPEL, unless = DO_NOT_STORE_NULL_SPEL)
-  public Optional<Set<TagDto>> readNoteTags(@NonNull UUID uuid, @NonNull UUID appUser) {
+  public Optional<Set<TagDto>> readNoteTags(@NonNull UUID uuid, @NonNull AppUser appUser) {
     return noteRepository
         .findByUuidAndAppUserFetchTags(uuid, appUser)
         .map(Note::getTags)
