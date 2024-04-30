@@ -3,6 +3,7 @@ package it.lbsoftware.daily.appusers;
 import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.DAILY;
 import static it.lbsoftware.daily.appusers.AppUserUtils.getAuthProvider;
 import static it.lbsoftware.daily.appusers.AppUserUtils.isDailyAuthProvider;
+import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.ACCESS_DENIED;
 
 import it.lbsoftware.daily.appusercreations.AppUserCreationService;
 import java.util.Optional;
@@ -31,11 +32,12 @@ public class AppUserOidcUserService implements OAuth2UserService<OidcUserRequest
     var email = validateEmail(oidcUser);
     var authProvider = getAuthProvider(email);
     if (isDailyAuthProvider(authProvider)) {
-      throw new OAuth2AuthenticationException(
+      log.error(
           "Invalid OAuth2 provider for AppUser with e-mail "
               + email
               + "; detected auth provider: "
               + DAILY);
+      throw new OAuth2AuthenticationException(ACCESS_DENIED);
     }
     log.info("Login of OAuth2 AppUser " + email);
 

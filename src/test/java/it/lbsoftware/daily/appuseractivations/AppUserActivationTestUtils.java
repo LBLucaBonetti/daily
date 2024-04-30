@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.appuseractivations;
 
 import it.lbsoftware.daily.appusers.AppUser;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public final class AppUserActivationTestUtils {
@@ -18,6 +19,10 @@ public final class AppUserActivationTestUtils {
    */
   public static AppUserActivation createAppUserActivation(
       final UUID activationCode, final AppUser appUser) {
-    return AppUserActivation.builder().activationCode(activationCode).appUser(appUser).build();
+    return AppUserActivation.builder()
+        .activationCode(activationCode)
+        .expiredAt(LocalDateTime.now().plusDays(1))
+        .appUser(appUser)
+        .build();
   }
 }
