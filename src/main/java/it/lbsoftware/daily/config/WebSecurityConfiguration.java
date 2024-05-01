@@ -8,10 +8,13 @@ import it.lbsoftware.daily.appusers.AppUserOidcUserService;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
@@ -42,7 +45,7 @@ public class WebSecurityConfiguration {
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     // CSRF configuration
     CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
     // Set the name of the attribute the CsrfToken will be populated on
@@ -95,10 +98,16 @@ public class WebSecurityConfiguration {
   }
 
   @Bean
-  public AuthenticationProvider authenticationProvider() {
+  AuthenticationProvider authenticationProvider() {
     var authenticationProvider = new DaoAuthenticationProvider();
     authenticationProvider.setPasswordEncoder(passwordEncoder);
     authenticationProvider.setUserDetailsService(appUserDetailsService);
     return authenticationProvider;
+  }
+
+  @Bean
+  AuthenticationEventPublisher authenticationEventPublisher(
+      ApplicationEventPublisher applicationEventPublisher) {
+    return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
   }
 }

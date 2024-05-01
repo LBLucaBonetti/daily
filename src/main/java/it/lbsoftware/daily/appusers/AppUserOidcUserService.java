@@ -39,7 +39,6 @@ public class AppUserOidcUserService implements OAuth2UserService<OidcUserRequest
               + DAILY);
       throw new OAuth2AuthenticationException(ACCESS_DENIED);
     }
-    log.info("Login of OAuth2 AppUser " + email);
 
     // The subject coming from OAuth2 is the unique key of the user in the OAuth2 provider realm
     appUserCreationService.createOrUpdateOauth2AppUser(
@@ -58,8 +57,9 @@ public class AppUserOidcUserService implements OAuth2UserService<OidcUserRequest
     return Optional.ofNullable(oidcUser.getEmail())
         .filter(StringUtils::isNotBlank)
         .orElseThrow(
-            () ->
-                new OAuth2AuthenticationException(
-                    "The OAuth2 user did not provide a valid e-mail address"));
+            () -> {
+              log.error("The OAuth2 user did not provide a valid e-mail address");
+              return new OAuth2AuthenticationException(ACCESS_DENIED);
+            });
   }
 }
