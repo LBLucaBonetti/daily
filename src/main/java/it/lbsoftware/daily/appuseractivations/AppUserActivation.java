@@ -19,6 +19,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Contains the details regarding the {@link AppUser} activation. An {@link AppUser} who signed up
+ * via email and password should activate its account before being able to log in. Note that OAuth2
+ * app users are not required to activate their account as the OAuth2 provider is trusted
+ */
 @Table(
     name = "app_user_activation",
     indexes = {
@@ -30,12 +35,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-/*
- The AppUserActivation contains the details regarding the AppUser activation. An AppUser who
- signed up via email and password should activate its account before being able to log in. Note
- that OAuth2 app users are not required to activate their account as the OAuth2 provider is
- trusted
-*/
 public class AppUserActivation extends BaseEntity {
 
   @OneToOne(fetch = FetchType.LAZY, optional = false)
