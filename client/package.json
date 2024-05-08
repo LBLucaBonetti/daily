@@ -14,15 +14,15 @@
     "@quasar/extras": "^1.16.11",
     "axios": "^1.6.8",
     "pinia": "^2.1.7",
-    "quasar": "^2.15.4",
+    "quasar": "^2.16.1",
     "vue": "^3.4.27",
     "quasar-extras-svg-icons": "^1.37.0",
-    "vue-i18n": "^9.12.1",
+    "vue-i18n": "^9.13.1",
     "vue-router": "^4.3.2"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
-    "@quasar/app-vite": "^1.9.1",
+    "@quasar/app-vite": "^1.9.2",
     "@types/node": "^20.12.10",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.21.0",
