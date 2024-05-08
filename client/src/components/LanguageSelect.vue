@@ -28,7 +28,7 @@ const props = defineProps({
 });
 
 const langList = import.meta.glob(
-  '../../node_modules/quasar/lang/(en-US|it).mjs'
+  '../../node_modules/quasar/lang/(en-US|it).js',
 );
 const { locale } = useI18n({ useScope: 'global' });
 const $q = useQuasar();
@@ -45,7 +45,7 @@ onMounted(() => {
 });
 
 function updateLang(val: object | string) {
-  langList[`../../node_modules/quasar/lang/${val}.mjs`]().then((lang) => {
+  langList[`../../node_modules/quasar/lang/${val}.js`]().then((lang) => {
     $q.lang.set(lang.default);
     const langIso = locale.value.toString();
     language.setLanguage(langIso);
