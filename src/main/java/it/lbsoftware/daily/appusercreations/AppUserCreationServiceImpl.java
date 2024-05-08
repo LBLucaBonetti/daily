@@ -5,6 +5,8 @@ import static it.lbsoftware.daily.appusersettings.AppUserSettingUtils.getAppUser
 
 import it.lbsoftware.daily.appuseractivations.AppUserActivation;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
+import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformation;
+import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusers.AppUserDto;
@@ -28,6 +30,7 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
   private final PasswordEncoder passwordEncoder;
   private final AppUserSettingService appUserSettingService;
   private final AppUserActivationService appUserActivationService;
+  private final AppUserRemovalInformationRepository appUserRemovalInformationRepository;
 
   @Override
   @Transactional
@@ -40,6 +43,9 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
     var savedAppUser = appUserRepository.saveAndFlush(appUser);
     // Create settings
     appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), savedAppUser);
+    // Create removal information
+    appUserRemovalInformationRepository.save(
+        AppUserRemovalInformation.builder().appUser(appUser).failures(0).notifiedAt(null).build());
     // Create the activation link
     return appUserActivationService
         .createAppUserActivation(savedAppUser)
@@ -105,6 +111,10 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
       final AppUserDto appUserDto, final AuthProvider authProvider, final String authProviderId) {
     var appUser = buildOauth2AppUser(appUserDto, authProvider, authProviderId);
     var savedAppUser = appUserRepository.saveAndFlush(appUser);
+    // Create settings
     appUserSettingService.createAppUserSettings(getAppUserSettings(appUserDto), savedAppUser);
+    // Create removal information
+    appUserRemovalInformationRepository.save(
+        AppUserRemovalInformation.builder().appUser(appUser).failures(0).notifiedAt(null).build());
   }
 }

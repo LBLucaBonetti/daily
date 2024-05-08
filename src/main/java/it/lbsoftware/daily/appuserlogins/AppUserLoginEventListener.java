@@ -1,6 +1,8 @@
 package it.lbsoftware.daily.appuserlogins;
 
 import it.lbsoftware.daily.appuserevents.AppUserLoginEvent;
+import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformation;
+import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusers.AppUserService;
@@ -21,6 +23,7 @@ public class AppUserLoginEventListener {
   private final AppUserRepository appUserRepository;
   private final ApplicationEventPublisher applicationEventPublisher;
   private final AppUserService appUserService;
+  private final AppUserRemovalInformationRepository appUserRemovalInformationRepository;
 
   /**
    * This method is triggered by {@code DefaultAuthenticationEventPublisher} whenever an {@code
@@ -48,7 +51,23 @@ public class AppUserLoginEventListener {
     appUserRepository
         .findByEmailIgnoreCase(email)
         .ifPresentOrElse(
-            (AppUser appUser) -> appUser.setLastLoginAt(LocalDateTime.now()),
-            () -> log.warn("AppUser with email " + email + " not found"));
+            (AppUser appUser) -> {
+              appUser.setLastLoginAt(LocalDateTime.now());
+              // Reset removal information since the app user logged in, and it could have already
+              // been marked for removal and been notified about it
+              appUserRemovalInformationRepository
+                  .findByAppUser(appUser)
+                  .ifPresentOrElse(
+                      (AppUserRemovalInformation appUserRemovalInformation) -> {
+                        appUserRemovalInformation.setFailures(0);
+                        appUserRemovalInformation.setNotifiedAt(null);
+                      },
+                      () ->
+                          log.warn(
+                              "AppUserRemovalInformation for AppUser with e-mail "
+                                  + email
+                                  + " not found"));
+            },
+            () -> log.warn("AppUser with e-mail " + email + " not found"));
   }
 }

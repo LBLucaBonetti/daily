@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appuserevents.AppUserLoginEvent;
+import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformation;
+import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusers.AppUserService;
@@ -33,12 +35,17 @@ class AppUserLoginEventListenerTests extends DailyAbstractUnitTests {
   @Mock private AppUserRepository appUserRepository;
   @Mock private ApplicationEventPublisher applicationEventPublisher;
   @Mock private AppUserService appUserService;
+  @Mock private AppUserRemovalInformationRepository appUserRemovalInformationRepository;
   private AppUserLoginEventListener appUserLoginEventListener;
 
   @BeforeEach
   void beforeEach() {
     appUserLoginEventListener =
-        new AppUserLoginEventListener(appUserRepository, applicationEventPublisher, appUserService);
+        new AppUserLoginEventListener(
+            appUserRepository,
+            applicationEventPublisher,
+            appUserService,
+            appUserRemovalInformationRepository);
   }
 
   @Test
@@ -65,6 +72,9 @@ class AppUserLoginEventListenerTests extends DailyAbstractUnitTests {
     var event = new AppUserLoginEvent(email);
     var appUser = AppUser.builder().email(email).lastLoginAt(null).build();
     when(appUserRepository.findByEmailIgnoreCase(email)).thenReturn(Optional.of(appUser));
+    var appUserRemovalInformation = mock(AppUserRemovalInformation.class);
+    when(appUserRemovalInformationRepository.findByAppUser(appUser))
+        .thenReturn(Optional.of(appUserRemovalInformation));
 
     // When
     appUserLoginEventListener.onAppUserLoginEvent(event);
@@ -72,6 +82,7 @@ class AppUserLoginEventListenerTests extends DailyAbstractUnitTests {
     // Then
     assertNotNull(appUser.getLastLoginAt());
     verify(appUserRepository, times(1)).findByEmailIgnoreCase(email);
+    verify(appUserRemovalInformationRepository, times(1)).findByAppUser(appUser);
   }
 
   @Test
@@ -87,6 +98,6 @@ class AppUserLoginEventListenerTests extends DailyAbstractUnitTests {
 
     // Then
     verify(appUserRepository, times(1)).findByEmailIgnoreCase(email);
-    assertThat(capturedOutput).contains("AppUser with email " + email + " not found");
+    assertThat(capturedOutput).contains("AppUser with e-mail " + email + " not found");
   }
 }

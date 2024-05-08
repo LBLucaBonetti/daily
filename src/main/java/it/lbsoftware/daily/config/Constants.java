@@ -76,8 +76,11 @@ public final class Constants {
   public static final String EMAIL_TITLE_KEY = "title";
   public static final String EMAIL_CONTEXT_RESERVED_KEY_MESSAGE =
       "The context key %s is reserved and will be ignored";
-  public static final String EMAIL_SEND_ERROR_MESSAGE =
-      "Could not send e-mail with the template %s";
+  public static final int REMOVAL_NOTIFICATION_THRESHOLD_DAYS = 30;
+  public static final int REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS = 2;
+  public static final int REMOVAL_THRESHOLD_DAYS =
+      REMOVAL_NOTIFICATION_THRESHOLD_DAYS + REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS;
+  public static final int FAILURES_THRESHOLD = 3;
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");

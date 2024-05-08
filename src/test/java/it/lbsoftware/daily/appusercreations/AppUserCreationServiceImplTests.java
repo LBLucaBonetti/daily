@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appuseractivations.AppUserActivation;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
+import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusers.AppUserDto;
@@ -43,6 +44,7 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
   @Mock private PasswordEncoder passwordEncoder;
   @Mock private AppUserSettingService appUserSettingService;
   @Mock private AppUserActivationService appUserActivationService;
+  @Mock private AppUserRemovalInformationRepository appUserRemovalInformationRepository;
   private AppUserCreationServiceImpl appUserCreationService;
 
   private static Stream<Arguments> test9() {
@@ -64,7 +66,11 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
   void beforeEach() {
     appUserCreationService =
         new AppUserCreationServiceImpl(
-            appUserRepository, passwordEncoder, appUserSettingService, appUserActivationService);
+            appUserRepository,
+            passwordEncoder,
+            appUserSettingService,
+            appUserActivationService,
+            appUserRemovalInformationRepository);
   }
 
   @ParameterizedTest
@@ -181,6 +187,7 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     // Then
     assertTrue(res.isPresent());
     assertEquals(uuid, res.get());
+    verify(appUserRemovalInformationRepository, times(1)).save(any());
   }
 
   @Test
@@ -206,15 +213,23 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should create oauth2 app user")
   void test8() {
     // Given
+    var authProviderId = "authProviderId";
+    var authProvider = GOOGLE;
     AppUserDto appUserDto = new AppUserDto();
+    given(appUserRepository.findByAuthProviderIdAndAuthProvider(authProviderId, authProvider))
+        .willReturn(Optional.empty());
     AppUser appUser = mock(AppUser.class);
     given(appUserRepository.saveAndFlush(any())).willReturn(appUser);
 
-    // When and then
+    // When
     assertDoesNotThrow(
         () ->
             appUserCreationService.createOrUpdateOauth2AppUser(
-                appUserDto, GOOGLE, "authProviderId"));
+                appUserDto, authProvider, authProviderId));
+
+    // Then
+    verify(appUserSettingService, times(1)).createAppUserSettings(any(), eq(appUser));
+    verify(appUserRemovalInformationRepository, times(1)).save(any());
   }
 
   @ParameterizedTest
