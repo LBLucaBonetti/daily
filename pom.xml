@@ -6,6 +6,27 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>google_checks.xml</configLocation>
+          <consoleOutput>true</consoleOutput>
+          <excludeGeneratedSources>false</excludeGeneratedSources>
+          <failOnViolation>true</failOnViolation>
+          <linkXRef>false</linkXRef>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <id>validate</id>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>${maven-checkstyle-plugin.version}</version>
+      </plugin>
+      <plugin>
         <artifactId>frontend-maven-plugin</artifactId>
         <configuration>
           <workingDirectory>client</workingDirectory>
@@ -270,6 +291,7 @@
     <java.version>17</java.version>
     <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     <mapstruct.version>1.5.5.Final</mapstruct.version>
+    <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
     <node.version>v18.15.0</node.version>
     <npm.version>9.5.0</npm.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
