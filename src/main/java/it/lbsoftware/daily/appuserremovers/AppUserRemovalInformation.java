@@ -1,18 +1,14 @@
-package it.lbsoftware.daily.appuseractivations;
+package it.lbsoftware.daily.appuserremovers;
 
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.bases.BaseEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,14 +16,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Contains the details regarding the {@link AppUser} activation. An {@link AppUser} who signed up
- * via email and password should activate its account before being able to log in. Note that OAuth2
- * app users are not required to activate their account as the OAuth2 provider is trusted
+ * Contains the details regarding the {@link AppUser} removal. An {@link AppUser} whose removal
+ * information object has certain characteristics could be notified of a pending scheduled removal
+ * for inactivity or completely removed, if already notified before; to preserve users that could
+ * not be notified up until a certain threshold, failures sending the removal notification are
+ * counted as well
  */
 @Table(
-    name = "app_user_activation",
+    name = "app_user_removal_information",
     indexes = {
-      @Index(name = "idx_app_user_activation_uuid", columnList = "uuid"),
+      @Index(name = "idx_app_user_removal_information_uuid", columnList = "uuid"),
     })
 @Entity
 @NoArgsConstructor
@@ -35,7 +33,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class AppUserActivation extends BaseEntity {
+public class AppUserRemovalInformation extends BaseEntity {
 
   @OneToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(
@@ -46,16 +44,14 @@ public class AppUserActivation extends BaseEntity {
       unique = true)
   private AppUser appUser;
 
-  @Column(updatable = false, nullable = false, unique = true)
-  @NotNull
-  private UUID activationCode;
+  /**
+   * Starts null and is filled when the removal notification is correctly sent or when the failures
+   * have reached a certain threshold
+   */
+  private LocalDateTime notifiedAt;
 
-  @Column(updatable = false, nullable = false)
-  @NotNull
-  @Future
-  private LocalDateTime expiredAt;
-
-  private LocalDateTime activatedAt;
+  /** Starts at 0 and counts every unsuccessful attempt to send the removal notification */
+  private int failures;
 
   @Override
   public int hashCode() {

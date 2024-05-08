@@ -24,7 +24,13 @@ public final class TestUtils {
 
   // The order in which the table names are listed matters
   private static final String[] tableNames = {
-    "note_tag", "tag", "note", "app_user_activation", "app_user_setting", "app_user"
+    "note_tag",
+    "tag",
+    "note",
+    "app_user_activation",
+    "app_user_setting",
+    "app_user_removal_information",
+    "app_user"
   };
 
   private TestUtils() {

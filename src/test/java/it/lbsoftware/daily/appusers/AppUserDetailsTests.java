@@ -27,7 +27,8 @@ class AppUserDetailsTests extends DailyAbstractUnitTests {
             "password",
             "FirstName",
             "LastName",
-            true);
+            true,
+            null);
 
     // When
     appUserDetails = new AppUserDetails(appUser);

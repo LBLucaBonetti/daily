@@ -1,7 +1,6 @@
 package it.lbsoftware.daily.emails;
 
 import static it.lbsoftware.daily.config.Constants.EMAIL_CONTEXT_RESERVED_KEY_MESSAGE;
-import static it.lbsoftware.daily.config.Constants.EMAIL_SEND_ERROR_MESSAGE;
 import static it.lbsoftware.daily.config.Constants.EMAIL_TITLE_KEY;
 import static it.lbsoftware.daily.emails.EmailTestUtils.createEmailInfo;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,6 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.exceptions.DailyEmailException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Collections;
 import java.util.Map;
@@ -60,7 +60,7 @@ class EmailServiceImplTests extends DailyAbstractUnitTests {
   @MethodSource
   @DisplayName("Should throw when send with null arguments")
   void test1(final EmailInfo emailInfo, final Map<String, Object> context) {
-    assertThrows(IllegalArgumentException.class, () -> emailService.send(emailInfo, context));
+    assertThrows(DailyEmailException.class, () -> emailService.send(emailInfo, context));
   }
 
   @Test
@@ -84,7 +84,7 @@ class EmailServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should not send and return early when there are problems configuring the message")
+  @DisplayName("Should not send and throw when there are problems configuring the message")
   void test3() {
     // Given
     Map<String, Object> context = Collections.emptyMap();
@@ -94,7 +94,7 @@ class EmailServiceImplTests extends DailyAbstractUnitTests {
     given(templateEngine.process(eq(EMAIL_INFO.templatePath()), any())).willReturn(null);
 
     // When
-    emailService.send(EMAIL_INFO, context);
+    assertThrows(DailyEmailException.class, () -> emailService.send(EMAIL_INFO, context));
 
     // Then
     verify(javaMailSender, times(0)).send(any(MimeMessage.class));
@@ -102,7 +102,7 @@ class EmailServiceImplTests extends DailyAbstractUnitTests {
 
   @Test
   @ExtendWith(OutputCaptureExtension.class)
-  @DisplayName("Should log an error when send and there is an e-mail exception")
+  @DisplayName("Should throw when send and there is an e-mail exception")
   void test4(final CapturedOutput capturedOutput) {
     // Given
     var context = Map.of(EMAIL_TITLE_KEY, (Object) "daily notification");
@@ -114,11 +114,10 @@ class EmailServiceImplTests extends DailyAbstractUnitTests {
     doThrow(new MailSendException("Could not send e-mail")).when(javaMailSender).send(mimeMessage);
 
     // When
-    emailService.send(EMAIL_INFO, context);
+    assertThrows(DailyEmailException.class, () -> emailService.send(EMAIL_INFO, context));
 
     // Then
-    assertThat(capturedOutput)
-        .contains(EMAIL_SEND_ERROR_MESSAGE.formatted(EMAIL_INFO.templatePath()));
+    verify(javaMailSender, times(1)).send(mimeMessage);
   }
 
   @Test

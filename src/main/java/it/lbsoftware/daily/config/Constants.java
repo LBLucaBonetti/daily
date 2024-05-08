@@ -6,7 +6,6 @@ public final class Constants {
 
   public static final String REDIRECT = "redirect:/";
   public static final String COOKIE_CSRF_TOKEN_REPOSITORY_BEAN_NAME = "cookieCsrfTokenRepository";
-  public static final String CSRF_TOKEN_NAME = "XSRF-TOKEN";
   // Allow everything but only from the same origin & Bootstrap CDN & Bunny Fonts CDN
   public static final String CONTENT_SECURITY_POLICY =
       "default-src 'self' https://cdn.jsdelivr.net/npm/ https://fonts.bunny.net/";
@@ -15,6 +14,7 @@ public final class Constants {
   public static final String DAILY_COOKIE_CSRF_ENHANCED_SECURITY_KEY =
       "daily.cookie.csrf.enhanced.security";
   public static final String DAILY_ASYNC_ENABLED = "daily.async.enabled";
+  public static final String DAILY_SCHEDULING_ENABLED = "daily.scheduling.enabled";
   public static final String ERROR_KEY = "error";
   public static final String ERROR_PREFIX = "daily.error.";
   public static final String ERROR_DEFAULT = ERROR_PREFIX + "default";
@@ -68,12 +68,19 @@ public final class Constants {
       EMAIL_PATH_PREFIX + "app_user_activation.html";
   public static final String EMAIL_APP_USER_ACTIVATION_SUBJECT =
       EMAIL_SUBJECT_PREFIX + "Activate your account";
+  public static final String EMAIL_APP_USER_REMOVAL_NOTIFICATION_PATH =
+      EMAIL_PATH_PREFIX + "app_user_removal_notification.html";
+  public static final String EMAIL_APP_USER_REMOVAL_NOTIFICATION_SUBJECT =
+      EMAIL_SUBJECT_PREFIX + "Action required";
   public static final String EMAIL_FROM = "daily@trydaily.click";
   public static final String EMAIL_TITLE_KEY = "title";
   public static final String EMAIL_CONTEXT_RESERVED_KEY_MESSAGE =
       "The context key %s is reserved and will be ignored";
-  public static final String EMAIL_SEND_ERROR_MESSAGE =
-      "Could not send e-mail with the template %s";
+  public static final int REMOVAL_NOTIFICATION_THRESHOLD_DAYS = 30;
+  public static final int REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS = 2;
+  public static final int REMOVAL_THRESHOLD_DAYS =
+      REMOVAL_NOTIFICATION_THRESHOLD_DAYS + REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS;
+  public static final int FAILURES_THRESHOLD = 3;
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
