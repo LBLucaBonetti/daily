@@ -17,6 +17,7 @@ import it.lbsoftware.daily.notes.NoteRepository;
 import it.lbsoftware.daily.tags.TagRepository;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,8 @@ public class AppUserRemoverService {
               Constants.EMAIL_APP_USER_REMOVAL_NOTIFICATION_SUBJECT),
           Map.of(
               "appUserFirstName",
-              appUser.getFirstName(),
+              Optional.ofNullable(appUser.getFirstName())
+                  .orElse(Constants.APP_USER_UNSPECIFIED_NAME),
               "hoursBeforeRemoval",
               REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS * 24));
       appUserRemovalInformation.setNotifiedAt(LocalDateTime.now());

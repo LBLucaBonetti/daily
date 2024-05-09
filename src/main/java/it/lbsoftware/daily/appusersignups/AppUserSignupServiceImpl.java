@@ -14,6 +14,7 @@ import it.lbsoftware.daily.emails.EmailService;
 import it.lbsoftware.daily.exceptions.DailyEmailException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -82,13 +83,15 @@ public class AppUserSignupServiceImpl implements AppUserSignupService {
               Constants.EMAIL_APP_USER_ACTIVATION_SUBJECT),
           Map.of(
               "appUserFirstName",
-              appUserDto.getFirstName(),
+              Optional.ofNullable(appUserDto.getFirstName())
+                  .orElse(Constants.APP_USER_UNSPECIFIED_NAME),
               // We generate the whole URI here instead of building it with the template
               // engine because it will be simpler to change it without touching the html
               // file
               "activationUri",
               appUserActivationService.getActivationUri(activationCode)));
     } catch (DailyEmailException e) {
+      log.error("Could not send activation e-mail to AppUser with e-mail " + appUserDto.getEmail());
       return false;
     }
     return true;

@@ -37,6 +37,7 @@ public final class Constants {
   public static final int APP_USER_AUTH_PROVIDER_MAX = 255;
   public static final String APP_USER_LANG_REGEXP = "^(en-US|it)$";
   public static final String APP_USER_LANG_PATTERN_MESSAGE = "Invalid language";
+  public static final String APP_USER_UNSPECIFIED_NAME = "<unspecified>";
   public static final String LOGIN_VIEW = "login";
   public static final String LOGIN_PATH = "/" + LOGIN_VIEW;
   public static final String SIGNUP_VIEW = "signup";
