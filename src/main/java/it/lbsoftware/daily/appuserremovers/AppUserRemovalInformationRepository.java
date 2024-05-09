@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.appusersettings;
+package it.lbsoftware.daily.appuserremovers;
 
 import it.lbsoftware.daily.appusers.AppUser;
 import java.util.Optional;
@@ -7,11 +7,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface AppUserSettingRepository extends JpaRepository<AppUserSetting, Long> {
+public interface AppUserRemovalInformationRepository
+    extends JpaRepository<AppUserRemovalInformation, Long> {
 
-  Optional<AppUserSetting> findByAppUser(AppUser appUser);
+  Optional<AppUserRemovalInformation> findByAppUser(AppUser appUser);
 
-  @Query("delete from AppUserSetting aus where aus.appUser = :appUser")
+  @Query("delete from AppUserRemovalInformation auri where auri.appUser = :appUser")
   @Modifying
   void deleteByAppUser(@Param("appUser") AppUser appUser);
 }

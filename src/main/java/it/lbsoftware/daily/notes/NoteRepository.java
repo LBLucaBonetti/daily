@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -40,4 +41,8 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
       "select n from Note n left join fetch n.tags where n.uuid = :uuid and n.appUser = :appUser")
   Optional<Note> findByUuidAndAppUserFetchTags(
       @Param("uuid") UUID uuid, @Param("appUser") AppUser appUser);
+
+  @Query("delete from Note n where n.appUser = :appUser")
+  @Modifying
+  void deleteByAppUser(@Param("appUser") AppUser appUser);
 }

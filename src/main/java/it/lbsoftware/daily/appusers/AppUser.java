@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,6 +63,11 @@ public class AppUser extends BaseEntity {
   @Column(nullable = false)
   private boolean enabled;
 
+  /**
+   * Indicates the last successful login for this app user; if null, the app user never logged in
+   */
+  @Column private LocalDateTime lastLoginAt;
+
   public AppUser(
       String authProviderId,
       AuthProvider authProvider,
@@ -69,7 +75,8 @@ public class AppUser extends BaseEntity {
       String password,
       String firstName,
       String lastName,
-      boolean enabled) {
+      boolean enabled,
+      LocalDateTime lastLoginAt) {
     this.authProviderId = authProviderId;
     this.authProvider = authProvider;
     setEmail(email); // Custom logic there
@@ -77,6 +84,7 @@ public class AppUser extends BaseEntity {
     this.firstName = firstName;
     this.lastName = lastName;
     this.enabled = enabled;
+    this.lastLoginAt = lastLoginAt;
   }
 
   public String getEmail() {

@@ -7,6 +7,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,6 +18,7 @@ import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
 import it.lbsoftware.daily.appusercreations.AppUserCreationService;
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.emails.EmailService;
+import it.lbsoftware.daily.exceptions.DailyEmailException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -175,6 +177,37 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
     verify(appUserCreationService, times(1)).createDailyAppUser(appUserDto);
     verify(bindingResult, times(0)).addError(any());
     verify(model, times(1)).addAttribute(eq(SIGNUP_SUCCESS), anyString());
+    verify(appUserActivationService, times(1)).getActivationUri(activationCode);
+    verify(emailService, times(1)).send(any(), any());
+  }
+
+  @Test
+  @DisplayName(
+      "Should add error to view when daily app user creation succeeds but activation email is not sent")
+  void test7() {
+    // Given
+    var appUserDto = mock(AppUserDto.class);
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    var activationCode = UUID.randomUUID();
+    when(bindingResult.hasErrors()).thenReturn(false);
+    when(appUserDto.getPassword()).thenReturn("password");
+    when(appUserDto.getPasswordConfirmation()).thenReturn("password");
+    when(appUserDto.getEmail()).thenReturn("appuser@email.com");
+    when(appUserDto.getFirstName()).thenReturn("First name");
+    when(appUserCreationService.createDailyAppUser(appUserDto))
+        .thenReturn(Optional.of(activationCode));
+    var activationUri = "http://localhost/daily/" + ACTIVATIONS_VIEW + "/" + activationCode;
+    when(appUserActivationService.getActivationUri(activationCode)).thenReturn(activationUri);
+    doThrow(new DailyEmailException()).when(emailService).send(any(), any());
+
+    // When
+    appUserSignupService.signup(appUserDto, bindingResult, model);
+
+    // Then
+    verify(appUserCreationService, times(1)).createDailyAppUser(appUserDto);
+    verify(bindingResult, times(1)).addError(any());
+    verify(model, times(0)).addAttribute(eq(SIGNUP_SUCCESS), anyString());
     verify(appUserActivationService, times(1)).getActivationUri(activationCode);
     verify(emailService, times(1)).send(any(), any());
   }

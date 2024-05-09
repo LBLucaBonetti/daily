@@ -15,7 +15,7 @@ public final class AppUserUtils {
   /**
    * Retrieves the {@code AuthProvider} from the provided e-mail address
    *
-   * @param email The source e-mail address to retrieve the {@code AuthProvider from}
+   * @param email The source e-mail address to retrieve the {@code AuthProvider} from
    * @return The {@code AuthProvider}
    */
   public static AuthProvider getAuthProvider(@NonNull final String email) {

@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationRepository;
+import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformationRepository;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.appusers.AppUserRepository;
@@ -33,6 +34,7 @@ class AppUserSignupIntegrationTests extends DailyAbstractIntegrationTests {
   @Autowired private AppUserSettingRepository appUserSettingRepository;
   @Autowired private AppUserActivationRepository appUserActivationRepository;
   @Autowired private AppUserSettingService appUserSettingService;
+  @Autowired private AppUserRemovalInformationRepository appUserRemovalInformationRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -88,5 +90,7 @@ class AppUserSignupIntegrationTests extends DailyAbstractIntegrationTests {
     assertEquals(appUserDto.getEmail(), appUser.getEmail());
     assertEquals(appUserDto.getFirstName(), appUser.getFirstName());
     assertEquals(appUserDto.getLastName(), appUser.getLastName());
+    // Should add the removal information entity
+    assertEquals(1, appUserRemovalInformationRepository.findAll().size());
   }
 }
