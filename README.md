@@ -14,7 +14,7 @@ of APIs under a specific context. The login and signup routes are the only publi
 
 To build and run the app, the following requirements are needed:
 
-- Java 17+
+- Java 21+
 - Maven
 - Docker
 

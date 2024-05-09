@@ -131,6 +131,7 @@
               -Amapstruct.defaultComponentModel=spring
             </arg>
           </compilerArgs>
+          <parameters>true</parameters>
           <source>${java.version}</source>
           <target>${java.version}</target>
         </configuration>
@@ -282,13 +283,13 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <groupId>org.springframework.boot</groupId>
     <relativePath/>
-    <version>3.1.5</version> <!-- lookup parent from repository -->
+    <version>3.2.5</version> <!-- lookup parent from repository -->
   </parent>
   <properties>
     <apache-commons-lang3.version>3.14.0</apache-commons-lang3.version>
     <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
     <jacoco.version>0.8.12</jacoco.version>
-    <java.version>17</java.version>
+    <java.version>21</java.version>
     <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     <mapstruct.version>1.5.5.Final</mapstruct.version>
     <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
@@ -299,6 +300,6 @@
     <sonar.sources>src/main/java,src/main/resources</sonar.sources>
   </properties>
 
-  <version>0.5.0</version>
+  <version>0.6.0</version>
 
 </project>
