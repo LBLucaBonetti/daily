@@ -1,11 +1,12 @@
 package it.lbsoftware.daily.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractIntegrationTests;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,6 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.DefaultCsrfToken;
@@ -28,7 +28,7 @@ import org.springframework.security.web.csrf.DefaultCsrfToken;
 class CookieCsrfTokenRepositoryConfigurationTests extends DailyAbstractIntegrationTests {
 
   @Autowired private CookieCsrfTokenRepository cookieCsrfTokenRepository;
-  @Captor private ArgumentCaptor<String> csrfTokenCookieCaptor;
+  @Captor private ArgumentCaptor<Cookie> csrfTokenCookieCaptor;
 
   @Test
   @DisplayName("Should build a CSRF token with enhanced security")
@@ -47,11 +47,11 @@ class CookieCsrfTokenRepositoryConfigurationTests extends DailyAbstractIntegrati
     cookieCsrfTokenRepository.saveToken(csrfToken, mockHttpServletRequest, mockHttpServletResponse);
 
     // Then
-    verify(mockHttpServletResponse)
-        .addHeader(eq(HttpHeaders.SET_COOKIE), csrfTokenCookieCaptor.capture());
+    verify(mockHttpServletResponse).addCookie(csrfTokenCookieCaptor.capture());
     var csrfTokenCookie = csrfTokenCookieCaptor.getValue();
-    var expectedCsrfTokenCookie =
-        csrfCookieName + "=" + token + "; Path=/; Secure; SameSite=Strict";
-    assertEquals(expectedCsrfTokenCookie, csrfTokenCookie);
+    assertEquals(csrfCookieName, csrfTokenCookie.getName());
+    assertEquals(token, csrfTokenCookie.getValue());
+    assertTrue(csrfTokenCookie.getSecure());
+    assertEquals("Strict", csrfTokenCookie.getAttribute("SameSite"));
   }
 }

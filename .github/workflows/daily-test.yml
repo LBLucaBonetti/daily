@@ -15,8 +15,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'adopt'
+          java-version: '21'
+          distribution: 'corretto'
       - name: Test and analyze backend (bundle with frontend)
         env:
           TEST_SPRING_DATASOURCE_URL: jdbc:tc:postgresql:latest:///daily_develop
