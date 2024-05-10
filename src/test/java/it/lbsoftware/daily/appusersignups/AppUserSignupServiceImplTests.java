@@ -149,7 +149,7 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
     verify(bindingResult, times(1)).addError(any());
     verify(model, times(0)).addAttribute(eq(SIGNUP_SUCCESS), anyString());
     verify(appUserActivationService, times(0)).getActivationUri(any());
-    verify(emailService, times(0)).send(any(), any());
+    verify(emailService, times(0)).sendSynchronously(any(), any());
   }
 
   @Test
@@ -178,7 +178,7 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
     verify(bindingResult, times(0)).addError(any());
     verify(model, times(1)).addAttribute(eq(SIGNUP_SUCCESS), anyString());
     verify(appUserActivationService, times(1)).getActivationUri(activationCode);
-    verify(emailService, times(1)).send(any(), any());
+    verify(emailService, times(1)).sendSynchronously(any(), any());
   }
 
   @Test
@@ -199,7 +199,7 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
         .thenReturn(Optional.of(activationCode));
     var activationUri = "http://localhost/daily/" + ACTIVATIONS_VIEW + "/" + activationCode;
     when(appUserActivationService.getActivationUri(activationCode)).thenReturn(activationUri);
-    doThrow(new DailyEmailException()).when(emailService).send(any(), any());
+    doThrow(new DailyEmailException()).when(emailService).sendSynchronously(any(), any());
 
     // When
     appUserSignupService.signup(appUserDto, bindingResult, model);
@@ -209,6 +209,6 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
     verify(bindingResult, times(1)).addError(any());
     verify(model, times(0)).addAttribute(eq(SIGNUP_SUCCESS), anyString());
     verify(appUserActivationService, times(1)).getActivationUri(activationCode);
-    verify(emailService, times(1)).send(any(), any());
+    verify(emailService, times(1)).sendSynchronously(any(), any());
   }
 }

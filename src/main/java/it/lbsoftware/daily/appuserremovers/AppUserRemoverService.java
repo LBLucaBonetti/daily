@@ -8,6 +8,7 @@ import static it.lbsoftware.daily.config.Constants.REMOVAL_THRESHOLD_DAYS;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserRepository;
+import it.lbsoftware.daily.appusers.AppUserUtils;
 import it.lbsoftware.daily.appusersettings.AppUserSettingRepository;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.emails.EmailInfo;
@@ -17,7 +18,6 @@ import it.lbsoftware.daily.notes.NoteRepository;
 import it.lbsoftware.daily.tags.TagRepository;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Service;
@@ -68,15 +68,14 @@ public class AppUserRemoverService {
             + "; attempt #"
             + (appUserRemovalInformation.getFailures() + 1));
     try {
-      emailService.send(
+      emailService.sendSynchronously(
           new EmailInfo(
               Constants.EMAIL_APP_USER_REMOVAL_NOTIFICATION_PATH,
               email,
               Constants.EMAIL_APP_USER_REMOVAL_NOTIFICATION_SUBJECT),
           Map.of(
               "appUserFirstName",
-              Optional.ofNullable(appUser.getFirstName())
-                  .orElse(Constants.APP_USER_UNSPECIFIED_NAME),
+              AppUserUtils.getFirstNameOrDefault(appUser),
               "hoursBeforeRemoval",
               REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS * 24));
       appUserRemovalInformation.setNotifiedAt(LocalDateTime.now());

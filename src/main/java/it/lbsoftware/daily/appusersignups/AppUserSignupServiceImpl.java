@@ -76,7 +76,7 @@ public class AppUserSignupServiceImpl implements AppUserSignupService {
 
   private boolean sendActivationEmail(final AppUserDto appUserDto, final UUID activationCode) {
     try {
-      emailService.send(
+      emailService.sendSynchronously(
           new EmailInfo(
               Constants.EMAIL_APP_USER_ACTIVATION_PATH,
               appUserDto.getEmail(),

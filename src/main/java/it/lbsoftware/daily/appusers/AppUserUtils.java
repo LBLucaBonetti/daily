@@ -4,7 +4,10 @@ import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.DAILY;
 import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.GOOGLE;
 
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
+import it.lbsoftware.daily.config.Constants;
+import java.util.Optional;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 
 public final class AppUserUtils {
 
@@ -45,5 +48,18 @@ public final class AppUserUtils {
    */
   public static boolean isDailyAuthProvider(final AuthProvider authProvider) {
     return !isOauth2AuthProvider(authProvider);
+  }
+
+  /**
+   * Retrieves the app user first name or a default one if missing
+   *
+   * @param appUser The source app user
+   * @return The app user first name or a default one if missing
+   */
+  public static String getFirstNameOrDefault(final AppUser appUser) {
+    return Optional.ofNullable(appUser)
+        .map(AppUser::getFirstName)
+        .filter(StringUtils::isNotBlank)
+        .orElse(Constants.APP_USER_UNSPECIFIED_NAME);
   }
 }

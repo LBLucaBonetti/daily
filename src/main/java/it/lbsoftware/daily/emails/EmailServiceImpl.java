@@ -27,8 +27,17 @@ public class EmailServiceImpl implements EmailService {
   private final JavaMailSender javaMailSender;
 
   @Override
+  public void sendSynchronously(final EmailInfo emailInfo, final Map<String, Object> context) {
+    send(emailInfo, context);
+  }
+
+  @Override
   @Async
-  public void send(EmailInfo emailInfo, Map<String, Object> context) {
+  public void sendAsynchronously(final EmailInfo emailInfo, final Map<String, Object> context) {
+    send(emailInfo, context);
+  }
+
+  private void send(final EmailInfo emailInfo, final Map<String, Object> context) {
     try {
       sendEmail(emailInfo, context);
     } catch (Exception e) {
@@ -37,7 +46,8 @@ public class EmailServiceImpl implements EmailService {
     }
   }
 
-  private void sendEmail(@NonNull EmailInfo emailInfo, @NonNull Map<String, Object> context)
+  private void sendEmail(
+      @NonNull final EmailInfo emailInfo, @NonNull final Map<String, Object> context)
       throws MessagingException {
     Context templateContext = prepareTemplateContext(emailInfo, context);
     String processedTemplate = templateEngine.process(emailInfo.templatePath(), templateContext);

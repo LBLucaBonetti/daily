@@ -9,12 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
+import it.lbsoftware.daily.config.Constants;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 
 class AppUserUtilsTests extends DailyAbstractUnitTests {
@@ -120,5 +122,46 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
 
     // Then
     assertFalse(res);
+  }
+
+  @Test
+  @DisplayName("Should return default first name when app user is null")
+  void test9() {
+    // Given
+    AppUser appUser = null;
+
+    // When
+    var res = AppUserUtils.getFirstNameOrDefault(appUser);
+
+    // Then
+    assertEquals(Constants.APP_USER_UNSPECIFIED_NAME, res);
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  @DisplayName("Should return default first name when app user is null")
+  void test10(final String firstName) {
+    // Given
+    AppUser appUser = AppUser.builder().firstName(firstName).build();
+
+    // When
+    var res = AppUserUtils.getFirstNameOrDefault(appUser);
+
+    // Then
+    assertEquals(Constants.APP_USER_UNSPECIFIED_NAME, res);
+  }
+
+  @Test
+  @DisplayName("Should return first name if app user is not null and first name is not blank")
+  void test11() {
+    // Given
+    var firstName = "FirstName";
+    var appUser = AppUser.builder().firstName(firstName).build();
+
+    // When
+    var res = AppUserUtils.getFirstNameOrDefault(appUser);
+
+    // Then
+    assertEquals(firstName, res);
   }
 }
