@@ -9,6 +9,7 @@ import it.lbsoftware.daily.appuseractivations.AppUserActivationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusersettings.AppUserSettingRepository;
+import it.lbsoftware.daily.config.DailyConfig;
 import it.lbsoftware.daily.emails.EmailService;
 import it.lbsoftware.daily.notes.NoteRepository;
 import it.lbsoftware.daily.tags.TagRepository;
@@ -28,6 +29,7 @@ class AppUserRemoverServiceTests extends DailyAbstractUnitTests {
   @Mock private AppUserRemovalInformationRepository appUserRemovalInformationRepository;
   @Mock private AppUserRepository appUserRepository;
   @Mock private EmailService emailService;
+  @Mock private DailyConfig dailyConfig;
   private AppUserRemoverService appUserRemoverService;
 
   @BeforeEach
@@ -40,7 +42,8 @@ class AppUserRemoverServiceTests extends DailyAbstractUnitTests {
             appUserSettingRepository,
             appUserRemovalInformationRepository,
             appUserRepository,
-            emailService);
+            emailService,
+            dailyConfig);
   }
 
   @Test
@@ -52,6 +55,7 @@ class AppUserRemoverServiceTests extends DailyAbstractUnitTests {
     var appUserRemovalInformation = AppUserRemovalInformation.builder().appUser(appUser).build();
     given(appUserRemovalInformationRepository.findByAppUser(appUser))
         .willReturn(Optional.of(appUserRemovalInformation));
+    given(dailyConfig.getBaseUri()).willReturn("baseUri");
 
     // When and then
     assertDoesNotThrow(() -> appUserRemoverService.notifyForRemovalAndRemove());

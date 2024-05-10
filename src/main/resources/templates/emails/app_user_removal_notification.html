@@ -29,6 +29,10 @@
       opacity: .25;
       margin: 1rem 0;
     }
+    .daily-link {
+      text-decoration: underline;
+      color: #ea580c;
+    }
 
   </style>
 </head>
@@ -39,8 +43,10 @@
   <p>Dear <span th:text="${appUserFirstName}"></span>,<br><br><br>It has been a while since you last
     logged in. Unfortunately, to keep running the app we need engaged and active users.
     Your account and your data will be completely deleted in <span
-        th:text="${hoursBeforeRemoval}"></span> hours if you do not perform access to
-    daily<br><br><br>Thanks,<br><br>The daily team
+        th:text="${hoursBeforeRemoval}"></span> hours if you do not perform access to <a
+        class="daily-link"
+        th:href="@{{baseUri}(baseUri=${baseUri})}">daily</a><br><br><br>Thanks,<br><br>The daily
+    team
   </p>
   <hr class="daily-hr">
   <small>If you received this email by mistake, you can safely ignore it</small>

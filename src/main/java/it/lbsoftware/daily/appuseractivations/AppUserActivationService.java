@@ -30,8 +30,6 @@ public interface AppUserActivationService {
    *
    * @param activationCode The activation code to create the activation URI with
    * @return The complete URI of the activation URI, ready to be sent to the user
-   * @implNote The caller should make sure an active request is being processed, so that a {@code
-   *     RequestAttributes} can be found
    */
   String getActivationUri(UUID activationCode);
 }

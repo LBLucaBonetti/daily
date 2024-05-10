@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appuseractivations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -13,18 +14,25 @@ import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.config.Constants;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 class AppUserActivationIntegrationTests extends DailyAbstractIntegrationTests {
 
   private static final String BASE_URL = Constants.ACTIVATION_PATH;
+
+  @Value("${daily.base-uri}")
+  private String baseUri;
+
   @Autowired private AppUserActivationRepository appUserActivationRepository;
   @Autowired private AppUserRepository appUserRepository;
+  @Autowired private AppUserActivationServiceImpl appUserActivationService;
 
   @BeforeEach
   void beforeEach() {
@@ -71,5 +79,19 @@ class AppUserActivationIntegrationTests extends DailyAbstractIntegrationTests {
     var appUserActivation = appUserActivationRepository.findAll().get(0);
     assertNotNull(appUserActivation.getActivatedAt());
     assertTrue(appUserRepository.findAll().get(0).isEnabled());
+  }
+
+  @Test
+  @DisplayName("Should get activation uri with injected value")
+  void test2() {
+    // Given
+    var activationCode = UUID.randomUUID();
+    var expectedUri = baseUri + "/" + Constants.ACTIVATIONS_VIEW + "/" + activationCode.toString();
+
+    // When
+    var res = appUserActivationService.getActivationUri(activationCode);
+
+    // Then
+    assertEquals(expectedUri, res);
   }
 }

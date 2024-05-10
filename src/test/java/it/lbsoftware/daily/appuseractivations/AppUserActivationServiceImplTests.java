@@ -13,6 +13,7 @@ import static org.mockito.BDDMockito.given;
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
+import it.lbsoftware.daily.config.DailyConfig;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,18 +22,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 class AppUserActivationServiceImplTests extends DailyAbstractUnitTests {
 
   @Mock private AppUserActivationRepository appUserActivationRepository;
+  @Mock private DailyConfig dailyConfig;
   private AppUserActivationServiceImpl appUserActivationService;
 
   @BeforeEach
   void beforeEach() {
-    appUserActivationService = new AppUserActivationServiceImpl(appUserActivationRepository);
+    appUserActivationService =
+        new AppUserActivationServiceImpl(appUserActivationRepository, dailyConfig);
   }
 
   @ParameterizedTest
@@ -69,19 +69,15 @@ class AppUserActivationServiceImplTests extends DailyAbstractUnitTests {
   @DisplayName("Should get activation uri")
   void test4() {
     // Given
-    var mockHttpServletRequest = new MockHttpServletRequest();
-    var prefix = mockHttpServletRequest.getRequestURL();
-    var baseUri = "/daily";
+    var baseUri = "http://localhost:8080";
     var activationCode = UUID.randomUUID();
-    mockHttpServletRequest.setContextPath(baseUri);
-    var servletRequestAttributes = new ServletRequestAttributes(mockHttpServletRequest);
-    RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+    given(dailyConfig.getBaseUri()).willReturn(baseUri);
 
     // When
     var res = appUserActivationService.getActivationUri(activationCode);
 
     // Then
-    assertEquals(prefix + baseUri + "/" + ACTIVATIONS_VIEW + "/" + activationCode.toString(), res);
+    assertEquals(baseUri + "/" + ACTIVATIONS_VIEW + "/" + activationCode, res);
   }
 
   @Test

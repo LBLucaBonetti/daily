@@ -4,6 +4,7 @@ import static it.lbsoftware.daily.appusers.AppUserUtils.isOauth2AuthProvider;
 
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.config.DailyConfig;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class AppUserActivationServiceImpl implements AppUserActivationService {
 
   private final AppUserActivationRepository appUserActivationRepository;
+  private final DailyConfig dailyConfig;
 
   @Override
   @Transactional
@@ -57,7 +59,7 @@ public class AppUserActivationServiceImpl implements AppUserActivationService {
     return Optional.ofNullable(activationCode)
         .map(
             (UUID appUserActivationCode) ->
-                ServletUriComponentsBuilder.fromCurrentContextPath()
+                UriComponentsBuilder.fromUriString(dailyConfig.getBaseUri())
                     .pathSegment(Constants.ACTIVATIONS_VIEW, appUserActivationCode.toString())
                     .build()
                     .encode()

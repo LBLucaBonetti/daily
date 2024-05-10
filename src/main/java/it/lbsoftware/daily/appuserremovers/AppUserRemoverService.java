@@ -11,6 +11,7 @@ import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusers.AppUserUtils;
 import it.lbsoftware.daily.appusersettings.AppUserSettingRepository;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.config.DailyConfig;
 import it.lbsoftware.daily.emails.EmailInfo;
 import it.lbsoftware.daily.emails.EmailService;
 import it.lbsoftware.daily.exceptions.DailyEmailException;
@@ -36,6 +37,7 @@ public class AppUserRemoverService {
   private final AppUserRemovalInformationRepository appUserRemovalInformationRepository;
   private final AppUserRepository appUserRepository;
   private final EmailService emailService;
+  private final DailyConfig dailyConfig;
 
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public void notifyForRemovalAndRemove() {
@@ -77,7 +79,9 @@ public class AppUserRemoverService {
               "appUserFirstName",
               AppUserUtils.getFirstNameOrDefault(appUser),
               "hoursBeforeRemoval",
-              REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS * 24));
+              REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS * 24,
+              "baseUri",
+              dailyConfig.getBaseUri()));
       appUserRemovalInformation.setNotifiedAt(LocalDateTime.now());
       log.info("Successfully notified for removal AppUser with e-mail " + email);
     } catch (DailyEmailException e) {
