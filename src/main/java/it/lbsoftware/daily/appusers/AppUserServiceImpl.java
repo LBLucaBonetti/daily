@@ -20,15 +20,19 @@ public class AppUserServiceImpl implements AppUserService {
   public InfoDto getAppUserInfo(@NonNull Object principal) {
     String fullName;
     String email;
-    if (principal instanceof OidcUser appUserOidcUser) {
-      fullName = appUserOidcUser.getFullName();
-      email = appUserOidcUser.getEmail();
-    } else if (principal instanceof AppUserDetails appUserDetails) {
-      fullName = appUserDetails.getFullname();
-      email = appUserDetails.getUsername();
-    } else {
-      log.warn("Invalid AppUser instance detected");
-      throw new IllegalStateException();
+    switch (principal) {
+      case OidcUser appUserOidcUser -> {
+        fullName = appUserOidcUser.getFullName();
+        email = appUserOidcUser.getEmail();
+      }
+      case AppUserDetails appUserDetails -> {
+        fullName = appUserDetails.getFullname();
+        email = appUserDetails.getUsername();
+      }
+      default -> {
+        log.warn("Invalid AppUser instance detected");
+        throw new IllegalStateException();
+      }
     }
     return new InfoDto(
         StringUtils.defaultIfBlank(fullName, StringUtils.EMPTY),
