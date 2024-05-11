@@ -100,4 +100,25 @@ class AppUserLoginEventListenerTests extends DailyAbstractUnitTests {
     verify(appUserRepository, times(1)).findByEmailIgnoreCase(email);
     assertThat(capturedOutput).contains("AppUser with e-mail " + email + " not found");
   }
+
+  @Test
+  @DisplayName(
+      "Should not set last login on login event when AppUserRemovalInformation is not found")
+  void test4(final CapturedOutput capturedOutput) {
+    // Given
+    var email = "user@email.com";
+    var event = new AppUserLoginEvent(email);
+    var appUser = AppUser.builder().email(email).build();
+    when(appUserRepository.findByEmailIgnoreCase(email)).thenReturn(Optional.of(appUser));
+    when(appUserRemovalInformationRepository.findByAppUser(appUser)).thenReturn(Optional.empty());
+
+    // When
+    appUserLoginEventListener.onAppUserLoginEvent(event);
+
+    // Then
+    verify(appUserRepository, times(1)).findByEmailIgnoreCase(email);
+    verify(appUserRemovalInformationRepository, times(1)).findByAppUser(appUser);
+    assertThat(capturedOutput)
+        .contains("AppUserRemovalInformation for AppUser with e-mail " + email + " not found");
+  }
 }
