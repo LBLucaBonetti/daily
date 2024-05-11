@@ -34,6 +34,7 @@ class AppUserActivationController {
                 model.addAttribute(
                     Constants.ACTIVATION_CODE_SUCCESS,
                     "Your account has been activated! You can now log in");
+                log.info("Activation code " + activationCode + " has been activated");
               } else {
                 log.info("Found an invalid activation code " + activationCode);
                 model.addAttribute(Constants.ACTIVATION_CODE_FAILURE, "Invalid activation code");

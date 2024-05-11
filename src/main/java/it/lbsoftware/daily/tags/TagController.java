@@ -33,6 +33,7 @@ class TagController {
   @PostMapping
   public ResponseEntity<TagDto> createTag(
       @Valid @RequestBody TagDto tagDto, @AuthenticationPrincipal Object principal) {
+    log.info("POST request to /api/tags; parameters: %s".formatted(tagDto.toString()));
     TagDto createdTagDto = tagService.createTag(tagDto, appUserService.getAppUser(principal));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdTagDto);
@@ -41,6 +42,7 @@ class TagController {
   @GetMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> readTag(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
+    log.info("GET request to /api/tags/%s".formatted(uuid.toString()));
     return tagService
         .readTag(uuid, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
@@ -50,6 +52,7 @@ class TagController {
   @GetMapping
   public ResponseEntity<PageDto<TagDto>> readTags(
       Pageable pageable, @AuthenticationPrincipal Object principal) {
+    log.info("GET request to /api/tags with paging");
     Page<TagDto> readTags;
     try {
       readTags = tagService.readTags(pageable, appUserService.getAppUser(principal));
@@ -67,6 +70,9 @@ class TagController {
       @PathVariable("uuid") UUID uuid,
       @Valid @RequestBody TagDto tagDto,
       @AuthenticationPrincipal Object principal) {
+    log.info(
+        "PUT request to /api/tags/%s; parameters: %s"
+            .formatted(uuid.toString(), tagDto.toString()));
     return tagService
         .updateTag(uuid, tagDto, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
@@ -76,6 +82,7 @@ class TagController {
   @DeleteMapping(value = "/{uuid}")
   public ResponseEntity<TagDto> deleteTag(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
+    log.info("DELETE request to /api/tags/%s".formatted(uuid.toString()));
     tagService.deleteTag(uuid, appUserService.getAppUser(principal));
 
     return ResponseEntity.noContent().build();

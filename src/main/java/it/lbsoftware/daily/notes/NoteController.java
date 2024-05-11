@@ -35,6 +35,7 @@ class NoteController {
   @PostMapping
   public ResponseEntity<NoteDto> createNote(
       @Valid @RequestBody NoteDto noteDto, @AuthenticationPrincipal Object principal) {
+    log.info("POST request to /api/notes; parameters: %s".formatted(noteDto.toString()));
     NoteDto createdNoteDto = noteService.createNote(noteDto, appUserService.getAppUser(principal));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdNoteDto);
@@ -43,6 +44,7 @@ class NoteController {
   @GetMapping(value = "/{uuid}")
   public ResponseEntity<NoteDto> readNote(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
+    log.info("GET request to /api/notes/%s".formatted(uuid.toString()));
     return noteService
         .readNote(uuid, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
@@ -52,6 +54,7 @@ class NoteController {
   @GetMapping
   public ResponseEntity<PageDto<NoteDto>> readNotes(
       Pageable pageable, @AuthenticationPrincipal Object principal) {
+    log.info("GET request to /api/notes with paging");
     Page<NoteDto> readNotes;
     try {
       readNotes = noteService.readNotes(pageable, appUserService.getAppUser(principal));
@@ -69,6 +72,9 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @Valid @RequestBody NoteDto noteDto,
       @AuthenticationPrincipal Object principal) {
+    log.info(
+        "PUT request to /api/notes/%s; parameters: %s"
+            .formatted(uuid.toString(), noteDto.toString()));
     return noteService
         .updateNote(uuid, noteDto, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
@@ -78,6 +84,7 @@ class NoteController {
   @DeleteMapping(value = "/{uuid}")
   public ResponseEntity<NoteDto> deleteNote(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
+    log.info("DELETE request to /api/notes/%s".formatted(uuid.toString()));
     noteService.deleteNote(uuid, appUserService.getAppUser(principal));
 
     return ResponseEntity.noContent().build();
@@ -88,6 +95,7 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @PathVariable("tagUuid") UUID tagUuid,
       @AuthenticationPrincipal Object principal) {
+    log.info("PUT request to /api/notes/%s/tags/%s".formatted(uuid.toString(), tagUuid.toString()));
     noteService.addTagToNote(uuid, tagUuid, appUserService.getAppUser(principal));
 
     return ResponseEntity.noContent().build();
@@ -98,6 +106,8 @@ class NoteController {
       @PathVariable("uuid") UUID uuid,
       @PathVariable("tagUuid") UUID tagUuid,
       @AuthenticationPrincipal Object principal) {
+    log.info(
+        "DELETE request to /api/notes/%s/tags/%s".formatted(uuid.toString(), tagUuid.toString()));
     noteService.removeTagFromNote(uuid, tagUuid, appUserService.getAppUser(principal));
 
     return ResponseEntity.noContent().build();
@@ -106,6 +116,7 @@ class NoteController {
   @GetMapping(value = "/{uuid}/tags")
   public ResponseEntity<Set<TagDto>> readNoteTags(
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
+    log.info("GET request to /api/notes/%s/tags".formatted(uuid.toString()));
     return noteService
         .readNoteTags(uuid, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)

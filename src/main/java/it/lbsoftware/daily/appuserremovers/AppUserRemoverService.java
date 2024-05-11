@@ -48,9 +48,12 @@ public class AppUserRemoverService {
 
   private void notifyForRemoval(final LocalDateTime now) {
     var removalNotificationThreshold = now.minusDays(REMOVAL_NOTIFICATION_THRESHOLD_DAYS);
-    appUserRepository
-        .findToNotifyForRemoval(removalNotificationThreshold)
-        .forEach(this::notifyForRemoval);
+    var appUsersToNotifyForRemoval =
+        appUserRepository.findToNotifyForRemoval(removalNotificationThreshold);
+    log.info(
+        "Found %s AppUser records to notify for removal"
+            .formatted(appUsersToNotifyForRemoval.size()));
+    appUsersToNotifyForRemoval.forEach(this::notifyForRemoval);
   }
 
   private void notifyForRemoval(final AppUser appUser) {
@@ -83,7 +86,10 @@ public class AppUserRemoverService {
               "baseUri",
               dailyConfig.getBaseUri()));
       appUserRemovalInformation.setNotifiedAt(LocalDateTime.now());
-      log.info("Successfully notified for removal AppUser with e-mail " + email);
+      log.info(
+          "The AppUser with e-mail "
+              + email
+              + " has been successfully notified for removal from daily");
     } catch (DailyEmailException e) {
       appUserRemovalInformation.setFailures(appUserRemovalInformation.getFailures() + 1);
       if (appUserRemovalInformation.getFailures() >= FAILURES_THRESHOLD) {
@@ -94,9 +100,9 @@ public class AppUserRemoverService {
                 + " has reached its limit; the AppUser will be marked for removal anyway");
       } else {
         log.error(
-            "Could not notify for removal AppUser with e-mail "
+            "The AppUser with e-mail "
                 + email
-                + "; will try again next time");
+                + " could not be notified for removal; another attempt will be made next time");
       }
     }
     appUserRemovalInformationRepository.saveAndFlush(appUserRemovalInformation);
@@ -105,25 +111,34 @@ public class AppUserRemoverService {
   private void remove(final LocalDateTime now) {
     var removalThreshold = now.minusDays(REMOVAL_THRESHOLD_DAYS);
     var removalNotificationThreshold = now.minusDays(REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS);
-    appUserRepository
-        .findToRemove(removalThreshold, removalNotificationThreshold)
-        .forEach(this::remove);
+    var appUsersToRemove =
+        appUserRepository.findToRemove(removalThreshold, removalNotificationThreshold);
+    log.info("Found %s AppUser records to remove".formatted(appUsersToRemove.size()));
+    appUsersToRemove.forEach(this::remove);
   }
 
   private void remove(final AppUser appUser) {
     var email = appUser.getEmail();
-    // Remove tags
-    tagRepository.deleteByAppUser(appUser);
-    // Remove notes
-    noteRepository.deleteByAppUser(appUser);
-    // Remove activation
-    appUserActivationRepository.deleteByAppUser(appUser);
-    // Remove settings
-    appUserSettingRepository.deleteByAppUser(appUser);
-    // Remove removal information
-    appUserRemovalInformationRepository.deleteByAppUser(appUser);
-    // Remove app user
-    appUserRepository.delete(appUser);
-    log.info("The AppUser with e-mail " + email + " has been completely removed from daily");
+    log.info("Trying to remove AppUser with e-mail " + email);
+    try {
+      // Remove tags
+      tagRepository.deleteByAppUser(appUser);
+      // Remove notes
+      noteRepository.deleteByAppUser(appUser);
+      // Remove activation
+      appUserActivationRepository.deleteByAppUser(appUser);
+      // Remove settings
+      appUserSettingRepository.deleteByAppUser(appUser);
+      // Remove removal information
+      appUserRemovalInformationRepository.deleteByAppUser(appUser);
+      // Remove app user
+      appUserRepository.delete(appUser);
+      log.info("The AppUser with e-mail " + email + " has been successfully removed from daily");
+    } catch (Exception e) {
+      log.error(
+          "The AppUser with e-mail "
+              + email
+              + " could not be removed; another attempt will be made next time");
+    }
   }
 }
