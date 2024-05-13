@@ -58,15 +58,15 @@ public class AppUserRemoverService {
 
   private void notifyForRemoval(final AppUser appUser) {
     var email = appUser.getEmail();
-    var appUserRemovalInformation =
-        appUserRemovalInformationRepository
-            .findByAppUser(appUser)
-            .orElseThrow(
-                () -> {
-                  log.error(
-                      "Could not find AppUserRemovalInformation for AppUser with e-mail " + email);
-                  return new IllegalStateException();
-                });
+    var appUserRemovalInformationOptional =
+        appUserRemovalInformationRepository.findByAppUser(appUser);
+    AppUserRemovalInformation appUserRemovalInformation;
+    if (appUserRemovalInformationOptional.isPresent()) {
+      appUserRemovalInformation = appUserRemovalInformationOptional.get();
+    } else {
+      log.error("Could not find AppUserRemovalInformation for AppUser with e-mail " + email);
+      return;
+    }
     log.info(
         "Trying to notify for removal AppUser with e-mail "
             + email
