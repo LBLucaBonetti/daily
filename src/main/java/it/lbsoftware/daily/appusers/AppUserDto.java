@@ -24,9 +24,8 @@ public class AppUserDto {
       message =
           Constants
               .NOT_BLANK_MESSAGE) // This is only used to produce the same invalid message the other
-  // fields produce; it is
-  // not strictly required since the @Email annotation would not accept a blank string
-  // anyway
+  // fields produce; it is not strictly required since the @Email annotation would not accept a
+  // blank string anyway
   private String email;
 
   @NotBlank(message = Constants.NOT_BLANK_MESSAGE)

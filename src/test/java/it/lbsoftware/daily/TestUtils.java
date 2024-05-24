@@ -38,7 +38,7 @@ public final class TestUtils {
   }
 
   /**
-   * Deletes all data from the default, hardcoded table names
+   * Deletes all data from the default, hardcoded table names.
    *
    * @param jdbcTemplate The jdbc handle instance to operate on
    * @return The number of deleted rows
@@ -49,7 +49,7 @@ public final class TestUtils {
 
   /**
    * Configures a mocked OpenID Connect login with an app user whose id token contains a sub claim
-   * with the provided appUser as value
+   * with the provided appUser as value.
    *
    * @param appUser UUID that will be used as the sub claim of the id token for the mocked app user
    * @return The configured RequestPostProcessor to be used to configure a MockMvc instance
@@ -60,13 +60,13 @@ public final class TestUtils {
 
   /**
    * Configures a mocked OpenID Connect login with an app user whose id token contains a sub claim
-   * with the provided appUser as value, a name claim with the provided fullName and an email claim
-   * with the provided email
+   * with the provided appUser as value, a name claim with the provided fullName and an e-mail claim
+   * with the provided e-mail.
    *
    * @param appUser UUID that will be used as the sub claim of the id token for the mocked app user
    * @param fullName String that will be used as the name claim of the id token for the mocked app
    *     user
-   * @param email String that will be used as the email claim of the id token for the mocked app
+   * @param email String that will be used as the e-mail claim of the id token for the mocked app
    *     user
    * @return The configured RequestPostProcessor to be used to configure a MockMvc instance
    */
@@ -82,7 +82,7 @@ public final class TestUtils {
   }
 
   /**
-   * Deletes all data from the defined caches
+   * Deletes all data from the defined caches.
    *
    * @param cacheManager The cache manager instance to operate on
    */
@@ -99,7 +99,7 @@ public final class TestUtils {
    * test class extends {@code DailyAbstractIntegrationTests}, it is considered an integration tests
    * class. Note that if the test class name does not correspond to the class it refers to (and
    * tests methods of), the displayed name could be inappropriate. The default display name will be
-   * composed of the test class name without the {@code SUFFIX} and a generic suffix
+   * composed of the test class name without the {@code SUFFIX} and a generic suffix.
    */
   public static class DailyDisplayNameGenerator extends DisplayNameGenerator.Standard {
 

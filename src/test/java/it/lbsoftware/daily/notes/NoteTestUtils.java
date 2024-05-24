@@ -12,11 +12,11 @@ public final class NoteTestUtils {
   }
 
   /**
-   * NoteDto generator
+   * {@link NoteDto} generator.
    *
    * @param uuid Unique identifier
    * @param text Text content
-   * @return The created NoteDto
+   * @return The created {@link NoteDto}
    */
   public static NoteDto createNoteDto(final UUID uuid, final String text) {
     NoteDto noteDto = new NoteDto();
@@ -26,12 +26,12 @@ public final class NoteTestUtils {
   }
 
   /**
-   * Note generator; the created instance is not persisted
+   * {@link Note} generator; the created instance is not persisted.
    *
    * @param text Text content
    * @param tags Tags set
    * @param appUser The creator
-   * @return The created Note
+   * @return The created {@link Note}
    */
   public static Note createNote(final String text, final Set<Tag> tags, final AppUser appUser) {
     return Note.builder().text(text).tags(tags).appUser(appUser).build();

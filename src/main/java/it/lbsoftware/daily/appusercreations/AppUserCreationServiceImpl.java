@@ -95,11 +95,11 @@ public class AppUserCreationServiceImpl implements AppUserCreationService {
   }
 
   /**
-   * Updates an OAuth2 {@code AppUser} with the provided data; this method assumes the {@code
+   * Updates an OAuth2 {@link AppUser} with the provided data; this method assumes the {@link
    * AppUser} already existed and update data has already been validated.
    *
-   * @param appUser The {@code AppUser} to update
-   * @param appUserDto The new data to update the {@code AppUser} with
+   * @param appUser The {@link AppUser} to update
+   * @param appUserDto The new data to update the {@link AppUser} with
    */
   private void updateOauth2AppUser(final AppUser appUser, final AppUserDto appUserDto) {
     var previousEmail = appUser.getEmail();
