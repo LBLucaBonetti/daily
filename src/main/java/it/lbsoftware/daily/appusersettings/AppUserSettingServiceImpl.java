@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Main {@link AppUserSetting} service implementation. */
 @Service
 @RequiredArgsConstructor
 public class AppUserSettingServiceImpl implements AppUserSettingService {

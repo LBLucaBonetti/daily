@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/** A {@link UserDetailsService} custom implementation to handle {@link AppUser} entities. */
 @Service
 @RequiredArgsConstructor
 public class AppUserDetailsService implements UserDetailsService {

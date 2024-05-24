@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Service class for {@link AppUser} entities. */
 @Service
 @RequiredArgsConstructor
 @CommonsLog

@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** The {@link AppUser} settings entity. Every {@link AppUser} has one settings entry. */
 @Table(
     name = "app_user_setting",
     indexes = {

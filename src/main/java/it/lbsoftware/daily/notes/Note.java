@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** The note entity. */
 @Table(
     indexes = {
       @Index(name = "idx_note_uuid", columnList = "uuid"),

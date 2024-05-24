@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/** Main {@link AppUserSetting} repository. */
 public interface AppUserSettingRepository extends JpaRepository<AppUserSetting, Long> {
 
   Optional<AppUserSetting> findByAppUser(AppUser appUser);

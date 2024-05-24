@@ -1,7 +1,5 @@
 package it.lbsoftware.daily.appusersignups;
 
-import static it.lbsoftware.daily.appusers.AppUserUtils.getAuthProvider;
-import static it.lbsoftware.daily.appusers.AppUserUtils.isOauth2AuthProvider;
 import static it.lbsoftware.daily.config.Constants.SIGNUP_SUCCESS;
 import static it.lbsoftware.daily.templates.TemplateUtils.addErrorToView;
 
@@ -19,11 +17,11 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+/** Main {@link it.lbsoftware.daily.appusers.AppUser} signup service implementation. */
 @Service
 @RequiredArgsConstructor
 @CommonsLog
@@ -45,18 +43,7 @@ public class AppUserSignupServiceImpl implements AppUserSignupService {
       addErrorToView(bindingResult, "Passwords should match");
       return;
     }
-    // 3. E-mail should not be OAuth2 (users should use the login screen link to perform login with
-    // their OAuth2 e-mail address)
-    var oauth2Provider = getAuthProvider(appUserDto.getEmail());
-    if (isOauth2AuthProvider(oauth2Provider)) {
-      addErrorToView(
-          bindingResult,
-          "You are not allowed to sign up with the provided e-mail address. Go back to the login page and use the "
-              + StringUtils.capitalize(StringUtils.toRootLowerCase(oauth2Provider.toString()))
-              + " link to log in");
-      return;
-    }
-    // 4. If the e-mail is not taken, creation can be performed
+    // 3. If the e-mail is not taken, creation can be performed
     appUserCreationService
         .createDailyAppUser(appUserDto)
         .ifPresentOrElse(

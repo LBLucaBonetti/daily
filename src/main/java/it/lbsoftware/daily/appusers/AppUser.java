@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
+/** The app user entity represents a user of the app. */
 @Table(
     name = "app_user",
     indexes = {
@@ -64,10 +65,22 @@ public class AppUser extends BaseEntity {
   private boolean enabled;
 
   /**
-   * Indicates the last successful login for this app user; if null, the app user never logged in
+   * Indicates the last successful login for this app user; if null, the app user never logged in.
    */
   @Column private LocalDateTime lastLoginAt;
 
+  /**
+   * Main constructor with meaningful params.
+   *
+   * @param authProviderId The auth provider id, unique in the realm of the chosen auth provider
+   * @param authProvider The auth provider, either DAILY or OAuth2
+   * @param email The e-mail, constrained to be unique
+   * @param password The password
+   * @param firstName The first name
+   * @param lastName The last name
+   * @param enabled Whether the app user is enabled
+   * @param lastLoginAt The last login time
+   */
   public AppUser(
       String authProviderId,
       AuthProvider authProvider,
@@ -105,11 +118,16 @@ public class AppUser extends BaseEntity {
     return super.hashCode();
   }
 
+  /**
+   * Auth providers are either OAuth2 providers or Daily (the app). This allows app users to sign up
+   * either via OAuth2 or via e-mail and password.
+   */
   public enum AuthProvider {
     DAILY,
     GOOGLE
   }
 
+  /** {@link AppUser} builder. */
   public static class AppUserBuilder {
 
     private String email;

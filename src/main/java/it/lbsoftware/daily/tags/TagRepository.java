@@ -10,10 +10,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/** Main {@link Tag} repository. */
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
   /**
-   * Finds a tag by its uuid and AppUser
+   * Finds a tag by its uuid and AppUser.
    *
    * @param uuid Tag uuid
    * @param appUser The appUser
@@ -22,7 +23,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
   Optional<Tag> findByUuidAndAppUser(UUID uuid, AppUser appUser);
 
   /**
-   * Finds tags by their AppUser
+   * Finds tags by their AppUser.
    *
    * @param pageable Pagination and sorting object
    * @param appUser The appUser
@@ -31,7 +32,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
   Page<Tag> findByAppUser(Pageable pageable, AppUser appUser);
 
   /**
-   * Finds a tag by its uuid and AppUser fetching the associated notes
+   * Finds a tag by its uuid and AppUser fetching the associated notes.
    *
    * @param uuid Tag uuid
    * @param appUser The appUser

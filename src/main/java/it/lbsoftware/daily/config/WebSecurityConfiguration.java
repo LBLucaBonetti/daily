@@ -26,6 +26,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+/** Web security configurations. */
 @Configuration
 @AllArgsConstructor
 public class WebSecurityConfiguration {

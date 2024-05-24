@@ -2,6 +2,7 @@ package it.lbsoftware.daily.config;
 
 import java.util.List;
 
+/** Application-specific constants. */
 public final class Constants {
 
   public static final String REDIRECT = "redirect:/";

@@ -21,10 +21,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Main app user creation service implementation. */
 @Service
 @RequiredArgsConstructor
 @CommonsLog
-class AppUserCreationServiceImpl implements AppUserCreationService {
+public class AppUserCreationServiceImpl implements AppUserCreationService {
 
   private final AppUserRepository appUserRepository;
   private final PasswordEncoder passwordEncoder;
@@ -35,7 +36,10 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
   @Override
   @Transactional
   public Optional<UUID> createDailyAppUser(@NonNull final AppUserDto appUserDto) {
-    if (appUserRepository.findByEmailIgnoreCase(appUserDto.getEmail()).isPresent()) {
+    var email = appUserDto.getEmail();
+    if (appUserRepository.findByEmailIgnoreCase(email).isPresent()) {
+      log.warn(
+          "Rejecting app user creation for e-mail %s because it is already taken".formatted(email));
       return Optional.empty();
     }
     var appUser = buildDailyAppUser(appUserDto);
@@ -92,7 +96,7 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
 
   /**
    * Updates an OAuth2 {@code AppUser} with the provided data; this method assumes the {@code
-   * AppUser} already existed and update data has already been validated
+   * AppUser} already existed and update data has already been validated.
    *
    * @param appUser The {@code AppUser} to update
    * @param appUserDto The new data to update the {@code AppUser} with
@@ -101,14 +105,27 @@ class AppUserCreationServiceImpl implements AppUserCreationService {
     var previousEmail = appUser.getEmail();
     var newEmail = appUserDto.getEmail();
     if (!previousEmail.equals(newEmail)) {
-      appUser.setEmail(newEmail);
-      log.info(
-          "The OAuth2 AppUser changed e-mail address from " + previousEmail + " to " + newEmail);
+      if (appUserRepository.findByEmailIgnoreCase(newEmail).isEmpty()) {
+        appUser.setEmail(newEmail);
+        log.info(
+            "The OAuth2 AppUser changed e-mail address from " + previousEmail + " to " + newEmail);
+      } else {
+        log.warn(
+            "Rejecting app user update from e-mail %s to %s because %s is already taken"
+                .formatted(previousEmail, newEmail, newEmail));
+        throw new IllegalArgumentException("Invalid e-mail address: " + newEmail);
+      }
     }
   }
 
   private void createOauth2AppUser(
       final AppUserDto appUserDto, final AuthProvider authProvider, final String authProviderId) {
+    var email = appUserDto.getEmail();
+    if (appUserRepository.findByEmailIgnoreCase(email).isPresent()) {
+      log.warn(
+          "Rejecting app user creation for e-mail %s because it is already taken".formatted(email));
+      throw new IllegalArgumentException("Invalid e-mail address: " + email);
+    }
     var appUser = buildOauth2AppUser(appUserDto, authProvider, authProviderId);
     var savedAppUser = appUserRepository.saveAndFlush(appUser);
     // Create settings

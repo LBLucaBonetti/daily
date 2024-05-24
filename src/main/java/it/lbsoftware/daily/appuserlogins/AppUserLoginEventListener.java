@@ -15,6 +15,7 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Listener class to handle {@link AppUser} login events. */
 @Component
 @RequiredArgsConstructor
 @CommonsLog
@@ -27,7 +28,7 @@ public class AppUserLoginEventListener {
 
   /**
    * This method is triggered by {@code DefaultAuthenticationEventPublisher} whenever an {@code
-   * AppUser} logs in
+   * AppUser} logs in.
    */
   @EventListener
   public void onAuthenticationSuccess(AuthenticationSuccessEvent authenticationSuccessEvent) {
@@ -39,7 +40,7 @@ public class AppUserLoginEventListener {
   }
 
   /**
-   * This method is triggered whenever an {@code AppUserLoginEvent} is published
+   * This method is triggered whenever an {@code AppUserLoginEvent} is published.
    *
    * @param loginEvent The login event that triggered this method call
    */

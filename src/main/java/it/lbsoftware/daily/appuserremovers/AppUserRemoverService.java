@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Deals with {@link AppUser} removal. */
 @Service
 @RequiredArgsConstructor
 @CommonsLog
@@ -39,6 +40,10 @@ public class AppUserRemoverService {
   private final EmailService emailService;
   private final DailyConfig dailyConfig;
 
+  /**
+   * Finds {@link AppUser} entities that should be notified for removal and notifies them; then
+   * finds the {@link AppUser} entities that were already notified and removes them.
+   */
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public void notifyForRemovalAndRemove() {
     var now = LocalDateTime.now();

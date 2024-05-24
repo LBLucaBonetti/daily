@@ -6,10 +6,11 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+/** Service to deal with {@link Tag} entities. */
 public interface TagService {
 
   /**
-   * Creates a tag
+   * Creates a tag.
    *
    * @param tag Tag object to be created
    * @param appUser The owner
@@ -18,7 +19,7 @@ public interface TagService {
   TagDto createTag(TagDto tag, AppUser appUser);
 
   /**
-   * Reads a tag
+   * Reads a tag.
    *
    * @param uuid Tag uuid
    * @param appUser The owner
@@ -27,7 +28,7 @@ public interface TagService {
   Optional<TagDto> readTag(UUID uuid, AppUser appUser);
 
   /**
-   * Reads tags
+   * Reads tags.
    *
    * @param pageable Pagination and sorting object
    * @param appUser The owner
@@ -36,7 +37,7 @@ public interface TagService {
   Page<TagDto> readTags(Pageable pageable, AppUser appUser);
 
   /**
-   * Updates a tag
+   * Updates a tag.
    *
    * @param uuid Tag uuid
    * @param tag Tag object with new data
@@ -46,7 +47,7 @@ public interface TagService {
   Optional<TagDto> updateTag(UUID uuid, TagDto tag, AppUser appUser);
 
   /**
-   * Deletes a tag
+   * Deletes a tag.
    *
    * @param uuid Tag uuid
    * @param appUser The owner

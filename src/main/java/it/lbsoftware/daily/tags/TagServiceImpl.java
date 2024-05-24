@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Main {@link Tag} service implementation. */
 @Service
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {

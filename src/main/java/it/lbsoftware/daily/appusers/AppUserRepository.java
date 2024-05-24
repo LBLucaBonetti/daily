@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/** Main repository to handle {@link AppUser} entities. */
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
   Optional<AppUser> findByEmailIgnoreCase(String email);

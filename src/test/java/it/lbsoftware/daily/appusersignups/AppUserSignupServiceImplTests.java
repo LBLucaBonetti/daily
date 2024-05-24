@@ -109,7 +109,7 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should return early when e-mail is from an OAuth2 provider")
+  @DisplayName("Should add error to view when daily app user creation fails")
   void test4() {
     // Given
     var appUserDto = mock(AppUserDto.class);
@@ -118,27 +118,6 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
     when(bindingResult.hasErrors()).thenReturn(false);
     when(appUserDto.getPassword()).thenReturn("password");
     when(appUserDto.getPasswordConfirmation()).thenReturn("password");
-    when(appUserDto.getEmail()).thenReturn("appuser@gmail.com");
-
-    // When
-    appUserSignupService.signup(appUserDto, bindingResult, model);
-
-    // Then
-    verify(appUserDto, times(1)).getEmail();
-    verify(appUserCreationService, times(0)).createDailyAppUser(appUserDto);
-  }
-
-  @Test
-  @DisplayName("Should add error to view when daily app user creation fails")
-  void test5() {
-    // Given
-    var appUserDto = mock(AppUserDto.class);
-    var bindingResult = mock(BindingResult.class);
-    var model = mock(Model.class);
-    when(bindingResult.hasErrors()).thenReturn(false);
-    when(appUserDto.getPassword()).thenReturn("password");
-    when(appUserDto.getPasswordConfirmation()).thenReturn("password");
-    when(appUserDto.getEmail()).thenReturn("appuser@email.com");
     when(appUserCreationService.createDailyAppUser(appUserDto)).thenReturn(Optional.empty());
 
     // When
@@ -154,7 +133,7 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
 
   @Test
   @DisplayName("Should send activation e-mail when daily app user creation succeeds")
-  void test6() {
+  void test5() {
     // Given
     var appUserDto = mock(AppUserDto.class);
     var bindingResult = mock(BindingResult.class);
@@ -184,7 +163,7 @@ class AppUserSignupServiceImplTests extends DailyAbstractUnitTests {
   @Test
   @DisplayName(
       "Should add error to view when daily app user creation succeeds but activation email is not sent")
-  void test7() {
+  void test6() {
     // Given
     var appUserDto = mock(AppUserDto.class);
     var bindingResult = mock(BindingResult.class);

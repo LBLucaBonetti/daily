@@ -1,14 +1,13 @@
 package it.lbsoftware.daily.appusers;
 
-import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.DAILY;
-import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.GOOGLE;
-
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.config.Constants;
 import java.util.Optional;
-import lombok.NonNull;
+import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
 
+/** Utilities for {@link AppUser} entities. */
+@CommonsLog
 public final class AppUserUtils {
 
   private AppUserUtils() {
@@ -16,21 +15,8 @@ public final class AppUserUtils {
   }
 
   /**
-   * Retrieves the {@code AuthProvider} from the provided e-mail address
-   *
-   * @param email The source e-mail address to retrieve the {@code AuthProvider} from
-   * @return The {@code AuthProvider}
-   */
-  public static AuthProvider getAuthProvider(@NonNull final String email) {
-    if (email.endsWith("@gmail.com")) {
-      return GOOGLE;
-    }
-    return DAILY;
-  }
-
-  /**
    * Determines whether the supplier auth provider is OAuth2; an app user is either an OAuth2 or a
-   * daily app user
+   * daily app user.
    *
    * @param authProvider The auth provider to check
    * @return True if the auth provider is OAuth2, false otherwise
@@ -41,7 +27,7 @@ public final class AppUserUtils {
 
   /**
    * Determines whether the supplier auth provider is daily; an app user is either an OAuth2 or a
-   * daily app user
+   * daily app user.
    *
    * @param authProvider The auth provider to check
    * @return True if the auth provider is daily, false otherwise
@@ -51,7 +37,7 @@ public final class AppUserUtils {
   }
 
   /**
-   * Retrieves the app user first name or a default one if missing
+   * Retrieves the app user first name or a default one if missing.
    *
    * @param appUser The source app user
    * @return The app user first name or a default one if missing
