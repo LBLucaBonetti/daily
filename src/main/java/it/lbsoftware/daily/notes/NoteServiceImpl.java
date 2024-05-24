@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Main {@link Note} service implementation. */
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = NOTE_CACHE)

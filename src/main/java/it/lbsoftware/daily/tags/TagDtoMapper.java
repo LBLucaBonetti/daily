@@ -3,6 +3,7 @@ package it.lbsoftware.daily.tags;
 import java.util.Set;
 import org.mapstruct.Mapper;
 
+/** Mapper for {@link Tag} entities. */
 @Mapper
 public interface TagDtoMapper {
 

@@ -17,6 +17,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+/** Base entity containing sensible common fields. */
 @MappedSuperclass
 @Getter
 public abstract class BaseEntity {
@@ -56,8 +57,12 @@ public abstract class BaseEntity {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!(obj instanceof BaseEntity that)) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof BaseEntity that)) {
+      return false;
+    }
     return getId() != null && Objects.equals(getId(), that.getId());
   }
 }

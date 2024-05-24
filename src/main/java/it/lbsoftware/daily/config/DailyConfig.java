@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+/** Application-specific configurations. */
 @Configuration
 @Getter
 public class DailyConfig {

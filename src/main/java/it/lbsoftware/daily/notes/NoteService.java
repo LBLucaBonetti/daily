@@ -8,10 +8,11 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+/** Service to deal with {@link Note} entities. */
 public interface NoteService {
 
   /**
-   * Creates a note
+   * Creates a note.
    *
    * @param note Note object to be created
    * @param appUser The owner
@@ -20,7 +21,7 @@ public interface NoteService {
   NoteDto createNote(NoteDto note, AppUser appUser);
 
   /**
-   * Reads a note
+   * Reads a note.
    *
    * @param uuid Note uuid
    * @param appUser The owner
@@ -29,7 +30,7 @@ public interface NoteService {
   Optional<NoteDto> readNote(UUID uuid, AppUser appUser);
 
   /**
-   * Reads notes
+   * Reads notes.
    *
    * @param pageable Pagination and sorting object
    * @param appUser The owner
@@ -38,7 +39,7 @@ public interface NoteService {
   Page<NoteDto> readNotes(Pageable pageable, AppUser appUser);
 
   /**
-   * Updates a note
+   * Updates a note.
    *
    * @param uuid Note uuid
    * @param note Note object with new data
@@ -48,7 +49,7 @@ public interface NoteService {
   Optional<NoteDto> updateNote(UUID uuid, NoteDto note, AppUser appUser);
 
   /**
-   * Deletes a note
+   * Deletes a note.
    *
    * @param uuid Note uuid
    * @param appUser The owner
@@ -56,7 +57,7 @@ public interface NoteService {
   void deleteNote(UUID uuid, AppUser appUser);
 
   /**
-   * Adds a tag to a note
+   * Adds a tag to a note.
    *
    * @param uuid Note uuid
    * @param tagUuid Tag uuid
@@ -65,7 +66,7 @@ public interface NoteService {
   void addTagToNote(UUID uuid, UUID tagUuid, AppUser appUser);
 
   /**
-   * Removes a tag from a note
+   * Removes a tag from a note.
    *
    * @param uuid Note uuid
    * @param tagUuid Tag uuid
@@ -74,7 +75,7 @@ public interface NoteService {
   void removeTagFromNote(UUID uuid, UUID tagUuid, AppUser appUser);
 
   /**
-   * Reads note tags
+   * Reads note tags.
    *
    * @param uuid Note uuid
    * @param appUser The owner

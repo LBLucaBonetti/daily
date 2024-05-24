@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/** {@link Tag} dto. */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)

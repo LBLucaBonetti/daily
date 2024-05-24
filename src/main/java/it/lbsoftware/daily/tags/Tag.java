@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** The tag entity. */
 @Table(
     indexes = {
       @Index(name = "idx_tag_uuid", columnList = "uuid"),
@@ -35,26 +36,20 @@ import lombok.Setter;
 @Builder
 public class Tag extends BaseEntity {
 
+  /** Display name for this tag. */
   @Column(nullable = false, length = Constants.TAG_NAME_MAX)
   @NotBlank
-  /*
-   Display name for this tag
-  */
   private String name;
 
+  /** Hex encoding string of the display color for this tag. */
   @Column(nullable = false)
   @NotNull
   @Pattern(regexp = Constants.TAG_COLOR_HEX_REGEXP)
-  /*
-   Hex encoding string of the display color for this tag
-  */
   private String colorHex;
 
+  /** Notes set with this tag. */
   @ManyToMany(mappedBy = "tags")
   @Builder.Default
-  /*
-   Notes set with this tag
-  */
   private Set<Note> notes = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -67,7 +62,7 @@ public class Tag extends BaseEntity {
   private AppUser appUser;
 
   /**
-   * Adds a tag to the specified note and vise versa
+   * Adds a tag to the specified note and vise versa.
    *
    * @param note Note object to link
    */
@@ -77,7 +72,7 @@ public class Tag extends BaseEntity {
   }
 
   /**
-   * Removes a tag from the specified note and vise versa
+   * Removes a tag from the specified note and vise versa.
    *
    * @param note Note object to unlink
    */

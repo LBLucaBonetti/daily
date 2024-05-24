@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
 
+/** Main e-mail service implementation. */
 @Service
 @RequiredArgsConstructor
 @CommonsLog
@@ -41,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
     try {
       sendEmail(emailInfo, context);
     } catch (Exception e) {
-      log.error("Problems sending the e-mail", e);
+      log.error("Problems sending the e-mail");
       throw new DailyEmailException();
     }
   }
