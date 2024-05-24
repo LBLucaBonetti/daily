@@ -7,12 +7,12 @@ public final class EmailTestUtils {
   }
 
   /**
-   * E-mail info generator
+   * {@link EmailInfo} generator.
    *
    * @param templatePath The template path
    * @param to The receiver of this e-mail
    * @param subject The subject for this e-mail
-   * @return The created e-mail info
+   * @return The created {@link EmailInfo}
    */
   public static EmailInfo createEmailInfo(
       final String templatePath, final String to, final String subject) {

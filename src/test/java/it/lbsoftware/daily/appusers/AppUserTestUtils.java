@@ -36,7 +36,7 @@ public final class AppUserTestUtils {
   }
 
   /**
-   * App user generator; the created instance is not persisted
+   * App user generator; the created instance is not persisted.
    *
    * @param idTokenClaims Key-value pairs for the id token claims; the sub claim is required
    * @return The created app user
@@ -46,7 +46,7 @@ public final class AppUserTestUtils {
   }
 
   /**
-   * App user generator; the created instance is not persisted
+   * App user generator; the created instance is not persisted.
    *
    * @param idTokenClaims Key-value pairs for the id token claims; the sub claim is required
    * @param authorities Strings representing the authorities this user will have
@@ -62,8 +62,8 @@ public final class AppUserTestUtils {
   }
 
   /**
-   * App user generator with default values; the created instance is persisted with the provided
-   * repository
+   * {@link AppUser} generator with default values; the created instance is persisted with the
+   * provided repository.
    *
    * @param appUserRepository Repository used to persist the created instance
    * @return The saved entity

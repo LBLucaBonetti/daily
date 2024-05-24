@@ -11,11 +11,11 @@ public final class AppUserActivationTestUtils {
   }
 
   /**
-   * {@code AppUserActivation} generator; the created instance is not persisted
+   * {@link AppUserActivation} generator; the created instance is not persisted.
    *
    * @param activationCode Activation code
    * @param appUser The creator
-   * @return The created {@code AppUserActivation}
+   * @return The created {@link AppUserActivation}
    */
   public static AppUserActivation createAppUserActivation(
       final UUID activationCode, final AppUser appUser) {
