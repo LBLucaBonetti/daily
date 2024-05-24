@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/** Main {@link AppUserActivation} service implementation. */
 @Service
 @RequiredArgsConstructor
 @CommonsLog

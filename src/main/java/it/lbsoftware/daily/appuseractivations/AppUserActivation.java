@@ -22,7 +22,7 @@ import lombok.Setter;
 /**
  * Contains the details regarding the {@link AppUser} activation. An {@link AppUser} who signed up
  * via email and password should activate its account before being able to log in. Note that OAuth2
- * app users are not required to activate their account as the OAuth2 provider is trusted
+ * app users are not required to activate their account as the OAuth2 provider is trusted.
  */
 @Table(
     name = "app_user_activation",

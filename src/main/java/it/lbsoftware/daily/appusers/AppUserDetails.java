@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+/** A {@link UserDetails} custom implementation to handle {@link AppUser} entities. */
 @RequiredArgsConstructor
 public class AppUserDetails implements UserDetails {
 

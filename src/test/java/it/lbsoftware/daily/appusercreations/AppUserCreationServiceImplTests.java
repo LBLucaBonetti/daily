@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusercreations;
 
+import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.DAILY;
 import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.GOOGLE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -262,6 +263,7 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     assertEquals(newEmail, appUser.getEmail());
+    verify(appUserRepository, times(1)).findByEmailIgnoreCase(newEmail);
   }
 
   @Test
@@ -284,5 +286,68 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     // Then
     assertEquals(email, appUser.getEmail());
     verify(appUser, times(0)).setEmail(any());
+    verify(appUserRepository, times(0)).findByEmailIgnoreCase(email);
+  }
+
+  @Test
+  @DisplayName("Should throw when update oauth2 app user with already-existent e-mail")
+  void test12() {
+    // Given
+    var newEmail = "newemail@gmail.com";
+    var appUserDto = new AppUserDto();
+    appUserDto.setEmail(newEmail);
+    var oldEmail = "oldemail@gmail.com";
+    var appUser = AppUser.builder().email(oldEmail).build();
+    var authProviderId = UUID.randomUUID().toString();
+    var authProvider = GOOGLE;
+    var alreadyExistentAppUser = AppUser.builder().email(newEmail).authProvider(DAILY).build();
+    given(appUserRepository.findByAuthProviderIdAndAuthProvider(authProviderId, authProvider))
+        .willReturn(Optional.of(appUser));
+    given(appUserRepository.findByEmailIgnoreCase(newEmail))
+        .willReturn(Optional.of(alreadyExistentAppUser));
+
+    // When
+    var res =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                appUserCreationService.createOrUpdateOauth2AppUser(
+                    appUserDto, authProvider, authProviderId));
+
+    // Then
+    assertNotNull(res);
+    assertEquals(oldEmail, appUser.getEmail());
+    verify(appUserRepository, times(1)).findByEmailIgnoreCase(newEmail);
+  }
+
+  @Test
+  @DisplayName("Should throw when create oauth2 app user with already-existent e-mail")
+  void test13() {
+    // Given
+    var email = "anemail@gmail.com";
+    var appUserDto = new AppUserDto();
+    appUserDto.setEmail(email);
+    var authProviderId = UUID.randomUUID().toString();
+    var authProvider = GOOGLE;
+    var alreadyExistentAppUser = AppUser.builder().email(email).authProvider(DAILY).build();
+    given(appUserRepository.findByAuthProviderIdAndAuthProvider(authProviderId, authProvider))
+        .willReturn(Optional.empty());
+    given(appUserRepository.findByEmailIgnoreCase(email))
+        .willReturn(Optional.of(alreadyExistentAppUser));
+
+    // When
+    var res =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                appUserCreationService.createOrUpdateOauth2AppUser(
+                    appUserDto, authProvider, authProviderId));
+
+    // Then
+    assertNotNull(res);
+    verify(appUserRepository, times(1)).findByEmailIgnoreCase(email);
+    verify(appUserRepository, times(0)).saveAndFlush(any());
+    verify(appUserSettingService, times(0)).createAppUserSettings(any(), any());
+    verify(appUserRemovalInformationRepository, times(0)).save(any());
   }
 }

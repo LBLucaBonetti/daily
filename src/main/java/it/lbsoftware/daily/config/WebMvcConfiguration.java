@@ -5,6 +5,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/** A {@link WebMvcConfigurer} custom implementation. */
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 

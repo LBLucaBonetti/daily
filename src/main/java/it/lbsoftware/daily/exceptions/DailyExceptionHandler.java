@@ -8,6 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * A container to define common exception mappings; each exception definition is bound to a specific
+ * HTTP status code.
+ */
 @ControllerAdvice
 public class DailyExceptionHandler {
 
@@ -29,6 +33,13 @@ public class DailyExceptionHandler {
         .body(getExceptionBody(exception.getMessage()));
   }
 
+  /**
+   * Composes a body consisting of the error key and a value of a default or provided error code.
+   *
+   * @param errorCode The error code to provide; it should start with a predefined constant
+   * @return A map with the error key and the error code as a value; the value is a default one if
+   *     the provided one is not valid
+   */
   public Map<String, Object> getExceptionBody(final String errorCode) {
     return Map.of(
         Constants.ERROR_KEY,

@@ -4,10 +4,11 @@ import it.lbsoftware.daily.appusers.AppUserDto;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+/** Front-facing service to deal with {@link it.lbsoftware.daily.appusers.AppUser} sign up. */
 public interface AppUserSignupService {
 
   /**
-   * Tries to sign a new {@code AppUser} up with the auth provider {@code DAILY}
+   * Tries to sign a new {@code AppUser} up with the auth provider {@code DAILY}.
    *
    * @param appUserDto The {@code AppUser} data
    * @param bindingResult The result of validating the provided {@code AppUser} data

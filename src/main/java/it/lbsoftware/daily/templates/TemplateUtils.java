@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
+/** Utilities to deal with templates. */
 public final class TemplateUtils {
 
   private static final String GLOBAL_ERRORS_KEY = "globalError";

@@ -10,10 +10,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/** Main {@link Note} repository. */
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
   /**
-   * Finds a note by its uuid and AppUser
+   * Finds a note by its uuid and AppUser.
    *
    * @param uuid Note uuid
    * @param appUser The appUser
@@ -22,7 +23,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
   Optional<Note> findByUuidAndAppUser(UUID uuid, AppUser appUser);
 
   /**
-   * Finds notes by their AppUser
+   * Finds notes by their AppUser.
    *
    * @param pageable Pagination and sorting object
    * @param appUser The appUser
@@ -31,7 +32,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
   Page<Note> findByAppUser(Pageable pageable, AppUser appUser);
 
   /**
-   * Finds a note by its uuid and AppUser fetching the associated tags
+   * Finds a note by its uuid and AppUser fetching the associated tags.
    *
    * @param uuid Note uuid
    * @param appUser Unique id of the appUser

@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Base dto to extend for meaningful dtos that require common {@link BaseEntity} fields. */
 @Getter
 @Setter
 @EqualsAndHashCode
