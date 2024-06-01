@@ -3,7 +3,6 @@ package it.lbsoftware.daily.config;
 import static it.lbsoftware.daily.config.Constants.CONTENT_SECURITY_POLICY;
 import static it.lbsoftware.daily.config.Constants.PERMISSIONS_POLICY;
 
-import it.lbsoftware.daily.appusers.AppUserDetailsService;
 import it.lbsoftware.daily.appusers.AppUserOidcUserService;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -33,8 +29,6 @@ public class WebSecurityConfiguration {
 
   private final CookieCsrfTokenRepository cookieCsrfTokenRepository;
   private final AppUserOidcUserService appUserOidcUserService;
-  private final AppUserDetailsService appUserDetailsService;
-  private final PasswordEncoder passwordEncoder;
 
   private String[] getAllowedPaths() {
     final List<String> allowedPaths = new ArrayList<>();
@@ -96,14 +90,6 @@ public class WebSecurityConfiguration {
                 .userInfoEndpoint(
                     userInfoEndpoint -> userInfoEndpoint.oidcUserService(appUserOidcUserService)));
     return http.build();
-  }
-
-  @Bean
-  AuthenticationProvider authenticationProvider() {
-    var authenticationProvider = new DaoAuthenticationProvider();
-    authenticationProvider.setPasswordEncoder(passwordEncoder);
-    authenticationProvider.setUserDetailsService(appUserDetailsService);
-    return authenticationProvider;
   }
 
   @Bean
