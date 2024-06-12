@@ -5,6 +5,7 @@
     :ripple="false"
     @click="logout()"
     :icon="heroOutline24ArrowRightOnRectangle"
+    class="text-1"
   ></q-btn>
   <form hidden :id="logoutFormId" method="post" action="/logout"></form>
 </template>

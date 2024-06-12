@@ -11,6 +11,18 @@ export default {
     edit: 'Modifica',
     delete: 'Cancella',
   },
+  pages: {
+    notes: { title: 'Note', subtitle: 'Annota ciò che desideri ricordare' },
+    tags: {
+      title: 'Tag',
+      subtitle:
+        'Etichette da associare per distinguere meglio le entità. Tocca un tag per modificarlo',
+    },
+    settings: {
+      title: 'Impostazioni',
+      subtitle: 'Le preferenze vengono salvate automaticamente',
+    },
+  },
   note: {
     placeholder: 'Scrivi qualcosa qui, poi salvalo',
     save: {
@@ -32,5 +44,56 @@ export default {
       error: 'Errore nel caricamento delle note',
     },
     created: 'Creata',
+  },
+  tag: {
+    name: {
+      placeholder: 'Scrivi qui il testo del tag, poi salvalo',
+    },
+    colorHex: {
+      placeholder: 'Scegli il colore',
+    },
+    save: {
+      button: 'Salva',
+      error: 'Errore nel salvataggio del tag',
+      ok: 'Il tag è stato salvato correttamente',
+      validation: {
+        name: {
+          empty: 'Il nome del tag non può essere vuoto',
+        },
+        colorHex: {
+          empty: 'Il colore del tag non può essere vuoto',
+        },
+      },
+    },
+    update: {
+      error: 'Errore di aggiornamento del tag',
+      ok: 'Il tag è stato aggiornato correttamente',
+      dialog: {
+        title: 'Aggiorna il tag',
+        confirm: 'Conferma',
+        cancel: 'Annulla',
+      },
+      confirm:
+        'Se il tag è associato a una o più entità, la modifica verrà propagata. Sei sicuro di voler continuare?',
+    },
+    delete: {
+      error: 'Errore nella cancellazione del tag',
+      ok: 'Il tag è stato cancellato correttamente',
+      confirm:
+        'Se elimini il tag, verranno eliminate anche tutte le associazioni alle entità che hai fatto. Vuoi continuare?',
+    },
+    addToNote: {
+      error: 'Errore di associazione del tag alla nota',
+      ok: 'Tag correttamente associato alla nota',
+      placeholder: 'Cerca tag da aggiungere',
+      noResults: 'Nessun tag disponibile trovato',
+    },
+    removeFromNote: {
+      error: 'Errore di rimozione del tag dalla nota',
+      ok: 'Tag correttamente rimosso dalla nota',
+    },
+    loading: {
+      error: 'Errore nel caricamento dei tag',
+    },
   },
 };

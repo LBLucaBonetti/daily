@@ -1,67 +1,87 @@
 <template>
-  <q-page class="text-1 w-sm-50" padding>
-    <q-input
-      outlined
-      autogrow
-      autofocus
-      clearable
-      input-class="text-1"
-      v-model="note"
-      :placeholder="$t('note.placeholder')"
-      counter
-      maxlength="255"
-      :rules="[(val) => validateNote(val, $t('note.save.validation.empty'))]"
-      lazy-rules="ondemand"
-      ref="noteInput"
-    >
-    </q-input>
-    <div class="row justify-end">
-      <q-btn
-        unelevated
-        padding="sm xl"
-        aria-label="Save note"
-        class="q-mt-sm bg-2 text-2"
-        @click="askConfirmationIfThereAreNotesInEditState"
-        :label="$t('note.save.button')"
-        ref="noteSaveBtn"
-        :loading="noteSaveBtnLoading"
-      ></q-btn>
-    </div>
+  <page-title
+    :translatedTitle="$t('pages.notes.title')"
+    :translatedSubtitle="$t('pages.notes.subtitle')"
+  ></page-title>
 
-    <q-infinite-scroll @load="onLoad" ref="infiniteScroll">
-      <note-card
-        v-for="note in notes"
-        :key="note.uuid"
-        @reload-notes="reloadNotes"
-        :note="note"
-      />
+  <q-input
+    outlined
+    autogrow
+    autofocus
+    clearable
+    input-class="text-1"
+    v-model="note"
+    :placeholder="$t('note.placeholder')"
+    counter
+    maxlength="255"
+    :rules="[(val) => validateNote(val, $t('note.save.validation.empty'))]"
+    lazy-rules="ondemand"
+    ref="noteInput"
+  >
+  </q-input>
+  <div class="row justify-end">
+    <q-btn
+      unelevated
+      padding="sm xl"
+      :aria-label="$t('note.save.button')"
+      class="q-mt-sm bg-2 text-2"
+      @click="askConfirmationIfThereAreNotesInEditState"
+      :label="$t('note.save.button')"
+      ref="noteSaveBtn"
+      :loading="noteSaveBtnLoading"
+    ></q-btn>
+  </div>
 
-      <template v-slot:loading>
-        <q-card class="q-mt-md bg-1 text-1" flat bordered>
-          <q-card-section class="q-pa-sm">
-            <q-skeleton type="text" class="note-skeleton-text"></q-skeleton>
-          </q-card-section>
+  <q-infinite-scroll @load="onLoad" ref="infiniteScroll">
+    <note-card
+      v-for="note in notes"
+      :key="note.uuid"
+      @reload-notes="reloadNotes"
+      :note="note"
+    />
 
-          <q-card-actions class="q-pa-sm" align="right">
-            <q-skeleton type="QBtn"></q-skeleton>
-            <q-skeleton type="QBtn" class="q-ml-sm"></q-skeleton>
-          </q-card-actions>
-        </q-card>
-      </template>
-    </q-infinite-scroll>
-  </q-page>
+    <template v-slot:loading>
+      <q-card class="q-mt-md bg-1 text-1" flat bordered>
+        <q-card-section class="q-pa-sm">
+          <q-skeleton type="text" class="note-skeleton-text"></q-skeleton>
+        </q-card-section>
+
+        <q-card-section class="q-pa-sm" horizontal>
+          <q-skeleton
+            type="text"
+            class="q-mr-md"
+            style="min-width: 2rem; border-radius: 4px"
+          ></q-skeleton>
+          <q-skeleton
+            type="text"
+            class="q-mx-md"
+            style="min-width: 1.5rem; border-radius: 4px"
+          ></q-skeleton>
+          <q-skeleton
+            type="text"
+            class="q-ml-md"
+            style="min-width: 3rem; border-radius: 4px"
+          ></q-skeleton>
+        </q-card-section>
+
+        <q-card-actions class="q-pa-sm">
+          <q-skeleton
+            type="text"
+            class="note-skeleton-text"
+            style="min-width: 8rem"
+          ></q-skeleton>
+          <q-space></q-space>
+          <q-skeleton type="QBtn"></q-skeleton>
+          <q-skeleton type="QBtn" class="q-ml-sm"></q-skeleton>
+        </q-card-actions>
+      </q-card>
+    </template>
+  </q-infinite-scroll>
 </template>
 
 <script setup lang="ts">
 import { AxiosError, AxiosResponse } from 'axios';
-import {
-  QBtn,
-  QInfiniteScroll,
-  QInput,
-  QPage,
-  QSkeleton,
-  useQuasar,
-} from 'quasar';
+import { QBtn, QInfiniteScroll, QInput, QSkeleton, useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
 import { ref } from 'vue';
 import NoteCard from '../components/NoteCard.vue';
@@ -73,6 +93,7 @@ import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { useNotesInEditStateStore } from 'src/stores/noteEditingStore';
 import { useI18n } from 'vue-i18n';
+import PageTitle from 'src/components/PageTitle.vue';
 
 const { t } = useI18n();
 const note = ref('');

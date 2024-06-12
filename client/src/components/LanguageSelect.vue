@@ -3,11 +3,10 @@
     v-model="locale"
     :options="props.localeOptions"
     :label="$t('language.label')"
-    dense
-    borderless
+    stack-label
+    outlined
     emit-value
     map-options
-    options-dense
     style="min-width: 150px"
   />
 </template>
