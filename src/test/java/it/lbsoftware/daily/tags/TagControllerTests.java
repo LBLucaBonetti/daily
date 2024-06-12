@@ -113,7 +113,7 @@ class TagControllerTests extends DailyAbstractUnitTests {
     given(tagService.readTags(pageable, APP_USER)).willReturn(readTags);
 
     // When
-    ResponseEntity<PageDto<TagDto>> res = tagController.readTags(pageable, appUser);
+    ResponseEntity<PageDto<TagDto>> res = tagController.readTags(pageable, appUser, null, null);
 
     // Then
     verify(appUserService, times(1)).getAppUser(appUser);
@@ -210,7 +210,8 @@ class TagControllerTests extends DailyAbstractUnitTests {
     // When
     DailyBadRequestException res =
         assertThrows(
-            DailyBadRequestException.class, () -> tagController.readTags(pageable, appUser));
+            DailyBadRequestException.class,
+            () -> tagController.readTags(pageable, appUser, null, null));
 
     // Then
     assertNotNull(res);

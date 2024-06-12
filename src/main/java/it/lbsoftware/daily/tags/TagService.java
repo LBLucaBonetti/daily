@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.tags;
 
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.search.SearchCriteriaRetriever;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ public interface TagService {
   Optional<TagDto> readTag(UUID uuid, AppUser appUser);
 
   /**
-   * Reads tags.
+   * Reads tags with pagination and no search filters.
    *
    * @param pageable Pagination and sorting object
    * @param appUser The owner
@@ -53,4 +54,14 @@ public interface TagService {
    * @param appUser The owner
    */
   void deleteTag(UUID uuid, AppUser appUser);
+
+  /**
+   * Reads tags with pagination and search filters.
+   *
+   * @param search A search criteria retriever for this entity
+   * @param pageable Pagination and sorting object
+   * @param appUser The owner
+   * @return Read tags or empty list
+   */
+  Page<TagDto> searchTags(SearchCriteriaRetriever<Tag> search, Pageable pageable, AppUser appUser);
 }

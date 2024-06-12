@@ -4,11 +4,14 @@ import static it.lbsoftware.daily.config.Constants.BASIC_SINGLE_ENTITY_CACHE_KEY
 import static it.lbsoftware.daily.config.Constants.DO_NOT_STORE_NULL_SPEL;
 import static it.lbsoftware.daily.config.Constants.NOTE_CACHE;
 import static it.lbsoftware.daily.config.Constants.TAG_CACHE;
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.contains;
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
 
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.notes.Note;
+import it.lbsoftware.daily.search.SearchCriteriaRetriever;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -17,6 +20,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -95,5 +100,20 @@ public class TagServiceImpl implements TagService {
       note.getTags().remove(tag);
     }
     tagRepository.delete(tag);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<TagDto> searchTags(
+      SearchCriteriaRetriever<Tag> searchCriteriaRetriever, Pageable pageable, AppUser appUser) {
+    var searchCriteria = searchCriteriaRetriever.get();
+    searchCriteria.setAppUser(appUser);
+    var exampleMatcher =
+        ExampleMatcher.matching()
+            .withIgnorePaths("version")
+            .withMatcher("name", contains().ignoreCase())
+            .withMatcher("colorHex", exact().ignoreCase());
+    var example = Example.of(searchCriteria, exampleMatcher);
+    return tagRepository.findAll(example, pageable).map(tagDtoMapper::convertToDto);
   }
 }

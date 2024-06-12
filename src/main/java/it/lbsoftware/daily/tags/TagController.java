@@ -3,6 +3,7 @@ package it.lbsoftware.daily.tags;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.exceptions.DailyBadRequestException;
+import it.lbsoftware.daily.search.SearchCriteriaRetriever;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -51,11 +53,21 @@ class TagController {
 
   @GetMapping
   public ResponseEntity<PageDto<TagDto>> readTags(
-      Pageable pageable, @AuthenticationPrincipal Object principal) {
+      Pageable pageable,
+      @AuthenticationPrincipal Object principal,
+      @RequestParam(value = "name", required = false) String name,
+      @RequestParam(value = "color-hex", required = false) String colorHex) {
+    SearchCriteriaRetriever<Tag> searchCriteria = new TagSearch(name, colorHex);
     log.info("GET request to /api/tags with paging");
     Page<TagDto> readTags;
     try {
-      readTags = tagService.readTags(pageable, appUserService.getAppUser(principal));
+      var appUser = appUserService.getAppUser(principal);
+      if (searchCriteria.isPopulated()) {
+        log.info("Search criteria: " + searchCriteria);
+        readTags = tagService.searchTags(searchCriteria, pageable, appUser);
+      } else {
+        readTags = tagService.readTags(pageable, appUser);
+      }
     } catch (Exception e) {
       log.error(e);
       throw new DailyBadRequestException(null);
