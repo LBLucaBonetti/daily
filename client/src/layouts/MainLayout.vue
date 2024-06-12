@@ -28,38 +28,56 @@
       overlay
       bordered
     >
-      <q-list>
-        <q-item-label class="poppins-regular" header> daily </q-item-label>
+      <q-list class="q-pt-lg">
+        <q-avatar
+          class="q-mx-md q-mb-md text-2 non-selectable"
+          color="primary"
+          size="72px"
+          >{{ fullNameCapitalizedFirstLetter }}</q-avatar
+        >
         <q-item class="justify-between items-center">
           <div>
-            <q-item-label class="text-1">{{ fullName }}</q-item-label>
+            <q-item-label class="text-1 text-bold">{{ fullName }}</q-item-label>
             <q-item-label class="text-1">{{ email }}</q-item-label>
           </div>
           <div>
             <logout-button />
           </div>
         </q-item>
-        <q-item
-          ><language-select
-            :locale-options="[
-              {
-                value: 'en-US',
-                label: $t('language.english'),
-                selected: language.language === 'en-US',
-              },
-              {
-                value: 'it',
-                label: $t('language.italian'),
-                selected: language.language === 'it',
-              },
-            ]"
-          ></language-select
-        ></q-item>
       </q-list>
+      <q-toolbar class="q-pt-lg">
+        <q-tabs
+          vertical
+          indicator-color="primary"
+          switch-indicator
+          class="text-1 col-grow"
+          active-color="primary"
+          inline-label
+        >
+          <page-selector
+            to="/notes"
+            svg-id="notes"
+            :translated-label="$t('pages.notes.title')"
+          ></page-selector>
+          <page-selector
+            to="/tags"
+            svg-id="tags"
+            :translated-label="$t('pages.tags.title')"
+          ></page-selector>
+
+          <page-selector
+            to="/settings"
+            svg-id="settings"
+            :translated-label="$t('pages.settings.title')"
+          ></page-selector>
+        </q-tabs>
+      </q-toolbar>
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <q-page class="text-1 w-sm-50" padding>
+        <router-view />
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
@@ -70,7 +88,7 @@ import { heroOutline24Bars3 } from 'quasar-extras-svg-icons/hero-icons-v2';
 import { api } from 'src/boot/axios';
 import { AxiosResponse } from 'axios';
 import LogoutButton from 'components/LogoutButton.vue';
-import LanguageSelect from 'src/components/LanguageSelect.vue';
+import PageSelector from 'src/components/PageSelector.vue';
 import InfoDto from 'src/interfaces/InfoDto';
 import { refreshPage } from 'src/utils/refresh-page';
 import {
@@ -83,10 +101,10 @@ import {
   QItemLabel,
   QItem,
   QPageContainer,
+  QPage,
 } from 'quasar';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { RouterView } from 'vue-router';
-import { useLanguageStore } from 'src/stores/languageStore';
 
 const leftDrawerOpen = ref(false);
 
@@ -96,7 +114,7 @@ function toggleLeftDrawer() {
 
 const fullName = ref('');
 const email = ref('');
-const language = useLanguageStore();
+const fullNameCapitalizedFirstLetter = ref('');
 
 onMounted(() => {
   // Get info
@@ -104,6 +122,9 @@ onMounted(() => {
     .get('/appusers/info')
     .then((res: AxiosResponse<InfoDto>) => {
       fullName.value = res.data.fullName;
+      fullNameCapitalizedFirstLetter.value = fullName.value
+        ? fullName.value.charAt(0).toUpperCase()
+        : '?';
       email.value = res.data.email;
     })
     .catch((err) => {

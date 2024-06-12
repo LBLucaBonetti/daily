@@ -83,3 +83,12 @@
     margin: auto;
   }
 }
+
+.text-sm-h2 {
+  @media (min-width: 600px) {
+    font-size: 3.75rem;
+    font-weight: 300;
+    line-height: 3.75rem;
+    letter-spacing: -.00833em;
+  }
+}

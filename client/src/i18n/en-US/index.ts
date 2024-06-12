@@ -11,6 +11,21 @@ export default {
     edit: 'Edit',
     delete: 'Delete',
   },
+  pages: {
+    notes: {
+      title: 'Notes',
+      subtitle: 'Take note of things you want to remember',
+    },
+    tags: {
+      title: 'Tags',
+      subtitle:
+        'Labels to associate to better distinguish entities. Touch a tag to edit it',
+    },
+    settings: {
+      title: 'Settings',
+      subtitle: 'Options are automatically saved',
+    },
+  },
   note: {
     placeholder: 'Write something here, then save it',
     save: {
@@ -32,5 +47,56 @@ export default {
       error: 'Error loading notes',
     },
     created: 'Created',
+  },
+  tag: {
+    name: {
+      placeholder: 'Write the tag text here, then save it',
+    },
+    colorHex: {
+      placeholder: 'Choose the color',
+    },
+    save: {
+      button: 'Save',
+      error: 'Error saving tag',
+      ok: 'Tag correctly saved',
+      validation: {
+        name: {
+          empty: 'The tag name cannot be empty',
+        },
+        colorHex: {
+          empty: 'The tag color cannot be empty',
+        },
+      },
+    },
+    update: {
+      error: 'Error updating tag',
+      ok: 'Tag correctly updated',
+      dialog: {
+        title: 'Update tag',
+        confirm: 'Confirm',
+        cancel: 'Cancel',
+      },
+      confirm:
+        'If the tag is linked with one or more entities, the change will be propagated. Are you sure you want to continue?',
+    },
+    delete: {
+      error: 'Error deleting tag',
+      ok: 'Tag correctly deleted',
+      confirm:
+        'If you delete the tag, every association to entities will be deleted as well. Are you sure you want to continue?',
+    },
+    addToNote: {
+      error: 'Error linking tag to note',
+      ok: 'Tag correctly linked to note',
+      placeholder: 'Search for tags to add',
+      noResults: 'No tags available found',
+    },
+    removeFromNote: {
+      error: 'Error removing tag from note',
+      ok: 'Tag correctly removed from note',
+    },
+    loading: {
+      error: 'Error loading tags',
+    },
   },
 };
