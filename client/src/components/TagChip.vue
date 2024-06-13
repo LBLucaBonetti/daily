@@ -17,8 +17,7 @@
 <script setup lang="ts">
 import { QChip } from 'quasar';
 import TagDto from 'src/interfaces/TagDto';
-import { onMounted } from 'vue';
-import { PropType, ref } from 'vue';
+import { onMounted, PropType, ref } from 'vue';
 
 const props = defineProps({
   tag: { type: Object as PropType<TagDto>, required: true },
