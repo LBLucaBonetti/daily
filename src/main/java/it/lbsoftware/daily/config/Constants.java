@@ -60,6 +60,7 @@ public final class Constants {
           "/img/daily-logo.svg",
           "/favicon.ico",
           "/img/google-logo.svg",
+          "/img/github-logo.svg",
           "/public-login.js",
           "/public-signup.js",
           "/img/logo.svg");

@@ -15,8 +15,8 @@
   <link th:replace="~{common-fragments :: public-style}">
   <script defer th:src="@{/public-login.js}"></script>
 </head>
-<body>
-<main class="d-flex text-center justify-content-center py-5">
+<body class="login-body">
+<main class="d-flex text-center justify-content-center pt-5">
 
   <section class="container">
     <div class="row justify-content-center">
@@ -89,6 +89,12 @@
 
   </section>
 </main>
+<footer class="d-flex text-center justify-content-center align-items-center p-3 mt-auto">
+  <a href="https://github.com/LBLucaBonetti/daily.git"><img alt="GitHub repository link"
+                                                            height="49"
+                                                            th:src="@{/img/github-logo.svg}"
+                                                            width="49"></a>
+</footer>
 <script th:replace="~{common-fragments :: bootstrap-js}"></script>
 </body>
 </html>

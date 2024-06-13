@@ -4,6 +4,13 @@ body {
   color: #2f2e41 !important;
 }
 
+.login-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
 .daily-logo {
   width: 230px;
 }
