@@ -1,27 +1,27 @@
 <template>
-  <div class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center">
+  <div class="fullscreen bg-1 text-1 text-center q-pa-md flex flex-center">
     <div>
-      <div style="font-size: 30vh">
-        404
-      </div>
+      <div style="font-size: 30vh">404</div>
 
-      <div class="text-h2" style="opacity:.4">
-        Oops. Nothing here...
+      <div class="text-h2" style="opacity: 0.4">
+        {{ $t('pages.notFound.text') }}
       </div>
 
       <q-btn
-        class="q-mt-xl"
-        color="white"
-        text-color="blue"
         unelevated
+        :label="$t('pages.notFound.button')"
+        aria-label="Go home"
+        class="q-mt-xl not-found-back-home-btn"
+        color="primary"
         to="/"
-        label="Go Home"
-        no-caps
       />
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
+<style>
+.not-found-back-home-btn {
+  min-width: 300px;
+}
+</style>

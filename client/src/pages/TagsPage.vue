@@ -151,12 +151,11 @@ import TagDto from 'src/interfaces/TagDto';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { refreshPage } from 'src/utils/refresh-page';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { QBtn, QInfiniteScroll, QInput, useQuasar, QDialog } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import TagChip from 'src/components/TagChip.vue';
 import { validateTag } from 'src/validators/tag-validator';
-import { computed } from 'vue';
 
 const tags = ref<TagDto[]>([]);
 const infiniteScroll = ref<QInfiniteScroll | null>(null);

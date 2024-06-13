@@ -12,6 +12,10 @@ export default {
     delete: 'Cancella',
   },
   pages: {
+    notFound: {
+      text: 'Ooops, qualcosa è andato storto',
+      button: 'Home',
+    },
     notes: { title: 'Note', subtitle: 'Annota ciò che desideri ricordare' },
     tags: {
       title: 'Tag',
