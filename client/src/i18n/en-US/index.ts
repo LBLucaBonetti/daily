@@ -12,6 +12,10 @@ export default {
     delete: 'Delete',
   },
   pages: {
+    notFound: {
+      text: 'Ooops, something went wrong',
+      button: 'Home',
+    },
     notes: {
       title: 'Notes',
       subtitle: 'Take note of things you want to remember',
