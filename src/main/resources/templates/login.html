@@ -37,8 +37,7 @@
         <form id="login-form" method="post" th:action="@{/login}">
 
           <div class="alert alert-danger" id="invalid-credentials-alert" role="alert"
-               th:if="${param.error}">
-            Invalid e-mail and/or password
+               th:if="${invalidCredentialsError}" th:text="${invalidCredentialsError}">
           </div>
           <div class="alert alert-success" id="logout-alert" role="alert" th:if="${param.logout}">
             You have been logged out

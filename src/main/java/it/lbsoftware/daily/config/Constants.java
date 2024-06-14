@@ -45,6 +45,7 @@ public final class Constants {
   public static final String SIGNUP_PATH = "/" + SIGNUP_VIEW;
   public static final String ERROR_VIEW = "error";
   public static final String ERROR_PATH = "/" + ERROR_VIEW;
+  public static final String INVALID_CREDENTIALS_ERROR = "invalidCredentialsError";
   public static final String ACTIVATIONS_VIEW = "activations";
   public static final String ACTIVATION_CODE = "activationCode";
   public static final String ACTIVATION_PATH =
