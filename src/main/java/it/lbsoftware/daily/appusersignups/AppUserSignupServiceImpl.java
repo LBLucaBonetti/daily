@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.appusersignups;
 
 import static it.lbsoftware.daily.config.Constants.SIGNUP_SUCCESS;
+import static it.lbsoftware.daily.templates.TemplateUtils.DEFAULT_INVALID_CREDENTIALS_ERROR_MESSAGE;
 import static it.lbsoftware.daily.templates.TemplateUtils.addErrorToView;
 
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
@@ -58,7 +59,7 @@ public class AppUserSignupServiceImpl implements AppUserSignupService {
             },
             () ->
                 // Failure, notify
-                addErrorToView(bindingResult, "Invalid e-mail or password"));
+                addErrorToView(bindingResult, DEFAULT_INVALID_CREDENTIALS_ERROR_MESSAGE));
   }
 
   private boolean sendActivationEmail(final AppUserDto appUserDto, final UUID activationCode) {

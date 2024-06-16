@@ -16,7 +16,7 @@
   <script defer th:src="@{/public-login.js}"></script>
 </head>
 <body class="login-body">
-<main class="d-flex text-center justify-content-center pt-5">
+<main class="d-flex text-center justify-content-center pt-4">
 
   <section class="container">
     <div class="row justify-content-center">
@@ -45,9 +45,9 @@
 
           <div class="form-floating mb-3">
             <input autofocus class="form-control" id="email" maxlength="320" name="email"
-                   placeholder="Email"
+                   placeholder="E-mail"
                    required type="email"/>
-            <label for="email">Email</label>
+            <label for="email">E-mail</label>
           </div>
 
           <div class="form-floating mb-3">
@@ -55,6 +55,9 @@
                    required
                    type="password"/>
             <label for="password">Password</label>
+            <div class="text-end mt-2">
+              <a class="daily-link small" th:href="@{/passwords}">Reset password</a>
+            </div>
           </div>
 
           <div class="d-grid">

@@ -62,7 +62,7 @@ public final class TemplateUtils {
 
   /**
    * Retrieves the invalid-credentials error message from the request, if any. The error message
-   * either is from a mapped specific exception or from a default one.
+   * either is from a mapped specific exception or a default one.
    *
    * @param request The incoming request
    * @return An appropriate invalid-credentials error message, ready to be shown to the end user

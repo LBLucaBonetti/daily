@@ -50,8 +50,10 @@ public final class Constants {
   public static final String ACTIVATION_CODE = "activationCode";
   public static final String ACTIVATION_PATH =
       "/" + ACTIVATIONS_VIEW + "/" + "{" + ACTIVATION_CODE + "}";
+  public static final String SEND_PASSWORD_RESET_LINK_VIEW = "passwords";
+  public static final String PASSWORD_PATH = "/" + SEND_PASSWORD_RESET_LINK_VIEW;
   public static final List<String> ALLOWED_STATIC_TEMPLATES =
-      List.of(SIGNUP_PATH, ERROR_PATH, ACTIVATION_PATH);
+      List.of(SIGNUP_PATH, ERROR_PATH, ACTIVATION_PATH, PASSWORD_PATH);
   public static final String ACTIVATION_CODE_SUCCESS = "activationCodeSuccess";
   public static final String ACTIVATION_CODE_FAILURE = "activationCodeFailure";
   public static final String SIGNUP_SUCCESS = "signupSuccess";

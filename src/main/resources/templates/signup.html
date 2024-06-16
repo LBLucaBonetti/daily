@@ -45,10 +45,10 @@
           </div>
 
           <div class="form-floating mb-3">
-            <input autofocus class="form-control" id="email" maxlength="320" placeholder="Email"
+            <input autofocus class="form-control" id="email" maxlength="320" placeholder="E-mail"
                    required
                    th:field="*{email}" type="email"/>
-            <label for="email">Email</label>
+            <label for="email">E-mail</label>
             <div class="text-danger text-start" th:errors="*{email}"
                  th:if="${#fields.hasErrors('email')}"></div>
           </div>
