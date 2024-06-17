@@ -6,6 +6,7 @@ import static it.lbsoftware.daily.config.Constants.REMOVAL_NOTIFICATION_TO_REMOV
 import static it.lbsoftware.daily.config.Constants.REMOVAL_THRESHOLD_DAYS;
 
 import it.lbsoftware.daily.appuseractivations.AppUserActivationRepository;
+import it.lbsoftware.daily.appuserpasswords.AppUserPasswordResetRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusers.AppUserUtils;
@@ -36,6 +37,7 @@ public class AppUserRemoverService {
   private final AppUserActivationRepository appUserActivationRepository;
   private final AppUserSettingRepository appUserSettingRepository;
   private final AppUserRemovalInformationRepository appUserRemovalInformationRepository;
+  private final AppUserPasswordResetRepository appUserPasswordResetRepository;
   private final AppUserRepository appUserRepository;
   private final EmailService emailService;
   private final DailyConfig dailyConfig;
@@ -136,6 +138,8 @@ public class AppUserRemoverService {
       appUserSettingRepository.deleteByAppUser(appUser);
       // Remove removal information
       appUserRemovalInformationRepository.deleteByAppUser(appUser);
+      // Remove password reset
+      appUserPasswordResetRepository.deleteByAppUser(appUser);
       // Remove app user
       appUserRepository.delete(appUser);
       log.info("The AppUser with e-mail " + email + " has been successfully removed from daily");
