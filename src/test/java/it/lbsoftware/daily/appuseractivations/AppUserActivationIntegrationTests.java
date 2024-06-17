@@ -14,6 +14,7 @@ import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.config.Constants;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -74,7 +75,8 @@ class AppUserActivationIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertTrue(
         appUserActivationRepository
-            .findNonActivatedAndStillValidAppUserActivationFetchAppUser(activationCode)
+            .findNonActivatedAndStillValidAppUserActivationFetchAppUser(
+                activationCode, LocalDateTime.now())
             .isEmpty());
     var appUserActivation = appUserActivationRepository.findAll().get(0);
     assertNotNull(appUserActivation.getActivatedAt());
