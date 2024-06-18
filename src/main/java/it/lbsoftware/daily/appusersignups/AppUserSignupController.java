@@ -39,13 +39,13 @@ class AppUserSignupController {
   @PostMapping
   public String signup(
       @ModelAttribute(APP_USER_DTO_PARAMETER) @Valid AppUserDto appUserDto,
-      BindingResult result,
+      BindingResult bindingResult,
       Model model,
       Authentication authentication) {
     return redirectIfAuthenticated(authentication)
         .orElseGet(
             () -> {
-              appUserSignupService.signup(appUserDto, result, model);
+              appUserSignupService.signup(appUserDto, bindingResult, model);
               return SIGNUP_VIEW;
             });
   }
