@@ -18,7 +18,7 @@
   <img alt="daily" class="daily-logo" src="https://trydaily.click/img/daily-logo.svg">
   <p>Dear <span th:text="${appUserFirstName}"></span>,<br><br><br>We are thrilled to have you here
     with us!<br><br>Just click <a class="daily-link"
-                                  th:href="@{{activationUri}(activationUri=${activationUri})}">here</a>
+                                  th:href="@{${activationUri}}">here</a>
     in 24 hours to activate your account, and you will be good to go<br><br><br>Thanks, have a
     lovely day,<br><br>The daily team
   </p>

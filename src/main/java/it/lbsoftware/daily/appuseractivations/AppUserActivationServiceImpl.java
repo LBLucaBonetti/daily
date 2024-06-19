@@ -64,7 +64,6 @@ public class AppUserActivationServiceImpl implements AppUserActivationService {
                 UriComponentsBuilder.fromUriString(dailyConfig.getBaseUri())
                     .pathSegment(Constants.ACTIVATIONS_VIEW, appUserActivationCode.toString())
                     .build()
-                    .encode()
                     .toUriString())
         .orElseThrow(
             () -> new IllegalArgumentException("The provided activation code is malformed"));
