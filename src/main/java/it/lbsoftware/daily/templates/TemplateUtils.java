@@ -18,7 +18,7 @@ public final class TemplateUtils {
   public static final String DEFAULT_INVALID_CREDENTIALS_ERROR_MESSAGE =
       "Invalid e-mail and/or password";
   public static final String DEFAULT_COMPROMISED_PASSWORD_ERROR_MESSAGE =
-      "The provided password is compromised and should not be used. Please change it";
+      "The provided password is compromised and should not be used. Please reset it";
   private static final String GLOBAL_ERRORS_KEY = "globalError";
 
   private TemplateUtils() {
