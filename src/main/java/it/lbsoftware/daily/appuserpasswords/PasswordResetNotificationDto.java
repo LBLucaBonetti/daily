@@ -6,11 +6,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-/** Dto used to send data when requesting a password reset link. */
+/** Dto used to send data when requesting a password reset notification. */
 @EqualsAndHashCode
-public class PasswordResetLinkDto {
+@NoArgsConstructor
+public class PasswordResetNotificationDto {
 
   @Size(max = Constants.APP_USER_EMAIL_MAX)
   @Email
@@ -23,7 +25,7 @@ public class PasswordResetLinkDto {
   // blank string anyway
   private String email;
 
-  public PasswordResetLinkDto(final String email) {
+  public PasswordResetNotificationDto(final String email) {
     setEmail(email);
   }
 

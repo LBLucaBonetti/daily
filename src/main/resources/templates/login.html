@@ -34,6 +34,11 @@
              th:if="${activationCodeSuccess}" th:text="${activationCodeSuccess}">
         </div>
 
+        <div class="alert alert-success" id="password-reset-notification-success-alert" role="alert"
+             th:if="${passwordResetNotificationSuccess}"
+             th:text="${passwordResetNotificationSuccess}">
+        </div>
+
         <form id="login-form" method="post" th:action="@{/login}">
 
           <div class="alert alert-danger" id="invalid-credentials-alert" role="alert"
@@ -56,7 +61,8 @@
                    type="password"/>
             <label for="password">Password</label>
             <div class="text-end mt-2">
-              <a class="daily-link small" th:href="@{/passwords}">Reset password</a>
+              <a class="daily-link small" th:href="@{/password-reset-notification}">Reset
+                password</a>
             </div>
           </div>
 

@@ -50,13 +50,27 @@ public final class Constants {
   public static final String ACTIVATION_CODE = "activation-code";
   public static final String ACTIVATION_PATH =
       "/" + ACTIVATIONS_VIEW + "/" + "{" + ACTIVATION_CODE + "}";
-  public static final String SEND_PASSWORD_RESET_LINK_VIEW = "passwords";
-  public static final String PASSWORD_PATH = "/" + SEND_PASSWORD_RESET_LINK_VIEW;
+  public static final String SEND_PASSWORD_RESET_NOTIFICATION_VIEW = "password-reset-notification";
+  public static final String SEND_PASSWORD_RESET_NOTIFICATION_PATH =
+      "/" + SEND_PASSWORD_RESET_NOTIFICATION_VIEW;
+  public static final String PASSWORD_RESET_VIEW = "password-reset";
+  public static final String PASSWORD_RESET_CODE = "code";
+  public static final String PASSWORD_RESET_PATH = "/" + PASSWORD_RESET_VIEW;
   public static final List<String> ALLOWED_STATIC_TEMPLATES =
-      List.of(SIGNUP_PATH, ERROR_PATH, ACTIVATION_PATH, PASSWORD_PATH);
+      List.of(
+          SIGNUP_PATH,
+          ERROR_PATH,
+          ACTIVATION_PATH,
+          SEND_PASSWORD_RESET_NOTIFICATION_PATH,
+          PASSWORD_RESET_PATH);
   public static final String ACTIVATION_CODE_SUCCESS = "activationCodeSuccess";
   public static final String ACTIVATION_CODE_FAILURE = "activationCodeFailure";
   public static final String SIGNUP_SUCCESS = "signupSuccess";
+  public static final String PASSWORD_RESET_NOTIFICATION_SUCCESS =
+      "passwordResetNotificationSuccess";
+  public static final String PASSWORD_RESET_NOTIFICATION_SUCCESS_MESSAGE =
+      "If you signed up with the provided e-mail, you will receive a notification to reset your "
+          + "password";
   public static final List<String> ALLOWED_STATIC_ASSETS =
       List.of(
           "/public-style.css",
@@ -78,6 +92,10 @@ public final class Constants {
       EMAIL_PATH_PREFIX + "app_user_removal_notification.html";
   public static final String EMAIL_APP_USER_REMOVAL_NOTIFICATION_SUBJECT =
       EMAIL_SUBJECT_PREFIX + "Action required";
+  public static final String EMAIL_APP_USER_PASSWORD_RESET_PATH =
+      EMAIL_PATH_PREFIX + "app_user_password_reset.html";
+  public static final String EMAIL_APP_USER_PASSWORD_RESET_SUBJECT =
+      EMAIL_SUBJECT_PREFIX + "Reset password";
   public static final String EMAIL_FROM = "daily@trydaily.click";
   public static final String EMAIL_TITLE_KEY = "title";
   public static final String EMAIL_CONTEXT_RESERVED_KEY_MESSAGE =
@@ -87,6 +105,7 @@ public final class Constants {
   public static final int REMOVAL_THRESHOLD_DAYS =
       REMOVAL_NOTIFICATION_THRESHOLD_DAYS + REMOVAL_NOTIFICATION_TO_REMOVAL_DELTA_DAYS;
   public static final int FAILURES_THRESHOLD = 3;
+  public static final int PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES = 30;
 
   private Constants() {
     throw new UnsupportedOperationException("This class cannot be instantiated!");
