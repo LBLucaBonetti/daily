@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -58,6 +59,13 @@ public class WebSecurityConfiguration {
                 .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
                 .referrerPolicy(
                     referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                // The referrer policy for the password reset requests should be no-referrer to
+                // avoid referrer leakage
+                .addHeaderWriter(
+                    new DelegatingRequestMatcherHeaderWriter(
+                        new AntPathRequestMatcher(Constants.PASSWORD_RESET_PATH),
+                        new DailyReferrerPolicyHeaderWriter(
+                            ReferrerPolicy.NO_REFERRER.getPolicy())))
                 .permissionsPolicy(permissions -> permissions.policy(PERMISSIONS_POLICY)));
     // Authorization & authentication
     http.authorizeHttpRequests(
