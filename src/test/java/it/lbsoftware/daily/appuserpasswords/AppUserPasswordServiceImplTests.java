@@ -2,25 +2,19 @@ package it.lbsoftware.daily.appuserpasswords;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
-import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
-import it.lbsoftware.daily.appusers.AppUserRepository;
-import it.lbsoftware.daily.appusers.AppUserTestUtils;
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.config.DailyConfig;
 import it.lbsoftware.daily.emails.EmailService;
-import it.lbsoftware.daily.exceptions.DailyEmailException;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -36,8 +30,7 @@ import org.springframework.ui.Model;
 
 class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
 
-  @Mock private AppUserPasswordResetRepository appUserPasswordResetRepository;
-  @Mock private AppUserRepository appUserRepository;
+  @Mock private AppUserPasswordResetService appUserPasswordResetService;
   @Mock private EmailService emailService;
   @Mock private DailyConfig dailyConfig;
   private AppUserPasswordServiceImpl appUserPasswordService;
@@ -55,8 +48,7 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
   @BeforeEach
   void beforeEach() {
     this.appUserPasswordService =
-        new AppUserPasswordServiceImpl(
-            appUserPasswordResetRepository, appUserRepository, emailService, dailyConfig);
+        new AppUserPasswordServiceImpl(appUserPasswordResetService, emailService, dailyConfig);
   }
 
   @ParameterizedTest
@@ -71,110 +63,70 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should show success if app user is not found")
+  @DisplayName(
+      "Should show success and not send e-mail if app user password reset could not be created")
   void test2() {
     // Given
     var email = "appuser@email.com";
     var passwordResetNotificationDto = new PasswordResetNotificationDto(email);
     var model = new ExtendedModelMap();
-    given(appUserRepository.findByEmailIgnoreCaseAndAuthProvider(email, AuthProvider.DAILY))
+    given(appUserPasswordResetService.createAppUserPasswordReset(email))
         .willReturn(Optional.empty());
 
     // When
     appUserPasswordService.sendPasswordResetNotification(passwordResetNotificationDto, model);
 
     // Then
-    verify(appUserPasswordResetRepository, times(0)).findByAppUser(any());
+    verify(appUserPasswordResetService, times(1)).createAppUserPasswordReset(email);
+    verify(emailService, times(0)).sendAsynchronously(any(), any());
     assertEquals(
         Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS_MESSAGE,
         model.getAttribute(Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS));
   }
 
   @Test
-  @DisplayName(
-      "Should show success if app user is found and app user password reset could not be created")
+  @DisplayName("Should show success and send e-mail if app user password reset was created")
   void test3() {
     // Given
     var email = "appuser@email.com";
-    var appUser =
-        AppUserTestUtils.createAppUser(
-            UUID.randomUUID(), email, AuthProvider.DAILY, "authProviderId");
     var passwordResetNotificationDto = new PasswordResetNotificationDto(email);
     var model = new ExtendedModelMap();
-    given(appUserRepository.findByEmailIgnoreCaseAndAuthProvider(email, AuthProvider.DAILY))
-        .willReturn(Optional.of(appUser));
-    doThrow(new RuntimeException()).when(appUserPasswordResetRepository).save(any());
+    var appUserPasswordResetDto =
+        new AppUserPasswordResetDto(
+            AppUserPasswordReset.builder()
+                .appUser(AppUser.builder().firstName("First name").email(email).build())
+                .passwordResetCode(UUID.randomUUID())
+                .build());
+    given(appUserPasswordResetService.createAppUserPasswordReset(email))
+        .willReturn(Optional.of(appUserPasswordResetDto));
+    given(dailyConfig.getBaseUri()).willReturn("http://localhost:8080");
 
     // When
     appUserPasswordService.sendPasswordResetNotification(passwordResetNotificationDto, model);
 
     // Then
-    verify(appUserPasswordResetRepository, times(1)).save(any());
-    verify(emailService, times(0)).sendSynchronously(any(), any());
+    verify(appUserPasswordResetService, times(1)).createAppUserPasswordReset(email);
+    verify(emailService, times(1)).sendAsynchronously(any(), any());
     assertEquals(
         Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS_MESSAGE,
         model.getAttribute(Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS));
   }
 
   @Test
-  @DisplayName(
-      "Should throw if app user is found, app user password reset is created and send password reset notification throws")
+  @DisplayName("Should throw and not send e-mail when password reset code is null")
   void test4() {
     // Given
     var email = "appuser@email.com";
-    var appUser =
-        AppUserTestUtils.createAppUser(
-            UUID.randomUUID(), email, AuthProvider.DAILY, "authProviderId");
     var passwordResetNotificationDto = new PasswordResetNotificationDto(email);
     var model = new ExtendedModelMap();
-    var appUserPasswordReset =
-        AppUserPasswordReset.builder()
-            .appUser(appUser)
-            .passwordResetCode(UUID.randomUUID())
-            .expiredAt(
-                LocalDateTime.now()
-                    .plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES))
-            .build();
-    given(appUserRepository.findByEmailIgnoreCaseAndAuthProvider(email, AuthProvider.DAILY))
-        .willReturn(Optional.of(appUser));
-    given(appUserPasswordResetRepository.save(any())).willReturn(appUserPasswordReset);
-    given(dailyConfig.getBaseUri()).willReturn("http://localhost:8080");
-    doThrow(new DailyEmailException()).when(emailService).sendSynchronously(any(), any());
-
-    // When
-    var res =
-        assertThrows(
-            DailyEmailException.class,
-            () ->
-                appUserPasswordService.sendPasswordResetNotification(
-                    passwordResetNotificationDto, model));
-
-    // Then
-    assertNull(model.getAttribute(Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS));
-    assertNotNull(res);
-  }
-
-  @Test
-  @DisplayName("Should throw if app user password reset code is null")
-  void test5() {
-    // Given
-    var email = "appuser@email.com";
-    var appUser =
-        AppUserTestUtils.createAppUser(
-            UUID.randomUUID(), email, AuthProvider.DAILY, "authProviderId");
-    var passwordResetNotificationDto = new PasswordResetNotificationDto(email);
-    var model = new ExtendedModelMap();
-    var appUserPasswordReset =
-        AppUserPasswordReset.builder()
-            .appUser(appUser)
-            .passwordResetCode(null)
-            .expiredAt(
-                LocalDateTime.now()
-                    .plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES))
-            .build();
-    given(appUserRepository.findByEmailIgnoreCaseAndAuthProvider(email, AuthProvider.DAILY))
-        .willReturn(Optional.of(appUser));
-    given(appUserPasswordResetRepository.save(any())).willReturn(appUserPasswordReset);
+    var appUserPasswordResetDto =
+        new AppUserPasswordResetDto(
+            AppUserPasswordReset.builder()
+                .appUser(AppUser.builder().firstName("First name").email(email).build())
+                .passwordResetCode(null)
+                .build());
+    given(appUserPasswordResetService.createAppUserPasswordReset(email))
+        .willReturn(Optional.of(appUserPasswordResetDto));
 
     // When
     var res =
@@ -185,7 +137,7 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
                     passwordResetNotificationDto, model));
 
     // Then
-    assertNull(model.getAttribute(Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS));
     assertNotNull(res);
+    verify(emailService, times(0)).sendAsynchronously(any(), any());
   }
 }

@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
+import it.lbsoftware.daily.appuserpasswords.AppUserPasswordResetDto;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.config.Constants;
 import java.util.Optional;
@@ -47,5 +48,18 @@ public final class AppUserUtils {
         .map(AppUser::getFirstName)
         .filter(StringUtils::isNotBlank)
         .orElse(Constants.APP_USER_UNSPECIFIED_NAME);
+  }
+
+  /**
+   * Retrieves the app user first name or a default one if missing, getting data from the provided
+   * parameter.
+   *
+   * @param appUserPasswordResetDto The source data
+   * @return The app user first name or a default one if missing
+   */
+  public static String getFirstNameOrDefault(
+      final AppUserPasswordResetDto appUserPasswordResetDto) {
+    var appUser = AppUser.builder().email(appUserPasswordResetDto.getAppUserEmail()).build();
+    return getFirstNameOrDefault(appUser);
   }
 }

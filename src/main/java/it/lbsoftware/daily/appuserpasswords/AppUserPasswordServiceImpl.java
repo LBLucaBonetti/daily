@@ -6,15 +6,11 @@ import static it.lbsoftware.daily.config.Constants.PASSWORD_RESET_NOTIFICATION_S
 import static it.lbsoftware.daily.config.Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS_MESSAGE;
 import static it.lbsoftware.daily.config.Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES;
 
-import it.lbsoftware.daily.appusers.AppUser;
-import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
-import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusers.AppUserUtils;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.config.DailyConfig;
 import it.lbsoftware.daily.emails.EmailInfo;
 import it.lbsoftware.daily.emails.EmailService;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,87 +18,62 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Main {@link it.lbsoftware.daily.appusers.AppUser} password reset service implementation. Also
- * handles {@link AppUserPasswordReset}.
+ * Main {@link it.lbsoftware.daily.appusers.AppUser} password service implementation, defining
+ * methods that are not delegated to the framework (Spring Security or similar). Also handles {@link
+ * AppUserPasswordReset} but delegates main entity operations and logic to {@link
+ * AppUserPasswordResetService}.
  */
 @Service
 @RequiredArgsConstructor
 @CommonsLog
 public class AppUserPasswordServiceImpl implements AppUserPasswordService {
 
-  private final AppUserPasswordResetRepository appUserPasswordResetRepository;
-  private final AppUserRepository appUserRepository;
+  private final AppUserPasswordResetService appUserPasswordResetService;
   private final EmailService emailService;
   private final DailyConfig dailyConfig;
 
   @Override
-  @Transactional
   public void sendPasswordResetNotification(
       @NonNull PasswordResetNotificationDto passwordResetNotificationDto, @NonNull Model model) {
-    // 1. Find the app user; only DAILY app users provided a
-    // password, so ignore the other types
     var email = passwordResetNotificationDto.getEmail();
-    var validAuthProvider = AuthProvider.DAILY;
-    appUserRepository
-        .findByEmailIgnoreCaseAndAuthProvider(email, validAuthProvider)
-        .ifPresent(
-            (var appUser) ->
-                // 2. Try to create the password reset for the app user; ignore any failure
-                createAppUserPasswordReset(appUser)
-                    .ifPresent(
-                        (var appUserPasswordReset) ->
-                            // 3. Send the password reset notification; it the operation fails, an
-                            // exception will be thrown so that the transaction will be rolled back
-                            sendPasswordResetNotification(
-                                appUser, appUserPasswordReset.getPasswordResetCode())));
-    // 4. Show success anyway to avoid leaking information
+    appUserPasswordResetService
+        .createAppUserPasswordReset(email)
+        .ifPresentOrElse(
+            this::sendPasswordResetEmail,
+            () ->
+                log.warn(
+                    ("Could not create AppUserPasswordReset for AppUser with email %s; either the "
+                            + "AppUser does not exist, or there is already another "
+                            + "AppUserPasswordReset for it or the save failed")
+                        .formatted(email)));
+    // Show success anyway to avoid leaking information
     model.addAttribute(
         PASSWORD_RESET_NOTIFICATION_SUCCESS, PASSWORD_RESET_NOTIFICATION_SUCCESS_MESSAGE);
   }
 
   /**
-   * Sends a password reset notification synchronously. Does not catch exceptions because when this
-   * operation fails, a rollback of the transaction should be performed (it makes no sense to create
-   * an AppUserPasswordReset when the e-mail for it could not be sent).
+   * Sends a password reset notification asynchronously. Since the error handling is not important
+   * for the app user to avoid leaking information, the async operation is fine here.
    *
-   * @param appUser The app user to send this notification to
-   * @param passwordResetCode The password reset code
+   * @param appUserPasswordResetDto Contains data used to send this e-mail
    */
-  private void sendPasswordResetNotification(final AppUser appUser, final UUID passwordResetCode) {
-    emailService.sendSynchronously(
+  private void sendPasswordResetEmail(final AppUserPasswordResetDto appUserPasswordResetDto) {
+    emailService.sendAsynchronously(
         new EmailInfo(
             EMAIL_APP_USER_PASSWORD_RESET_PATH,
-            appUser.getEmail(),
+            appUserPasswordResetDto.getAppUserEmail(),
             EMAIL_APP_USER_PASSWORD_RESET_SUBJECT),
         Map.of(
             "appUserFirstName",
-            AppUserUtils.getFirstNameOrDefault(appUser),
+            AppUserUtils.getFirstNameOrDefault(appUserPasswordResetDto),
             "passwordResetUri",
-            getPasswordResetUri(passwordResetCode),
+            getPasswordResetUri(appUserPasswordResetDto.getPasswordResetCode()),
             "minutesBeforeExpiration",
             PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES));
-  }
-
-  private Optional<AppUserPasswordReset> createAppUserPasswordReset(final AppUser appUser) {
-    try {
-      return Optional.of(
-          appUserPasswordResetRepository.save(
-              AppUserPasswordReset.builder()
-                  .appUser(appUser)
-                  .passwordResetCode(UUID.randomUUID())
-                  .expiredAt(
-                      LocalDateTime.now()
-                          .plusMinutes(PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES))
-                  .build()));
-    } catch (Exception e) {
-      log.error("Could not save AppUserPasswordReset", e);
-    }
-    return Optional.empty();
   }
 
   private String getPasswordResetUri(final UUID passwordResetCode) {

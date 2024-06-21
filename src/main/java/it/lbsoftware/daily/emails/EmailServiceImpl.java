@@ -42,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
     try {
       sendEmail(emailInfo, context);
     } catch (Exception e) {
-      log.error("Problems sending the e-mail");
+      log.error("Problems sending the e-mail", e);
       throw new DailyEmailException();
     }
   }
