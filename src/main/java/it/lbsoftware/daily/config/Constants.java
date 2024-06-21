@@ -1,6 +1,7 @@
 package it.lbsoftware.daily.config;
 
 import java.util.List;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 /** Application-specific constants. */
 public final class Constants {
@@ -10,6 +11,8 @@ public final class Constants {
   // Allow everything but only from the same origin & Bootstrap CDN & Bunny Fonts CDN
   public static final String CONTENT_SECURITY_POLICY =
       "default-src 'self' https://cdn.jsdelivr.net/npm/ https://fonts.bunny.net/";
+  public static final ReferrerPolicy REFERRER_POLICY =
+      ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN;
   public static final String PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
   public static final String LOCALDATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
   public static final String DAILY_COOKIE_CSRF_ENHANCED_SECURITY_KEY =

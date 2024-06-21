@@ -57,8 +57,7 @@ public class WebSecurityConfiguration {
         headers ->
             headers
                 .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
-                .referrerPolicy(
-                    referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                .referrerPolicy(referrer -> referrer.policy(Constants.REFERRER_POLICY))
                 // The referrer policy for the password reset requests should be no-referrer to
                 // avoid referrer leakage
                 .addHeaderWriter(
