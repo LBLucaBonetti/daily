@@ -52,6 +52,7 @@ class ReferrerPolicyHeaderWriterIntegrationTests extends DailyAbstractIntegratio
             post(passwordResetUrl)
                 .formField("password", "new-password")
                 .formField("passwordConfirmation", "new-password")
+                .formField("passwordResetCode", UUID.randomUUID().toString())
                 .with(csrf()))
         .andExpect(status().isOk())
         .andExpect(

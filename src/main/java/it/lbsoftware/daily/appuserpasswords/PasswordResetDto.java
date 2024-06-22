@@ -2,6 +2,8 @@ package it.lbsoftware.daily.appuserpasswords;
 
 import it.lbsoftware.daily.config.Constants;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +21,6 @@ public class PasswordResetDto {
 
   @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
   private String passwordConfirmation;
+
+  @NotNull private UUID passwordResetCode;
 }
