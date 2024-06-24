@@ -304,6 +304,6 @@
     <sonar.sources>src/main/java,src/main/resources</sonar.sources>
   </properties>
 
-  <version>0.6.0</version>
+  <version>0.7.0</version>
 
 </project>
