@@ -56,6 +56,12 @@ public class AppUserPasswordReset extends BaseEntity {
   @Future
   private LocalDateTime expiredAt;
 
+  /**
+   * Marks the password reset as used; a used password reset entity can no-longer be used to reset
+   * the password.
+   */
+  private LocalDateTime usedAt;
+
   @Override
   public int hashCode() {
     return super.hashCode();

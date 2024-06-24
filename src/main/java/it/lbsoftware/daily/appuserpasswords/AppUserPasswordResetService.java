@@ -50,6 +50,7 @@ public class AppUserPasswordResetService {
             .passwordResetCode(UUID.randomUUID())
             .expiredAt(
                 LocalDateTime.now().plusMinutes(PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES))
+            .usedAt(null) // Not used yet
             .build());
   }
 

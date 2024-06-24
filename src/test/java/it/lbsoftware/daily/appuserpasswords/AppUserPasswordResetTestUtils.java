@@ -24,6 +24,7 @@ public final class AppUserPasswordResetTestUtils {
     return AppUserPasswordReset.builder()
         .passwordResetCode(passwordResetCode)
         .expiredAt(expiredAt)
+        .usedAt(null) // Not used yet
         .appUser(appUser)
         .build();
   }
