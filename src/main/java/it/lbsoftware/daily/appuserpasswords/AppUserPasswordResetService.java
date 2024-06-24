@@ -57,4 +57,20 @@ public class AppUserPasswordResetService {
   private boolean notExistsAppUserPasswordReset(final AppUser appUser) {
     return appUserPasswordResetRepository.findByAppUser(appUser).isEmpty();
   }
+
+  /**
+   * Finds an {@link AppUserPasswordReset} that is still valid by its password reset code.
+   *
+   * @param passwordResetCode The password reset code to find the {@link AppUserPasswordReset} by
+   * @return The {@link AppUserPasswordResetDto} created from the {@link AppUserPasswordReset}
+   *     entity or an empty value
+   */
+  @Transactional(readOnly = true)
+  public Optional<AppUserPasswordResetDto> findStillValidAppUserPasswordReset(
+      @NonNull final UUID passwordResetCode) {
+    return appUserPasswordResetRepository
+        .findStillValidAppUserPasswordResetFetchEnabledAppUser(
+            passwordResetCode, LocalDateTime.now())
+        .map(AppUserPasswordResetDto::new);
+  }
 }

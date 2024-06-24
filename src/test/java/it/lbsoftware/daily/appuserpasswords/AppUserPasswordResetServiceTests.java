@@ -7,9 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.config.Constants;
@@ -119,5 +123,67 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     assertEquals(passwordResetCode, appUserPasswordResetDto.getPasswordResetCode());
     assertEquals(expiredAt, appUserPasswordResetDto.getExpiredAt());
     assertEquals(firstName, appUserPasswordResetDto.getAppUserFirstName());
+  }
+
+  @Test
+  @DisplayName(
+      "Should return empty value when find still valid app user password reset is not found")
+  void test5() {
+    // Given
+    var code = UUID.randomUUID();
+    given(
+            appUserPasswordResetRepository.findStillValidAppUserPasswordResetFetchEnabledAppUser(
+                eq(code), any()))
+        .willReturn(Optional.empty());
+
+    // When
+    var res = appUserPasswordResetService.findStillValidAppUserPasswordReset(code);
+
+    // Then
+    verify(appUserPasswordResetRepository, times(1))
+        .findStillValidAppUserPasswordResetFetchEnabledAppUser(eq(code), any());
+    assertEquals(Optional.empty(), res);
+  }
+
+  @Test
+  @DisplayName(
+      "Should return app user password reset dto when find still valid app user password reset is found")
+  void test6() {
+    // Given
+    var code = UUID.randomUUID();
+    var appUserPasswordReset =
+        AppUserPasswordReset.builder()
+            .passwordResetCode(code)
+            .usedAt(null)
+            .expiredAt(
+                LocalDateTime.now()
+                    .plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES))
+            .appUser(
+                AppUser.builder()
+                    .enabled(true)
+                    .email("appUser@gmail.com")
+                    .firstName("First name")
+                    .build())
+            .build();
+    given(
+            appUserPasswordResetRepository.findStillValidAppUserPasswordResetFetchEnabledAppUser(
+                eq(code), any()))
+        .willReturn(Optional.of(appUserPasswordReset));
+
+    // When
+    var res = appUserPasswordResetService.findStillValidAppUserPasswordReset(code);
+
+    // Then
+    verify(appUserPasswordResetRepository, times(1))
+        .findStillValidAppUserPasswordResetFetchEnabledAppUser(eq(code), any());
+    assertTrue(res.isPresent());
+    var appUserPasswordResetDto = res.get();
+    assertEquals(code, appUserPasswordResetDto.getPasswordResetCode());
+    assertEquals(appUserPasswordReset.getExpiredAt(), appUserPasswordResetDto.getExpiredAt());
+    assertEquals(
+        appUserPasswordReset.getAppUser().getEmail(), appUserPasswordResetDto.getAppUserEmail());
+    assertEquals(
+        appUserPasswordReset.getAppUser().getFirstName(),
+        appUserPasswordResetDto.getAppUserFirstName());
   }
 }

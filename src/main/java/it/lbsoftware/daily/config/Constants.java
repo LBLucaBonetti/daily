@@ -58,6 +58,7 @@ public final class Constants {
       "/" + SEND_PASSWORD_RESET_NOTIFICATION_VIEW;
   public static final String PASSWORD_RESET_VIEW = "password-reset";
   public static final String PASSWORD_RESET_CODE = "code";
+  public static final String PASSWORD_RESET_CODE_FAILURE = "passwordResetCodeFailure";
   public static final String PASSWORD_RESET_PATH = "/" + PASSWORD_RESET_VIEW;
   public static final List<String> ALLOWED_STATIC_TEMPLATES =
       List.of(

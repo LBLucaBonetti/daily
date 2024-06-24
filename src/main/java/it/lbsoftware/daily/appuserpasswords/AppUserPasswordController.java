@@ -25,6 +25,7 @@ class AppUserPasswordController {
       "passwordResetNotificationDto";
   private static final String PASSWORD_RESET_DTO_PARAMETER = "passwordResetDto";
   private final AppUserPasswordService appUserPasswordService;
+  private final AppUserPasswordResetService appUserPasswordResetService;
 
   @GetMapping(value = Constants.SEND_PASSWORD_RESET_NOTIFICATION_PATH)
   public String sendPasswordResetNotification(Model model, Authentication authentication) {
@@ -65,7 +66,17 @@ class AppUserPasswordController {
     return redirectIfAuthenticated(authentication)
         .orElseGet(
             () -> {
-              model.addAttribute(PASSWORD_RESET_DTO_PARAMETER, new PasswordResetDto());
+              var passwordResetDto = new PasswordResetDto();
+              appUserPasswordResetService
+                  .findStillValidAppUserPasswordReset(code)
+                  .ifPresentOrElse(
+                      (var appUserPasswordResetDto) -> passwordResetDto.setPasswordResetCode(code),
+                      () ->
+                          model.addAttribute(
+                              Constants.PASSWORD_RESET_CODE_FAILURE,
+                              "Invalid password reset code"));
+
+              model.addAttribute(PASSWORD_RESET_DTO_PARAMETER, passwordResetDto);
               return Constants.PASSWORD_RESET_VIEW;
             });
   }
