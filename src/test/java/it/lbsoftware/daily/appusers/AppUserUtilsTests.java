@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appuserpasswords.AppUserPasswordReset;
+import it.lbsoftware.daily.appuserpasswords.AppUserPasswordResetDto;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.config.Constants;
 import java.lang.reflect.Constructor;
@@ -105,7 +107,7 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
 
   @ParameterizedTest
   @NullAndEmptySource
-  @DisplayName("Should return default first name when app user is null")
+  @DisplayName("Should return default first name when app user first name is null")
   void test7(final String firstName) {
     // Given
     AppUser appUser = AppUser.builder().firstName(firstName).build();
@@ -126,6 +128,53 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
 
     // When
     var res = AppUserUtils.getFirstNameOrDefault(appUser);
+
+    // Then
+    assertEquals(firstName, res);
+  }
+
+  @Test
+  @DisplayName("Should return default first name when app user password reset dto is null")
+  void test9() {
+    // Given
+    AppUserPasswordResetDto appUserPasswordResetDto = null;
+
+    // When
+    var res = AppUserUtils.getFirstNameOrDefault(appUserPasswordResetDto);
+
+    // Then
+    assertEquals(Constants.APP_USER_UNSPECIFIED_NAME, res);
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  @DisplayName(
+      "Should return default first name when app user password reset dto first name is null")
+  void test10(final String firstName) {
+    // Given
+    var appUser = AppUser.builder().firstName(firstName).build();
+    var appUserPasswordReset = AppUserPasswordReset.builder().appUser(appUser).build();
+    var appUserPasswordResetDto = new AppUserPasswordResetDto(appUserPasswordReset);
+
+    // When
+    var res = AppUserUtils.getFirstNameOrDefault(appUserPasswordResetDto);
+
+    // Then
+    assertEquals(Constants.APP_USER_UNSPECIFIED_NAME, res);
+  }
+
+  @Test
+  @DisplayName(
+      "Should return first name if app user password reset dto is not null and first name is not blank")
+  void test11() {
+    // Given
+    var firstName = "FirstName";
+    var appUser = AppUser.builder().firstName(firstName).build();
+    var appUserPasswordReset = AppUserPasswordReset.builder().appUser(appUser).build();
+    var appUserPasswordResetDto = new AppUserPasswordResetDto(appUserPasswordReset);
+
+    // When
+    var res = AppUserUtils.getFirstNameOrDefault(appUserPasswordResetDto);
 
     // Then
     assertEquals(firstName, res);

@@ -59,7 +59,14 @@ public final class AppUserUtils {
    */
   public static String getFirstNameOrDefault(
       final AppUserPasswordResetDto appUserPasswordResetDto) {
-    var appUser = AppUser.builder().email(appUserPasswordResetDto.getAppUserEmail()).build();
-    return getFirstNameOrDefault(appUser);
+    return Optional.ofNullable(appUserPasswordResetDto)
+        .map(
+            (var nonNullAppUserPasswordResetDto) ->
+                AppUser.builder()
+                    .email(nonNullAppUserPasswordResetDto.getAppUserEmail())
+                    .firstName(nonNullAppUserPasswordResetDto.getAppUserFirstName())
+                    .build())
+        .map(AppUserUtils::getFirstNameOrDefault)
+        .orElse(Constants.APP_USER_UNSPECIFIED_NAME);
   }
 }
