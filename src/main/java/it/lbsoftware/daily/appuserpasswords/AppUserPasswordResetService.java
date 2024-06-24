@@ -37,7 +37,7 @@ public class AppUserPasswordResetService {
       @NonNull final String appUserEmail) {
     var validAuthProvider = AuthProvider.DAILY;
     return appUserRepository
-        .findByEmailIgnoreCaseAndAuthProvider(appUserEmail, validAuthProvider)
+        .findByEmailIgnoreCaseAndAuthProviderAndEnabledTrue(appUserEmail, validAuthProvider)
         .filter(this::notExistsAppUserPasswordReset)
         .map(this::createAppUserPasswordReset)
         .map(AppUserPasswordResetDto::new);

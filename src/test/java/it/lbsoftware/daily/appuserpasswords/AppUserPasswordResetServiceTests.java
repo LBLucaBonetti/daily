@@ -60,7 +60,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     // Given
     var email = "appUser@gmail.com";
     var authProvider = AuthProvider.DAILY;
-    given(appUserRepository.findByEmailIgnoreCaseAndAuthProvider(email, authProvider))
+    given(appUserRepository.findByEmailIgnoreCaseAndAuthProviderAndEnabledTrue(email, authProvider))
         .willReturn(Optional.empty());
 
     // When
@@ -82,7 +82,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     var expiredAt =
         LocalDateTime.now().plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES);
     var appUserPasswordReset = createAppUserPasswordReset(passwordResetCode, expiredAt, appUser);
-    given(appUserRepository.findByEmailIgnoreCaseAndAuthProvider(email, authProvider))
+    given(appUserRepository.findByEmailIgnoreCaseAndAuthProviderAndEnabledTrue(email, authProvider))
         .willReturn(Optional.of(appUser));
     given(appUserPasswordResetRepository.findByAppUser(appUser))
         .willReturn(Optional.of(appUserPasswordReset));
@@ -108,7 +108,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     var expiredAt =
         LocalDateTime.now().plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES);
     var appUserPasswordReset = createAppUserPasswordReset(passwordResetCode, expiredAt, appUser);
-    given(appUserRepository.findByEmailIgnoreCaseAndAuthProvider(email, authProvider))
+    given(appUserRepository.findByEmailIgnoreCaseAndAuthProviderAndEnabledTrue(email, authProvider))
         .willReturn(Optional.of(appUser));
     given(appUserPasswordResetRepository.findByAppUser(appUser)).willReturn(Optional.empty());
     given(appUserPasswordResetRepository.save(any())).willReturn(appUserPasswordReset);

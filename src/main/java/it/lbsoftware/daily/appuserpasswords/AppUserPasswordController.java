@@ -87,6 +87,13 @@ class AppUserPasswordController {
       BindingResult bindingResult,
       Model model,
       Authentication authentication) {
-    return redirectIfAuthenticated(authentication).orElse(Constants.PASSWORD_RESET_VIEW);
+    return redirectIfAuthenticated(authentication)
+        .orElseGet(
+            () -> {
+              if (bindingResult.hasErrors()) {
+                return Constants.PASSWORD_RESET_VIEW;
+              }
+              return Constants.PASSWORD_RESET_VIEW;
+            });
   }
 }
