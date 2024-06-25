@@ -16,15 +16,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-class AppUserControllerTests extends DailyAbstractUnitTests {
+class AppUserInfoControllerTests extends DailyAbstractUnitTests {
 
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
-  private AppUserController appUserController;
+  private AppUserInfoController appUserInfoController;
 
   @BeforeEach
   void beforeEach() {
-    appUserController = new AppUserController(appUserService);
+    appUserInfoController = new AppUserInfoController(appUserService);
   }
 
   @Test
@@ -35,7 +35,7 @@ class AppUserControllerTests extends DailyAbstractUnitTests {
     given(appUserService.getAppUserInfo(appUser)).willReturn(info);
 
     // When
-    ResponseEntity<InfoDto> res = appUserController.readInfo(appUser);
+    ResponseEntity<InfoDto> res = appUserInfoController.readInfo(appUser);
 
     // Then
     verify(appUserService, times(1)).getAppUserInfo(appUser);

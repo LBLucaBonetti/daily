@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/appusers")
 @CommonsLog
-class AppUserController {
+class AppUserInfoController {
 
   private final AppUserService appUserService;
 
