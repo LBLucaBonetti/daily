@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appuserpasswords;
 
+import it.lbsoftware.daily.templates.OperationResult;
 import org.springframework.ui.Model;
 
 /**
@@ -18,4 +19,13 @@ public interface AppUserPasswordService {
    */
   void sendPasswordResetNotification(
       PasswordResetNotificationDto passwordResetNotificationDto, Model model);
+
+  /**
+   * Tries to reset the password with the given data.
+   *
+   * @param passwordResetDto The data to reset the password with; also contains the password reset
+   *     code to identify the {@link it.lbsoftware.daily.appusers.AppUser}
+   * @return A detailed result, optionally containing messages to show to the user
+   */
+  OperationResult resetPassword(PasswordResetDto passwordResetDto);
 }

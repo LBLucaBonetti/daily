@@ -11,6 +11,9 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.authentication.password.CompromisedPasswordException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,8 @@ public class AppUserPasswordResetService {
 
   private final AppUserPasswordResetRepository appUserPasswordResetRepository;
   private final AppUserRepository appUserRepository;
+  private final CompromisedPasswordChecker compromisedPasswordChecker;
+  private final PasswordEncoder passwordEncoder;
 
   /**
    * Tries to find the {@link it.lbsoftware.daily.appusers.AppUser} and create a new {@link
@@ -68,9 +73,43 @@ public class AppUserPasswordResetService {
   @Transactional(readOnly = true)
   public Optional<AppUserPasswordResetDto> findStillValidAppUserPasswordReset(
       @NonNull final UUID passwordResetCode) {
-    return appUserPasswordResetRepository
-        .findStillValidAppUserPasswordResetFetchEnabledAppUser(
-            passwordResetCode, LocalDateTime.now())
+    return findStillValidAppUserPasswordResetFetchEnabledAppUser(passwordResetCode)
         .map(AppUserPasswordResetDto::new);
+  }
+
+  private Optional<AppUserPasswordReset> findStillValidAppUserPasswordResetFetchEnabledAppUser(
+      final UUID passwordResetCode) {
+    return appUserPasswordResetRepository.findStillValidAppUserPasswordResetFetchEnabledAppUser(
+        passwordResetCode, LocalDateTime.now());
+  }
+
+  /**
+   * Tries to reset the {@link AppUser} password. Performs additional checks but supposes the
+   * provided pair already matches.
+   *
+   * @param passwordResetDto Contains the data to set the new password
+   * @return A dto of the {@link AppUserPasswordReset} when found
+   * @throws java.util.NoSuchElementException When the {@link AppUserPasswordReset} or the {@link
+   *     AppUser} are not valid or found
+   * @throws CompromisedPasswordException When the new password is compromised
+   */
+  @Transactional
+  public Optional<AppUserPasswordResetDto> resetAppUserPassword(
+      @NonNull final PasswordResetDto passwordResetDto) {
+    // Still valid password reset should exist
+    var appUserPasswordReset =
+        findStillValidAppUserPasswordResetFetchEnabledAppUser(
+                passwordResetDto.getPasswordResetCode())
+            .orElseThrow();
+    var newPassword = passwordResetDto.getPassword();
+    // New password should not be compromised
+    if (compromisedPasswordChecker.check(newPassword).isCompromised()) {
+      throw new CompromisedPasswordException("The chosen password is compromised");
+    }
+    // Encrypt and save the new password
+    var appUser = appUserPasswordReset.getAppUser();
+    appUser.setPassword(passwordEncoder.encode(newPassword));
+    appUserPasswordReset.setUsedAt(LocalDateTime.now());
+    return Optional.of(new AppUserPasswordResetDto(appUserPasswordReset, appUser));
   }
 }

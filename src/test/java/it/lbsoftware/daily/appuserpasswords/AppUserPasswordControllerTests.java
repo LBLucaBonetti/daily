@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.templates.OperationResult;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -205,5 +207,121 @@ class AppUserPasswordControllerTests extends DailyAbstractUnitTests {
     assertNotNull(passwordResetDto);
     assertEquals(code, passwordResetDto.getPasswordResetCode());
     assertEquals(Constants.PASSWORD_RESET_VIEW, res);
+  }
+
+  @Test
+  @DisplayName("Should redirect if authenticated when post reset password")
+  void test9() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    var authentication = mock(Authentication.class);
+
+    // When
+    var res =
+        appUserPasswordController.resetPassword(
+            passwordResetDto, bindingResult, model, authentication);
+
+    // Then
+    verify(appUserPasswordService, times(0)).resetPassword(any());
+    assertEquals(REDIRECT, res);
+  }
+
+  @Test
+  @DisplayName("Should return password reset view when post reset password with binding errors")
+  void test10() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    Authentication authentication = null;
+    given(bindingResult.hasErrors()).willReturn(true);
+
+    // When
+    var res =
+        appUserPasswordController.resetPassword(
+            passwordResetDto, bindingResult, model, authentication);
+
+    // Then
+    verify(appUserPasswordService, times(0)).resetPassword(any());
+    assertEquals(Constants.PASSWORD_RESET_VIEW, res);
+  }
+
+  @Test
+  @DisplayName(
+      "Should return password reset view when post reset password with non-matching new passwords")
+  void test11() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword("newPassword1");
+    passwordResetDto.setPasswordConfirmation("newPassword2");
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    Authentication authentication = null;
+    given(bindingResult.hasErrors()).willReturn(false);
+
+    // When
+    var res =
+        appUserPasswordController.resetPassword(
+            passwordResetDto, bindingResult, model, authentication);
+
+    // Then
+    verify(appUserPasswordService, times(0)).resetPassword(any());
+    assertEquals(Constants.PASSWORD_RESET_VIEW, res);
+  }
+
+  @Test
+  @DisplayName(
+      "Should return password reset view when post reset password with error password reset result")
+  void test12() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword("newPassword1");
+    passwordResetDto.setPasswordConfirmation("newPassword1");
+    passwordResetDto.setPasswordResetCode(UUID.randomUUID());
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    Authentication authentication = null;
+    given(bindingResult.hasErrors()).willReturn(false);
+    given(appUserPasswordService.resetPassword(passwordResetDto))
+        .willReturn(OperationResult.error(Constants.PASSWORD_RESET_CODE_FAILURE, "Unknown error"));
+
+    // When
+    var res =
+        appUserPasswordController.resetPassword(
+            passwordResetDto, bindingResult, model, authentication);
+
+    // Then
+    verify(appUserPasswordService, times(1)).resetPassword(any());
+    verify(model, times(0)).addAttribute(eq(Constants.PASSWORD_RESET_CODE_SUCCESS), any());
+    verify(model, times(1)).addAttribute(eq(Constants.PASSWORD_RESET_CODE_FAILURE), any());
+    assertEquals(Constants.PASSWORD_RESET_VIEW, res);
+  }
+
+  @Test
+  @DisplayName("Should return login view when post reset password and operation succeeds")
+  void test13() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword("newPassword1");
+    passwordResetDto.setPasswordConfirmation("newPassword1");
+    passwordResetDto.setPasswordResetCode(UUID.randomUUID());
+    var bindingResult = mock(BindingResult.class);
+    var model = mock(Model.class);
+    Authentication authentication = null;
+    given(bindingResult.hasErrors()).willReturn(false);
+    given(appUserPasswordService.resetPassword(passwordResetDto)).willReturn(OperationResult.ok());
+
+    // When
+    var res =
+        appUserPasswordController.resetPassword(
+            passwordResetDto, bindingResult, model, authentication);
+
+    // Then
+    verify(appUserPasswordService, times(1)).resetPassword(any());
+    verify(model, times(1)).addAttribute(eq(Constants.PASSWORD_RESET_CODE_SUCCESS), any());
+    verify(model, times(0)).addAttribute(eq(Constants.PASSWORD_RESET_CODE_FAILURE), any());
+    assertEquals(LOGIN_VIEW, res);
   }
 }

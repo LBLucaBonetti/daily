@@ -24,7 +24,8 @@ class AppUserPasswordResetDtoTests extends DailyAbstractUnitTests {
     var passwordResetCode = UUID.randomUUID();
     var expiredAt =
         LocalDateTime.now().plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES);
-    var appUser = AppUser.builder().email(email).firstName(firstName).build();
+    var password = "encodedPassword";
+    var appUser = AppUser.builder().email(email).firstName(firstName).password(password).build();
     var appUserPasswordReset =
         AppUserPasswordReset.builder()
             .appUser(null)
@@ -40,6 +41,7 @@ class AppUserPasswordResetDtoTests extends DailyAbstractUnitTests {
     assertEquals(firstName, res.getAppUserFirstName());
     assertEquals(passwordResetCode, res.getPasswordResetCode());
     assertEquals(expiredAt, res.getExpiredAt());
+    assertEquals(password, res.getAppUserEncodedPassword());
   }
 
   @Test
@@ -51,7 +53,8 @@ class AppUserPasswordResetDtoTests extends DailyAbstractUnitTests {
     var passwordResetCode = UUID.randomUUID();
     var expiredAt =
         LocalDateTime.now().plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES);
-    var appUser = AppUser.builder().email(email).firstName(firstName).build();
+    var password = "encodedPassword";
+    var appUser = AppUser.builder().email(email).firstName(firstName).password(password).build();
     var appUserPasswordReset =
         AppUserPasswordReset.builder()
             .appUser(appUser)
@@ -67,6 +70,7 @@ class AppUserPasswordResetDtoTests extends DailyAbstractUnitTests {
     assertEquals(firstName, res.getAppUserFirstName());
     assertEquals(passwordResetCode, res.getPasswordResetCode());
     assertEquals(expiredAt, res.getExpiredAt());
+    assertEquals(password, res.getAppUserEncodedPassword());
   }
 
   @Test

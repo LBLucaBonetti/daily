@@ -39,6 +39,11 @@
              th:text="${passwordResetNotificationSuccess}">
         </div>
 
+        <div class="alert alert-success" id="password-reset-code-success-alert" role="alert"
+             th:if="${passwordResetCodeSuccess}"
+             th:text="${passwordResetCodeSuccess}">
+        </div>
+
         <form id="login-form" method="post" th:action="@{/login}">
 
           <div class="alert alert-danger" id="invalid-credentials-alert" role="alert"

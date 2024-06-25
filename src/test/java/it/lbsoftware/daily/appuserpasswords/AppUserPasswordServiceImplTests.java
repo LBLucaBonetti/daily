@@ -1,8 +1,10 @@
 package it.lbsoftware.daily.appuserpasswords;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -12,9 +14,11 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.config.DailyConfig;
 import it.lbsoftware.daily.emails.EmailService;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -25,6 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.springframework.security.authentication.password.CompromisedPasswordException;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
@@ -139,5 +144,101 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
     // Then
     assertNotNull(res);
     verify(emailService, times(0)).sendAsynchronously(any(), any());
+  }
+
+  @Test
+  @DisplayName("Should return error with message when reset password with null argument")
+  void test5() {
+    // Given
+    PasswordResetDto passwordResetDto = null;
+
+    // When
+    var res = appUserPasswordService.resetPassword(passwordResetDto);
+
+    // Then
+    verify(emailService, times(0)).sendAsynchronously(any(), any());
+    assertTrue(res.isError());
+    assertTrue(res.hasMessage());
+  }
+
+  @Test
+  @DisplayName(
+      "Should return error with message when reset password and reset app user password returns empty")
+  void test6() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword("newPassword");
+    passwordResetDto.setPasswordConfirmation("newPassword");
+    passwordResetDto.setPasswordResetCode(UUID.randomUUID());
+    given(appUserPasswordResetService.resetAppUserPassword(passwordResetDto))
+        .willReturn(Optional.empty());
+
+    // When
+    var res = appUserPasswordService.resetPassword(passwordResetDto);
+
+    // Then
+    verify(emailService, times(0)).sendAsynchronously(any(), any());
+    assertTrue(res.isError());
+    assertTrue(res.hasMessage());
+  }
+
+  @Test
+  @DisplayName(
+      "Should return error with message when reset password and reset app user password throws because of compromised password")
+  void test7() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword("newPassword");
+    passwordResetDto.setPasswordConfirmation("newPassword");
+    passwordResetDto.setPasswordResetCode(UUID.randomUUID());
+    given(appUserPasswordResetService.resetAppUserPassword(passwordResetDto))
+        .willThrow(CompromisedPasswordException.class);
+
+    // When
+    var res = appUserPasswordService.resetPassword(passwordResetDto);
+
+    // Then
+    verify(emailService, times(0)).sendAsynchronously(any(), any());
+    assertTrue(res.isError());
+    assertTrue(res.hasMessage());
+  }
+
+  @Test
+  @DisplayName(
+      "Should return ok with no message and send confirmation e-mail when reset password and reset app user password is ok")
+  void test8() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword("newPassword");
+    passwordResetDto.setPasswordConfirmation("newPassword");
+    passwordResetDto.setPasswordResetCode(UUID.randomUUID());
+    given(appUserPasswordResetService.resetAppUserPassword(passwordResetDto))
+        .willReturn(
+            Optional.of(
+                new AppUserPasswordResetDto(
+                    AppUserPasswordReset.builder()
+                        .appUser(
+                            AppUser.builder()
+                                .email("appuser@gmail.com")
+                                .firstName("FirstName")
+                                .enabled(true)
+                                .authProvider(AuthProvider.DAILY)
+                                .password("newPasswordEncoded")
+                                .build())
+                        .expiredAt(
+                            LocalDateTime.now()
+                                .plusMinutes(
+                                    Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES))
+                        .usedAt(null)
+                        .passwordResetCode(passwordResetDto.getPasswordResetCode())
+                        .build())));
+
+    // When
+    var res = appUserPasswordService.resetPassword(passwordResetDto);
+
+    // Then
+    verify(emailService, times(1)).sendAsynchronously(any(), any());
+    assertTrue(res.isOk());
+    assertFalse(res.hasMessage());
   }
 }

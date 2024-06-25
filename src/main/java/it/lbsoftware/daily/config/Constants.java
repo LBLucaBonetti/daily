@@ -59,6 +59,7 @@ public final class Constants {
   public static final String PASSWORD_RESET_VIEW = "password-reset";
   public static final String PASSWORD_RESET_CODE = "code";
   public static final String PASSWORD_RESET_CODE_FAILURE = "passwordResetCodeFailure";
+  public static final String PASSWORD_RESET_CODE_SUCCESS = "passwordResetCodeSuccess";
   public static final String PASSWORD_RESET_PATH = "/" + PASSWORD_RESET_VIEW;
   public static final List<String> ALLOWED_STATIC_TEMPLATES =
       List.of(
@@ -100,6 +101,10 @@ public final class Constants {
       EMAIL_PATH_PREFIX + "app_user_password_reset.html";
   public static final String EMAIL_APP_USER_PASSWORD_RESET_SUBJECT =
       EMAIL_SUBJECT_PREFIX + "Reset password";
+  public static final String EMAIL_APP_USER_PASSWORD_RESET_CONFIRMATION_PATH =
+      EMAIL_PATH_PREFIX + "app_user_password_reset_confirmation.html";
+  public static final String EMAIL_APP_USER_PASSWORD_RESET_CONFIRMATION_SUBJECT =
+      EMAIL_SUBJECT_PREFIX + "Password reset";
   public static final String EMAIL_FROM = "daily@trydaily.click";
   public static final String EMAIL_TITLE_KEY = "title";
   public static final String EMAIL_CONTEXT_RESERVED_KEY_MESSAGE =

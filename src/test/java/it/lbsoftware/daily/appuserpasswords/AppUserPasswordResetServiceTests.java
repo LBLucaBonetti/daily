@@ -18,6 +18,7 @@ import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.config.Constants;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
@@ -25,21 +26,31 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.authentication.password.CompromisedPasswordDecision;
+import org.springframework.security.authentication.password.CompromisedPasswordException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
 
   @Mock private AppUserPasswordResetRepository appUserPasswordResetRepository;
   @Mock private AppUserRepository appUserRepository;
+  @Mock private CompromisedPasswordChecker compromisedPasswordChecker;
+  @Mock private PasswordEncoder passwordEncoder;
   private AppUserPasswordResetService appUserPasswordResetService;
 
   @BeforeEach
   void beforeEach() {
     appUserPasswordResetService =
-        new AppUserPasswordResetService(appUserPasswordResetRepository, appUserRepository);
+        new AppUserPasswordResetService(
+            appUserPasswordResetRepository,
+            appUserRepository,
+            compromisedPasswordChecker,
+            passwordEncoder);
   }
 
   @Test
-  @DisplayName("Should throw with null e-mail")
+  @DisplayName("Should throw when create app user password reset with null e-mail")
   void test1() {
     // Given
     String email = null;
@@ -55,7 +66,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
   }
 
   @Test
-  @DisplayName("Should return empty when AppUser does not exist")
+  @DisplayName("Should return empty when create app user password reset and AppUser does not exist")
   void test2() {
     // Given
     var email = "appUser@gmail.com";
@@ -72,7 +83,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
 
   @Test
   @DisplayName(
-      "Should return empty when AppUser exists but there is already another AppUserPasswordReset for that")
+      "Should return empty when create app user password reset and AppUser exists but there is already another AppUserPasswordReset for that")
   void test3() {
     // Given
     var email = "appUser@gmail.com";
@@ -96,7 +107,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
 
   @Test
   @DisplayName(
-      "Should return AppUserPasswordResetDto when AppUser exists, there is no other AppUserPasswordReset for that and it can be saved")
+      "Should return AppUserPasswordResetDto when create app user password reset and AppUser exists, there is no other AppUserPasswordReset for that and it can be saved")
   void test4() {
     // Given
     var email = "appUser@gmail.com";
@@ -185,5 +196,154 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     assertEquals(
         appUserPasswordReset.getAppUser().getFirstName(),
         appUserPasswordResetDto.getAppUserFirstName());
+  }
+
+  @Test
+  @DisplayName("Should throw when reset app user password with null argument")
+  void test7() {
+    // Given
+    PasswordResetDto passwordResetDto = null;
+
+    // When
+    var res =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> appUserPasswordResetService.resetAppUserPassword(passwordResetDto));
+
+    // Then
+    assertNotNull(res);
+  }
+
+  @Test
+  @DisplayName(
+      "Should throw when reset app user password and valid app user password reset does not exist")
+  void test8() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword("newPassword");
+    passwordResetDto.setPasswordConfirmation("newPassword");
+    var passwordResetCode = UUID.randomUUID();
+    passwordResetDto.setPasswordResetCode(passwordResetCode);
+    given(
+            appUserPasswordResetRepository.findStillValidAppUserPasswordResetFetchEnabledAppUser(
+                eq(passwordResetCode), any()))
+        .willReturn(Optional.empty());
+
+    // When
+    var res =
+        assertThrows(
+            NoSuchElementException.class,
+            () -> appUserPasswordResetService.resetAppUserPassword(passwordResetDto));
+
+    // Then
+    assertNotNull(res);
+  }
+
+  @Test
+  @DisplayName("Should throw when reset app user password and new password is compromised")
+  void test9() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword("newPassword");
+    passwordResetDto.setPasswordConfirmation("newPassword");
+    var passwordResetCode = UUID.randomUUID();
+    passwordResetDto.setPasswordResetCode(passwordResetCode);
+    given(
+            appUserPasswordResetRepository.findStillValidAppUserPasswordResetFetchEnabledAppUser(
+                eq(passwordResetCode), any()))
+        .willReturn(
+            Optional.of(
+                AppUserPasswordReset.builder()
+                    .passwordResetCode(passwordResetCode)
+                    .appUser(
+                        AppUser.builder()
+                            .enabled(true)
+                            .authProvider(AuthProvider.DAILY)
+                            .email("appuser@gmail.com")
+                            .firstName("FirstName")
+                            .build())
+                    .usedAt(null)
+                    .expiredAt(
+                        LocalDateTime.now()
+                            .plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES))
+                    .build()));
+    given(compromisedPasswordChecker.check(passwordResetDto.getPassword()))
+        .willReturn(new CompromisedPasswordDecision(true));
+
+    // When
+    var res =
+        assertThrows(
+            CompromisedPasswordException.class,
+            () -> appUserPasswordResetService.resetAppUserPassword(passwordResetDto));
+
+    // Then
+    assertNotNull(res);
+  }
+
+  @Test
+  @DisplayName(
+      "Should return app user password reset dto when reset app user password and new password is correctly set")
+  void test10() {
+    // Given
+    var passwordResetDto = new PasswordResetDto();
+    var newPassword = "nonCompromisedNewPassword";
+    passwordResetDto.setPassword(newPassword);
+    passwordResetDto.setPasswordConfirmation(newPassword);
+    var passwordResetCode = UUID.randomUUID();
+    var encodedNewPassword = "encodedNewPassword";
+    var firstName = "FirstName";
+    var email = "appuser@gmail.com";
+    var expiredAt =
+        LocalDateTime.now().plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES);
+    passwordResetDto.setPasswordResetCode(passwordResetCode);
+    given(
+            appUserPasswordResetRepository.findStillValidAppUserPasswordResetFetchEnabledAppUser(
+                eq(passwordResetCode), any()))
+        .willReturn(
+            Optional.of(
+                AppUserPasswordReset.builder()
+                    .passwordResetCode(passwordResetCode)
+                    .appUser(
+                        AppUser.builder()
+                            .enabled(true)
+                            .authProvider(AuthProvider.DAILY)
+                            .email(email)
+                            .firstName(firstName)
+                            .build())
+                    .usedAt(null)
+                    .expiredAt(expiredAt)
+                    .build()));
+    given(compromisedPasswordChecker.check(passwordResetDto.getPassword()))
+        .willReturn(new CompromisedPasswordDecision(false));
+    given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
+
+    // When
+    var res = appUserPasswordResetService.resetAppUserPassword(passwordResetDto);
+
+    // Then
+    assertTrue(res.isPresent());
+    var appUserPasswordResetDto = res.get();
+    assertEquals(email, appUserPasswordResetDto.getAppUserEmail());
+    assertEquals(firstName, appUserPasswordResetDto.getAppUserFirstName());
+    assertEquals(passwordResetCode, appUserPasswordResetDto.getPasswordResetCode());
+    assertEquals(expiredAt, appUserPasswordResetDto.getExpiredAt());
+    assertEquals(encodedNewPassword, appUserPasswordResetDto.getAppUserEncodedPassword());
+  }
+
+  @Test
+  @DisplayName("Should throw when find still valid app user password reset with null argument")
+  void test11() {
+    // Given
+    UUID passwordResetCode = null;
+
+    // When
+    var res =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                appUserPasswordResetService.findStillValidAppUserPasswordReset(passwordResetCode));
+
+    // Then
+    assertNotNull(res);
   }
 }

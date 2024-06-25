@@ -13,6 +13,13 @@ public class AppUserPasswordResetDto {
 
   private final String appUserEmail;
   private final String appUserFirstName;
+
+  /**
+   * This password should be the encoded one coming from the stored {@link AppUser}. No check is
+   * performed here to verify it is not cleartext
+   */
+  private final String appUserEncodedPassword;
+
   private final UUID passwordResetCode;
   private final LocalDateTime expiredAt;
 
@@ -30,10 +37,12 @@ public class AppUserPasswordResetDto {
     if (appUser != null) {
       this.appUserEmail = appUser.getEmail();
       this.appUserFirstName = appUser.getFirstName();
+      this.appUserEncodedPassword = appUser.getPassword();
     } else {
       var appUserPasswordResetAppUser = appUserPasswordReset.getAppUser();
       this.appUserEmail = appUserPasswordResetAppUser.getEmail();
       this.appUserFirstName = appUserPasswordResetAppUser.getFirstName();
+      this.appUserEncodedPassword = appUserPasswordResetAppUser.getPassword();
     }
     this.passwordResetCode = appUserPasswordReset.getPasswordResetCode();
     this.expiredAt = appUserPasswordReset.getExpiredAt();

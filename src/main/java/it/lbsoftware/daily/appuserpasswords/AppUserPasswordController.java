@@ -1,9 +1,11 @@
 package it.lbsoftware.daily.appuserpasswords;
 
+import static it.lbsoftware.daily.templates.TemplateUtils.addErrorToView;
 import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
 
 import it.lbsoftware.daily.config.Constants;
 import jakarta.validation.Valid;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
@@ -71,10 +73,14 @@ class AppUserPasswordController {
                   .findStillValidAppUserPasswordReset(code)
                   .ifPresentOrElse(
                       (var appUserPasswordResetDto) -> passwordResetDto.setPasswordResetCode(code),
-                      () ->
-                          model.addAttribute(
-                              Constants.PASSWORD_RESET_CODE_FAILURE,
-                              "Invalid password reset code"));
+                      () -> {
+                        log.info(
+                            "Found an invalid password reset code "
+                                + code
+                                + " trying to get reset password view");
+                        model.addAttribute(
+                            Constants.PASSWORD_RESET_CODE_FAILURE, "Invalid password reset code");
+                      });
 
               model.addAttribute(PASSWORD_RESET_DTO_PARAMETER, passwordResetDto);
               return Constants.PASSWORD_RESET_VIEW;
@@ -90,9 +96,31 @@ class AppUserPasswordController {
     return redirectIfAuthenticated(authentication)
         .orElseGet(
             () -> {
+              // Show validation errors if any
               if (bindingResult.hasErrors()) {
                 return Constants.PASSWORD_RESET_VIEW;
               }
+              // Passwords should match
+              if (!Objects.equals(
+                  passwordResetDto.getPassword(), passwordResetDto.getPasswordConfirmation())) {
+                addErrorToView(bindingResult, "Passwords should match");
+                return Constants.PASSWORD_RESET_VIEW;
+              }
+              var resetPasswordResult = appUserPasswordService.resetPassword(passwordResetDto);
+              if (resetPasswordResult.isOk()) {
+                log.info(
+                    "Password successfully reset for code "
+                        + passwordResetDto.getPasswordResetCode());
+                model.addAttribute(
+                    Constants.PASSWORD_RESET_CODE_SUCCESS,
+                    "Your password has been successfully reset! You can now log in");
+                return Constants.LOGIN_VIEW;
+              }
+              log.info(
+                  "Found an invalid reset code "
+                      + passwordResetDto.getPasswordResetCode()
+                      + " trying to post reset password");
+              resetPasswordResult.ifHasMessageDo(model::addAttribute);
               return Constants.PASSWORD_RESET_VIEW;
             });
   }
