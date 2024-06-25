@@ -3,6 +3,7 @@ package it.lbsoftware.daily.appuserpasswords;
 import it.lbsoftware.daily.appusers.AppUser;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,4 +27,8 @@ public interface AppUserPasswordResetRepository extends JpaRepository<AppUserPas
   Optional<AppUserPasswordReset> findStillValidAppUserPasswordResetFetchEnabledAppUser(
       @Param("passwordResetCode") UUID passwordResetCode,
       @Param("passwordResetThreshold") LocalDateTime passwordResetThreshold);
+
+  @Query(
+      "select aupr from AppUserPasswordReset aupr where (aupr.expiredAt < :passwordResetRemovalThreshold or aupr.usedAt is not null)")
+  Set<AppUserPasswordReset> findToRemove(LocalDateTime passwordResetRemovalThreshold);
 }
