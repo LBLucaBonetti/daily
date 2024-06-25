@@ -23,6 +23,7 @@ public final class AppUserTestUtils {
   public static final String APP_USER_LASTNAME = "LastName";
   public static final String APP_USER_FULLNAME = APP_USER_FIRSTNAME + " " + APP_USER_LASTNAME;
   public static final String APP_USER_EMAIL = "appUser@gmail.com";
+  public static final String APP_USER_ENCODED_PASSWORD = "appUserEncodedPassword";
   public static final String OTHER_APP_USER_AUTH_PROVIDER_ID = "otherAppUserAuthProviderId";
   public static final String OTHER_APP_USER_FIRSTNAME = "OtherFirstName";
   public static final String OTHER_APP_USER_LASTNAME = "OtherLastName";
@@ -62,8 +63,8 @@ public final class AppUserTestUtils {
   }
 
   /**
-   * {@link AppUser} generator with default values; the created instance is persisted with the
-   * provided repository.
+   * OAuth2 {@link AppUser} generator with default values; the created instance is persisted with
+   * the provided repository.
    *
    * @param appUserRepository Repository used to persist the created instance
    * @return The saved entity
@@ -77,12 +78,34 @@ public final class AppUserTestUtils {
             .firstName(APP_USER_FIRSTNAME)
             .lastName(APP_USER_LASTNAME)
             .email(APP_USER_EMAIL)
+            .password(APP_USER_ENCODED_PASSWORD)
             .build());
   }
 
   /**
-   * App user generator with different default values; the created instance is persisted with the
-   * provided repository
+   * Daily {@link AppUser} generator with default values (it is saved as enabled even if no {@link
+   * it.lbsoftware.daily.appuseractivations.AppUserActivation} is created); the created instance is
+   * persisted with the provided repository.
+   *
+   * @param appUserRepository Repository used to persist the created instance
+   * @return The saved entity
+   */
+  public static AppUser saveDaily2AppUser(@NonNull final AppUserRepository appUserRepository) {
+    return appUserRepository.save(
+        AppUser.builder()
+            .enabled(true)
+            .authProviderId(APP_USER_AUTH_PROVIDER_ID)
+            .authProvider(AuthProvider.DAILY)
+            .firstName(APP_USER_FIRSTNAME)
+            .lastName(APP_USER_LASTNAME)
+            .email(APP_USER_EMAIL)
+            .password(APP_USER_ENCODED_PASSWORD)
+            .build());
+  }
+
+  /**
+   * OAuth2 {@link AppUser} generator with different default values; the created instance is
+   * persisted with the provided repository
    *
    * @param appUserRepository Repository used to persist the created instance
    * @return The saved entity
@@ -96,6 +119,7 @@ public final class AppUserTestUtils {
             .firstName(OTHER_APP_USER_FIRSTNAME)
             .lastName(OTHER_APP_USER_LASTNAME)
             .email(OTHER_APP_USER_EMAIL)
+            .password(APP_USER_ENCODED_PASSWORD)
             .build());
   }
 
