@@ -1,8 +1,8 @@
 package it.lbsoftware.daily.appuserlogins;
 
-import static it.lbsoftware.daily.templates.TemplateUtils.getInvalidCredentialsErrorMessage;
-import static it.lbsoftware.daily.templates.TemplateUtils.hasNonNullParameter;
-import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
+import static it.lbsoftware.daily.frontend.TemplateUtils.getInvalidCredentialsErrorMessage;
+import static it.lbsoftware.daily.frontend.TemplateUtils.hasNonNullParameter;
+import static it.lbsoftware.daily.frontend.TemplateUtils.redirectIfAuthenticated;
 
 import it.lbsoftware.daily.config.Constants;
 import jakarta.servlet.http.HttpServletRequest;

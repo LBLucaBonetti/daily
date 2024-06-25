@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.templates;
+package it.lbsoftware.daily.frontend;
 
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;

@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
-import it.lbsoftware.daily.templates.OperationResult;
+import it.lbsoftware.daily.frontend.OperationResult;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;

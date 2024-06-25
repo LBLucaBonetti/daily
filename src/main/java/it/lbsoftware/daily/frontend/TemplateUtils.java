@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.templates;
+package it.lbsoftware.daily.frontend;
 
 import static it.lbsoftware.daily.config.Constants.REDIRECT;
 

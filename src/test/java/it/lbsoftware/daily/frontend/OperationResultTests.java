@@ -1,4 +1,4 @@
-package it.lbsoftware.daily.templates;
+package it.lbsoftware.daily.frontend;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

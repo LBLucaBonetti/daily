@@ -1,8 +1,8 @@
-package it.lbsoftware.daily.templates;
+package it.lbsoftware.daily.frontend;
 
 import static it.lbsoftware.daily.config.Constants.REDIRECT;
-import static it.lbsoftware.daily.templates.TemplateUtils.DEFAULT_COMPROMISED_PASSWORD_ERROR_MESSAGE;
-import static it.lbsoftware.daily.templates.TemplateUtils.DEFAULT_INVALID_CREDENTIALS_ERROR_MESSAGE;
+import static it.lbsoftware.daily.frontend.TemplateUtils.DEFAULT_COMPROMISED_PASSWORD_ERROR_MESSAGE;
+import static it.lbsoftware.daily.frontend.TemplateUtils.DEFAULT_INVALID_CREDENTIALS_ERROR_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;

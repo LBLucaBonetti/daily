@@ -1,7 +1,7 @@
 package it.lbsoftware.daily.appuserpasswords;
 
-import static it.lbsoftware.daily.templates.TemplateUtils.addErrorToView;
-import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
+import static it.lbsoftware.daily.frontend.TemplateUtils.addErrorToView;
+import static it.lbsoftware.daily.frontend.TemplateUtils.redirectIfAuthenticated;
 
 import it.lbsoftware.daily.config.Constants;
 import jakarta.validation.Valid;

@@ -1,7 +1,7 @@
 package it.lbsoftware.daily.appusersignups;
 
 import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;
-import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
+import static it.lbsoftware.daily.frontend.TemplateUtils.redirectIfAuthenticated;
 
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.config.Constants;

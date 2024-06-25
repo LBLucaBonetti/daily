@@ -13,7 +13,7 @@ import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.config.DailyConfig;
 import it.lbsoftware.daily.emails.EmailInfo;
 import it.lbsoftware.daily.emails.EmailService;
-import it.lbsoftware.daily.templates.OperationResult;
+import it.lbsoftware.daily.frontend.OperationResult;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;

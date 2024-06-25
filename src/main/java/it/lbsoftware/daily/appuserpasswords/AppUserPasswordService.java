@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.appuserpasswords;
 
-import it.lbsoftware.daily.templates.OperationResult;
+import it.lbsoftware.daily.frontend.OperationResult;
 import org.springframework.ui.Model;
 
 /**
