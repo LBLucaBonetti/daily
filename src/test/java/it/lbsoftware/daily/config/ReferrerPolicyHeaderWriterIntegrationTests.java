@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+@DisplayName("Referrer policy header writer integration tests")
 class ReferrerPolicyHeaderWriterIntegrationTests extends DailyAbstractIntegrationTests {
 
   @BeforeEach

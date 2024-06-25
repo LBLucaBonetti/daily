@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+@DisplayName("App user activation integration tests")
 class AppUserActivationIntegrationTests extends DailyAbstractIntegrationTests {
 
   private static final String BASE_URL = Constants.ACTIVATION_PATH;
