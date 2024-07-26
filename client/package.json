@@ -15,7 +15,7 @@
     "axios": "^1.7.2",
     "pinia": "^2.1.7",
     "quasar": "^2.16.6",
-    "vue": "^3.4.33",
+    "vue": "^3.4.34",
     "quasar-extras-svg-icons": "^1.37.0",
     "vue-i18n": "^9.13.1",
     "vue-router": "^4.4.0"
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@quasar/app-vite": "^1.9.3",
-    "@types/node": "^20.14.11",
+    "@types/node": "^20.14.12",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.21.0",
     "autoprefixer": "^10.4.19",
@@ -31,7 +31,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.27.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.4"
   },
   "engines": {
     "node": "^20 || ^18 || ^16",
