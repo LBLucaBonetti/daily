@@ -119,6 +119,26 @@ export default {
       subtitle: 'Le seguenti operazioni non sono reversibili',
       passwordChange: {
         button: 'Cambia password',
+        dialog: {
+          title: 'Cambia password',
+          subtitle:
+            'Inserisci la password corrente e la nuova ripetendola per conferma',
+          oldPassword: {
+            placeholder: 'Password corrente',
+            empty: 'Inserisci la password corrente',
+          },
+          newPassword: {
+            placeholder: 'Nuova password',
+            empty: 'Inserisci la nuova password',
+          },
+          newPasswordConfirmation: {
+            placeholder: 'Ripeti la nuova password',
+            empty: 'Ripeti la nuova password',
+          },
+          confirm:
+            "Vuoi davvero cambiare la password? L'operazione non è reversibile",
+        },
+        ok: 'Password cambiata correttamente, verrà richiesta a partire dal prossimo accesso',
       },
       deleteAppUser: { button: 'Elimina account' },
     },

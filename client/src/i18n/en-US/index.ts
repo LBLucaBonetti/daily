@@ -7,7 +7,7 @@ export default {
           compromised:
             'The new password is compromised and should not be used. Choose a different one and retry',
           generic: 'Error saving the new password',
-          mismatch: 'The chosed passwords do not match',
+          mismatch: 'The chosen passwords do not match',
         },
       },
     },
@@ -122,6 +122,26 @@ export default {
       subtitle: 'The following operations cannot be undone',
       passwordChange: {
         button: 'Change password',
+        dialog: {
+          title: 'Change password',
+          subtitle:
+            'Type your current password and the new one twice to confirm',
+          oldPassword: {
+            placeholder: 'Current password',
+            empty: 'Type your current password',
+          },
+          newPassword: {
+            placeholder: 'New password',
+            empty: 'Type the new password',
+          },
+          newPasswordConfirmation: {
+            placeholder: 'Type again the new password',
+            empty: 'Type again the new password',
+          },
+          confirm:
+            'Do you really want to change your password? The operation cannot be undone',
+        },
+        ok: 'Password correctly changed, it will be asked from the next login',
       },
       deleteAppUser: { button: 'Delete account' },
     },
