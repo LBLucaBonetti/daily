@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appuserpasswords;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.frontend.OperationResult;
 import org.springframework.ui.Model;
 
@@ -28,4 +29,13 @@ public interface AppUserPasswordService {
    * @return A detailed result, optionally containing messages to show to the user
    */
   OperationResult resetPassword(PasswordResetDto passwordResetDto);
+
+  /**
+   * Tries to change the {@link it.lbsoftware.daily.appusers.AppUser} password with the given data.
+   *
+   * @param passwordChangeDto The data to change the password with
+   * @param appUser The subject
+   * @return A detailed result, optionally containing messages to show to the user
+   */
+  OperationResult changePassword(PasswordChangeDto passwordChangeDto, AppUser appUser);
 }

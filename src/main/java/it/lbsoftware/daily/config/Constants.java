@@ -24,6 +24,12 @@ public final class Constants {
   public static final String ERROR_DEFAULT = ERROR_PREFIX + "default";
   public static final String ERROR_NOTE_TAGS_MAX = ERROR_PREFIX + "note.tags.max";
   public static final String ERROR_NOT_FOUND = ERROR_PREFIX + "not.found";
+  public static final String ERROR_PASSWORD_CHANGE_COMPROMISED =
+      ERROR_PREFIX + "password.change.compromised";
+  public static final String ERROR_PASSWORD_CHANGE_GENERIC =
+      ERROR_PREFIX + "password.change.generic";
+  public static final String ERROR_PASSWORD_CHANGE_MISMATCH =
+      ERROR_PREFIX + "password.change.mismatch";
   public static final String DO_NOT_STORE_NULL_SPEL = "#result == null";
   public static final String BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL =
       "'appUser:' + #appUser + ':' + #uuid";
@@ -68,6 +74,7 @@ public final class Constants {
           ACTIVATION_PATH,
           SEND_PASSWORD_RESET_NOTIFICATION_PATH,
           PASSWORD_RESET_PATH);
+  public static final String APP_USER_PATH = "/api/appusers";
   public static final String ACTIVATION_CODE_SUCCESS = "activationCodeSuccess";
   public static final String ACTIVATION_CODE_FAILURE = "activationCodeFailure";
   public static final String SIGNUP_SUCCESS = "signupSuccess";

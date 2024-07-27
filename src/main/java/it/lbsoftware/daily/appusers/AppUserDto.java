@@ -9,12 +9,14 @@ import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 /** Dto for {@link AppUser} entities. */
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class AppUserDto {
 
   @Size(max = Constants.APP_USER_EMAIL_MAX)
@@ -29,9 +31,11 @@ public class AppUserDto {
   private String email;
 
   @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
+  @ToString.Exclude
   private String password;
 
   @NotBlank(message = Constants.NOT_BLANK_MESSAGE)
+  @ToString.Exclude
   private String passwordConfirmation;
 
   @Size(max = Constants.APP_USER_FIRST_NAME_MAX)

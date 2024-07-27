@@ -29,6 +29,7 @@ public interface AppUserPasswordResetRepository extends JpaRepository<AppUserPas
       @Param("passwordResetThreshold") LocalDateTime passwordResetThreshold);
 
   @Query(
-      "select aupr from AppUserPasswordReset aupr where (aupr.expiredAt < :passwordResetRemovalThreshold or aupr.usedAt is not null)")
+      "select aupr from AppUserPasswordReset aupr where (aupr.expiredAt < "
+          + ":passwordResetRemovalThreshold or aupr.usedAt is not null)")
   Set<AppUserPasswordReset> findToRemove(LocalDateTime passwordResetRemovalThreshold);
 }

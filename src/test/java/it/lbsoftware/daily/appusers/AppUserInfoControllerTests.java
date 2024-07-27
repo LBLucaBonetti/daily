@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class AppUserInfoControllerTests extends DailyAbstractUnitTests {
   @DisplayName("Should read info and return info")
   void test1() {
     // Given
-    InfoDto info = new InfoDto(APP_USER_FULLNAME, APP_USER_EMAIL);
+    InfoDto info = new InfoDto(APP_USER_FULLNAME, APP_USER_EMAIL, AuthProvider.GOOGLE);
     given(appUserService.getAppUserInfo(appUser)).willReturn(info);
 
     // When

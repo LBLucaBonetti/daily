@@ -35,7 +35,7 @@ import org.springframework.ui.Model;
 
 class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
 
-  @Mock private AppUserPasswordResetService appUserPasswordResetService;
+  @Mock private AppUserPasswordModificationService appUserPasswordModificationService;
   @Mock private EmailService emailService;
   @Mock private DailyConfig dailyConfig;
   private AppUserPasswordServiceImpl appUserPasswordService;
@@ -53,7 +53,8 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
   @BeforeEach
   void beforeEach() {
     this.appUserPasswordService =
-        new AppUserPasswordServiceImpl(appUserPasswordResetService, emailService, dailyConfig);
+        new AppUserPasswordServiceImpl(
+            appUserPasswordModificationService, emailService, dailyConfig);
   }
 
   @ParameterizedTest
@@ -75,14 +76,14 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
     var email = "appuser@email.com";
     var passwordResetNotificationDto = new PasswordResetNotificationDto(email);
     var model = new ExtendedModelMap();
-    given(appUserPasswordResetService.createAppUserPasswordReset(email))
+    given(appUserPasswordModificationService.createAppUserPasswordReset(email))
         .willReturn(Optional.empty());
 
     // When
     appUserPasswordService.sendPasswordResetNotification(passwordResetNotificationDto, model);
 
     // Then
-    verify(appUserPasswordResetService, times(1)).createAppUserPasswordReset(email);
+    verify(appUserPasswordModificationService, times(1)).createAppUserPasswordReset(email);
     verify(emailService, times(0)).sendAsynchronously(any(), any());
     assertEquals(
         Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS_MESSAGE,
@@ -102,7 +103,7 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
                 .appUser(AppUser.builder().firstName("First name").email(email).build())
                 .passwordResetCode(UUID.randomUUID())
                 .build());
-    given(appUserPasswordResetService.createAppUserPasswordReset(email))
+    given(appUserPasswordModificationService.createAppUserPasswordReset(email))
         .willReturn(Optional.of(appUserPasswordResetDto));
     given(dailyConfig.getBaseUri()).willReturn("http://localhost:8080");
 
@@ -110,7 +111,7 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
     appUserPasswordService.sendPasswordResetNotification(passwordResetNotificationDto, model);
 
     // Then
-    verify(appUserPasswordResetService, times(1)).createAppUserPasswordReset(email);
+    verify(appUserPasswordModificationService, times(1)).createAppUserPasswordReset(email);
     verify(emailService, times(1)).sendAsynchronously(any(), any());
     assertEquals(
         Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS_MESSAGE,
@@ -130,7 +131,7 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
                 .appUser(AppUser.builder().firstName("First name").email(email).build())
                 .passwordResetCode(null)
                 .build());
-    given(appUserPasswordResetService.createAppUserPasswordReset(email))
+    given(appUserPasswordModificationService.createAppUserPasswordReset(email))
         .willReturn(Optional.of(appUserPasswordResetDto));
 
     // When
@@ -170,7 +171,7 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
     passwordResetDto.setPassword("newPassword");
     passwordResetDto.setPasswordConfirmation("newPassword");
     passwordResetDto.setPasswordResetCode(UUID.randomUUID());
-    given(appUserPasswordResetService.resetAppUserPassword(passwordResetDto))
+    given(appUserPasswordModificationService.resetAppUserPassword(passwordResetDto))
         .willReturn(Optional.empty());
 
     // When
@@ -191,7 +192,7 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
     passwordResetDto.setPassword("newPassword");
     passwordResetDto.setPasswordConfirmation("newPassword");
     passwordResetDto.setPasswordResetCode(UUID.randomUUID());
-    given(appUserPasswordResetService.resetAppUserPassword(passwordResetDto))
+    given(appUserPasswordModificationService.resetAppUserPassword(passwordResetDto))
         .willThrow(CompromisedPasswordException.class);
 
     // When
@@ -212,7 +213,7 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
     passwordResetDto.setPassword("newPassword");
     passwordResetDto.setPasswordConfirmation("newPassword");
     passwordResetDto.setPasswordResetCode(UUID.randomUUID());
-    given(appUserPasswordResetService.resetAppUserPassword(passwordResetDto))
+    given(appUserPasswordModificationService.resetAppUserPassword(passwordResetDto))
         .willReturn(
             Optional.of(
                 new AppUserPasswordResetDto(

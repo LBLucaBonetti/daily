@@ -1,11 +1,13 @@
 package it.lbsoftware.daily.appuserpasswords;
 
+import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.config.Constants.LOGIN_VIEW;
 import static it.lbsoftware.daily.config.Constants.REDIRECT;
 import static it.lbsoftware.daily.config.Constants.SEND_PASSWORD_RESET_NOTIFICATION_VIEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -15,7 +17,10 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.appusers.AppUserDetails;
+import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exceptions.DailyBadRequestException;
 import it.lbsoftware.daily.frontend.OperationResult;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,14 +35,19 @@ import org.springframework.validation.BindingResult;
 
 class AppUserPasswordControllerTests extends DailyAbstractUnitTests {
 
+  private static final String EMAIL = "appuser@email.com";
+  private static final UUID UNIQUE_ID = UUID.randomUUID();
+  private static final AppUser APP_USER = createAppUser(UNIQUE_ID, EMAIL);
   @Mock private AppUserPasswordService appUserPasswordService;
-  @Mock private AppUserPasswordResetService appUserPasswordResetService;
+  @Mock private AppUserPasswordModificationService appUserPasswordModificationService;
+  @Mock private AppUserService appUserService;
   private AppUserPasswordController appUserPasswordController;
 
   @BeforeEach
   void beforeEach() {
     appUserPasswordController =
-        new AppUserPasswordController(appUserPasswordService, appUserPasswordResetService);
+        new AppUserPasswordController(
+            appUserPasswordService, appUserPasswordModificationService, appUserService);
   }
 
   @Test
@@ -156,14 +166,14 @@ class AppUserPasswordControllerTests extends DailyAbstractUnitTests {
     var code = UUID.randomUUID();
     var model = new ExtendedModelMap();
     Authentication authentication = null;
-    given(appUserPasswordResetService.findStillValidAppUserPasswordReset(code))
+    given(appUserPasswordModificationService.findStillValidAppUserPasswordReset(code))
         .willReturn(Optional.empty());
 
     // When
     var res = appUserPasswordController.resetPassword(code, model, authentication);
 
     // Then
-    verify(appUserPasswordResetService, times(1)).findStillValidAppUserPasswordReset(code);
+    verify(appUserPasswordModificationService, times(1)).findStillValidAppUserPasswordReset(code);
     String passwordResetCodeFailure =
         (String) model.getAttribute(Constants.PASSWORD_RESET_CODE_FAILURE);
     assertNotNull(passwordResetCodeFailure);
@@ -182,7 +192,7 @@ class AppUserPasswordControllerTests extends DailyAbstractUnitTests {
     var code = UUID.randomUUID();
     var model = new ExtendedModelMap();
     Authentication authentication = null;
-    given(appUserPasswordResetService.findStillValidAppUserPasswordReset(code))
+    given(appUserPasswordModificationService.findStillValidAppUserPasswordReset(code))
         .willReturn(
             Optional.of(
                 new AppUserPasswordResetDto(
@@ -199,7 +209,7 @@ class AppUserPasswordControllerTests extends DailyAbstractUnitTests {
     var res = appUserPasswordController.resetPassword(code, model, authentication);
 
     // Then
-    verify(appUserPasswordResetService, times(1)).findStillValidAppUserPasswordReset(code);
+    verify(appUserPasswordModificationService, times(1)).findStillValidAppUserPasswordReset(code);
     String passwordResetCodeFailure =
         (String) model.getAttribute(Constants.PASSWORD_RESET_CODE_FAILURE);
     assertNull(passwordResetCodeFailure);
@@ -323,5 +333,26 @@ class AppUserPasswordControllerTests extends DailyAbstractUnitTests {
     verify(model, times(1)).addAttribute(eq(Constants.PASSWORD_RESET_CODE_SUCCESS), any());
     verify(model, times(0)).addAttribute(eq(Constants.PASSWORD_RESET_CODE_FAILURE), any());
     assertEquals(LOGIN_VIEW, res);
+  }
+
+  @Test
+  @DisplayName(
+      "Should throw bad request with no message even if change password result has no message")
+  void test14() {
+    // Given
+    var passwordChangeDto = new PasswordChangeDto("oldPassword", "newPassword", "newPassword");
+    var principal = mock(AppUserDetails.class);
+    given(appUserService.getAppUser(principal)).willReturn(APP_USER);
+    given(appUserPasswordService.changePassword(passwordChangeDto, APP_USER))
+        .willReturn(OperationResult.error(null, null));
+
+    // When
+    var res =
+        assertThrows(
+            DailyBadRequestException.class,
+            () -> appUserPasswordController.changePassword(passwordChangeDto, principal));
+
+    // Then
+    assertNotNull(res);
   }
 }

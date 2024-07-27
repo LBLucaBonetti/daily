@@ -3,20 +3,27 @@ package it.lbsoftware.daily.appuserpasswords;
 import static it.lbsoftware.daily.frontend.TemplateUtils.addErrorToView;
 import static it.lbsoftware.daily.frontend.TemplateUtils.redirectIfAuthenticated;
 
+import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exceptions.DailyBadRequestException;
 import jakarta.validation.Valid;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,7 +34,8 @@ class AppUserPasswordController {
       "passwordResetNotificationDto";
   private static final String PASSWORD_RESET_DTO_PARAMETER = "passwordResetDto";
   private final AppUserPasswordService appUserPasswordService;
-  private final AppUserPasswordResetService appUserPasswordResetService;
+  private final AppUserPasswordModificationService appUserPasswordModificationService;
+  private final AppUserService appUserService;
 
   @GetMapping(value = Constants.SEND_PASSWORD_RESET_NOTIFICATION_PATH)
   public String sendPasswordResetNotification(Model model, Authentication authentication) {
@@ -69,7 +77,7 @@ class AppUserPasswordController {
         .orElseGet(
             () -> {
               var passwordResetDto = new PasswordResetDto();
-              appUserPasswordResetService
+              appUserPasswordModificationService
                   .findStillValidAppUserPasswordReset(code)
                   .ifPresentOrElse(
                       (var appUserPasswordResetDto) -> passwordResetDto.setPasswordResetCode(code),
@@ -120,8 +128,30 @@ class AppUserPasswordController {
                   "Found an invalid reset code "
                       + passwordResetDto.getPasswordResetCode()
                       + " trying to post reset password");
-              resetPasswordResult.ifHasMessageDo(model::addAttribute);
+              resetPasswordResult.ifHasMessage(model::addAttribute);
               return Constants.PASSWORD_RESET_VIEW;
             });
+  }
+
+  @PutMapping(Constants.APP_USER_PATH + "/passwords")
+  @ResponseBody
+  public ResponseEntity<Void> changePassword(
+      @Valid @RequestBody PasswordChangeDto passwordChangeDto,
+      @AuthenticationPrincipal Object principal) {
+    if (!Objects.equals(
+        passwordChangeDto.newPassword(), passwordChangeDto.newPasswordConfirmation())) {
+      throw new DailyBadRequestException(Constants.ERROR_PASSWORD_CHANGE_MISMATCH);
+    }
+    var changePasswordResult =
+        appUserPasswordService.changePassword(
+            passwordChangeDto, appUserService.getAppUser(principal));
+    if (changePasswordResult.isError()) {
+      changePasswordResult.ifHasMessage(
+          (String messageKey, String messageValue) -> {
+            throw new DailyBadRequestException(messageValue);
+          });
+      throw new DailyBadRequestException(null);
+    }
+    return ResponseEntity.noContent().build();
   }
 }

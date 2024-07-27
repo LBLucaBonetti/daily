@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
+import it.lbsoftware.daily.config.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/appusers")
+@RequestMapping(value = Constants.APP_USER_PATH)
 @CommonsLog
 class AppUserInfoController {
 

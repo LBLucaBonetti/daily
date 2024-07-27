@@ -8,6 +8,7 @@ import static it.lbsoftware.daily.config.Constants.PASSWORD_RESET_NOTIFICATION_S
 import static it.lbsoftware.daily.config.Constants.PASSWORD_RESET_NOTIFICATION_SUCCESS_MESSAGE;
 import static it.lbsoftware.daily.config.Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES;
 
+import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserUtils;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.config.DailyConfig;
@@ -29,14 +30,14 @@ import org.springframework.web.util.UriComponentsBuilder;
  * Main {@link it.lbsoftware.daily.appusers.AppUser} password service implementation, defining
  * methods that are not delegated to the framework (Spring Security or similar). Also handles {@link
  * AppUserPasswordReset} but delegates main entity operations and logic to {@link
- * AppUserPasswordResetService}.
+ * AppUserPasswordModificationService}.
  */
 @Service
 @RequiredArgsConstructor
 @CommonsLog
 public class AppUserPasswordServiceImpl implements AppUserPasswordService {
 
-  private final AppUserPasswordResetService appUserPasswordResetService;
+  private final AppUserPasswordModificationService appUserPasswordModificationService;
   private final EmailService emailService;
   private final DailyConfig dailyConfig;
 
@@ -44,7 +45,7 @@ public class AppUserPasswordServiceImpl implements AppUserPasswordService {
   public void sendPasswordResetNotification(
       @NonNull PasswordResetNotificationDto passwordResetNotificationDto, @NonNull Model model) {
     var email = passwordResetNotificationDto.getEmail();
-    appUserPasswordResetService
+    appUserPasswordModificationService
         .createAppUserPasswordReset(email)
         .ifPresentOrElse(
             this::sendPasswordResetEmail,
@@ -63,8 +64,12 @@ public class AppUserPasswordServiceImpl implements AppUserPasswordService {
   public OperationResult resetPassword(PasswordResetDto passwordResetDto) {
     try {
       var appUserPasswordResetDto =
-          appUserPasswordResetService.resetAppUserPassword(passwordResetDto).orElseThrow();
-      sendPasswordResetConfirmationEmail(appUserPasswordResetDto);
+          appUserPasswordModificationService.resetAppUserPassword(passwordResetDto).orElseThrow();
+      sendPasswordResetConfirmationEmail(
+          AppUser.builder()
+              .email(appUserPasswordResetDto.getAppUserEmail())
+              .firstName(appUserPasswordResetDto.getAppUserFirstName())
+              .build());
       return OperationResult.ok();
     } catch (CompromisedPasswordException e) {
       return OperationResult.error(
@@ -76,20 +81,40 @@ public class AppUserPasswordServiceImpl implements AppUserPasswordService {
     }
   }
 
+  @Override
+  public OperationResult changePassword(PasswordChangeDto passwordChangeDto, AppUser appUser) {
+    try {
+      var appUserPasswordChangedDto =
+          appUserPasswordModificationService
+              .changeAppUserPassword(passwordChangeDto, appUser)
+              .orElseThrow();
+      sendPasswordResetConfirmationEmail(
+          AppUser.builder()
+              .email(appUserPasswordChangedDto.appUserEmail())
+              .firstName(appUserPasswordChangedDto.appUserFirstName())
+              .build());
+      return OperationResult.ok();
+    } catch (CompromisedPasswordException e) {
+      return OperationResult.error(
+          Constants.ERROR_KEY, Constants.ERROR_PASSWORD_CHANGE_COMPROMISED);
+    } catch (Exception e) {
+      return OperationResult.error(Constants.ERROR_KEY, Constants.ERROR_PASSWORD_CHANGE_GENERIC);
+    }
+  }
+
   /**
    * Sends a password reset confirmation asynchronously. Since the error handling is not important
    * for the app user to avoid leaking information, the async operation is fine here.
    *
-   * @param appUserPasswordResetDto Contains data used to send this e-mail
+   * @param appUser Contains data used to send this e-mail
    */
-  private void sendPasswordResetConfirmationEmail(
-      final AppUserPasswordResetDto appUserPasswordResetDto) {
+  private void sendPasswordResetConfirmationEmail(final AppUser appUser) {
     emailService.sendAsynchronously(
         new EmailInfo(
             EMAIL_APP_USER_PASSWORD_RESET_CONFIRMATION_PATH,
-            appUserPasswordResetDto.getAppUserEmail(),
+            appUser.getEmail(),
             EMAIL_APP_USER_PASSWORD_RESET_CONFIRMATION_SUBJECT),
-        Map.of("appUserFirstName", AppUserUtils.getFirstNameOrDefault(appUserPasswordResetDto)));
+        Map.of("appUserFirstName", AppUserUtils.getFirstNameOrDefault(appUser)));
   }
 
   /**
@@ -106,7 +131,8 @@ public class AppUserPasswordServiceImpl implements AppUserPasswordService {
             EMAIL_APP_USER_PASSWORD_RESET_SUBJECT),
         Map.of(
             "appUserFirstName",
-            AppUserUtils.getFirstNameOrDefault(appUserPasswordResetDto),
+            AppUserUtils.getFirstNameOrDefault(
+                AppUser.builder().firstName(appUserPasswordResetDto.getAppUserFirstName()).build()),
             "passwordResetUri",
             getPasswordResetUri(appUserPasswordResetDto.getPasswordResetCode()),
             "minutesBeforeExpiration",

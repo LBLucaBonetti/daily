@@ -1,4 +1,17 @@
 export default {
+  daily: {
+    error: {
+      default: 'Unexpected error',
+      password: {
+        change: {
+          compromised:
+            'The new password is compromised and should not be used. Choose a different one and retry',
+          generic: 'Error saving the new password',
+          mismatch: 'The chosed passwords do not match',
+        },
+      },
+    },
+  },
   language: {
     label: 'Language',
     english: 'English',

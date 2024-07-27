@@ -70,7 +70,7 @@ class OperationResultTests extends DailyAbstractUnitTests {
 
     // When
     var res = OperationResult.ok();
-    res.ifHasMessageDo(map::put);
+    res.ifHasMessage(map::put);
 
     // Then
     assertFalse(res.hasMessage());

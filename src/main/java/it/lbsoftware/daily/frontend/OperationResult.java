@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
  * Generic operation result. It accepts a binary result, either ok or error, and a message that is
  * optional when the operation is ok and is mandatory when it is an error. Note that while the
  * message may be mandatory, the values can be null but the results can still be used with the
- * {@link OperationResult#ifHasMessageDo(BiConsumer)} method.
+ * {@link OperationResult#ifHasMessage(BiConsumer)} method.
  */
 public class OperationResult {
 
@@ -75,10 +75,11 @@ public class OperationResult {
 
   /**
    * Performs the provided operation only if the operation result has a valid non-blank message.
+   * Negative (error) operation results should always provide a message.
    *
    * @param messageConsumer The operation to perform with the message key and value
    */
-  public void ifHasMessageDo(final BiConsumer<String, String> messageConsumer) {
+  public void ifHasMessage(final BiConsumer<String, String> messageConsumer) {
     if (hasNoMessage()) {
       return;
     }

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -21,28 +22,40 @@ import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.authentication.password.CompromisedPasswordDecision;
 import org.springframework.security.authentication.password.CompromisedPasswordException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
+class AppUserPasswordModificationServiceTests extends DailyAbstractUnitTests {
 
+  private static final AppUser APP_USER = createAppUser(UUID.randomUUID(), "appuser@email.com");
   @Mock private AppUserPasswordResetRepository appUserPasswordResetRepository;
   @Mock private AppUserRepository appUserRepository;
   @Mock private CompromisedPasswordChecker compromisedPasswordChecker;
   @Mock private PasswordEncoder passwordEncoder;
-  private AppUserPasswordResetService appUserPasswordResetService;
+  private AppUserPasswordModificationService appUserPasswordModificationService;
+
+  private static Stream<Arguments> test12() {
+    // PasswordChangeDto, appUser
+    var passwordChangeDto = new PasswordChangeDto("oldPassword", "newPassword", "newPassword");
+    return Stream.of(
+        arguments(null, null), arguments(null, APP_USER), arguments(passwordChangeDto, null));
+  }
 
   @BeforeEach
   void beforeEach() {
-    appUserPasswordResetService =
-        new AppUserPasswordResetService(
+    appUserPasswordModificationService =
+        new AppUserPasswordModificationService(
             appUserPasswordResetRepository,
             appUserRepository,
             compromisedPasswordChecker,
@@ -59,7 +72,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     var res =
         assertThrows(
             IllegalArgumentException.class,
-            () -> appUserPasswordResetService.createAppUserPasswordReset(email));
+            () -> appUserPasswordModificationService.createAppUserPasswordReset(email));
 
     // Then
     assertNotNull(res);
@@ -75,7 +88,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
         .willReturn(Optional.empty());
 
     // When
-    var res = appUserPasswordResetService.createAppUserPasswordReset(email);
+    var res = appUserPasswordModificationService.createAppUserPasswordReset(email);
 
     // Then
     assertEquals(Optional.empty(), res);
@@ -99,7 +112,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
         .willReturn(Optional.of(appUserPasswordReset));
 
     // When
-    var res = appUserPasswordResetService.createAppUserPasswordReset(email);
+    var res = appUserPasswordModificationService.createAppUserPasswordReset(email);
 
     // Then
     assertEquals(Optional.empty(), res);
@@ -125,7 +138,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     given(appUserPasswordResetRepository.save(any())).willReturn(appUserPasswordReset);
 
     // When
-    var res = appUserPasswordResetService.createAppUserPasswordReset(email);
+    var res = appUserPasswordModificationService.createAppUserPasswordReset(email);
 
     // Then
     assertTrue(res.isPresent());
@@ -148,7 +161,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
         .willReturn(Optional.empty());
 
     // When
-    var res = appUserPasswordResetService.findStillValidAppUserPasswordReset(code);
+    var res = appUserPasswordModificationService.findStillValidAppUserPasswordReset(code);
 
     // Then
     verify(appUserPasswordResetRepository, times(1))
@@ -182,7 +195,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
         .willReturn(Optional.of(appUserPasswordReset));
 
     // When
-    var res = appUserPasswordResetService.findStillValidAppUserPasswordReset(code);
+    var res = appUserPasswordModificationService.findStillValidAppUserPasswordReset(code);
 
     // Then
     verify(appUserPasswordResetRepository, times(1))
@@ -208,7 +221,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     var res =
         assertThrows(
             IllegalArgumentException.class,
-            () -> appUserPasswordResetService.resetAppUserPassword(passwordResetDto));
+            () -> appUserPasswordModificationService.resetAppUserPassword(passwordResetDto));
 
     // Then
     assertNotNull(res);
@@ -233,7 +246,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     var res =
         assertThrows(
             NoSuchElementException.class,
-            () -> appUserPasswordResetService.resetAppUserPassword(passwordResetDto));
+            () -> appUserPasswordModificationService.resetAppUserPassword(passwordResetDto));
 
     // Then
     assertNotNull(res);
@@ -274,7 +287,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     var res =
         assertThrows(
             CompromisedPasswordException.class,
-            () -> appUserPasswordResetService.resetAppUserPassword(passwordResetDto));
+            () -> appUserPasswordModificationService.resetAppUserPassword(passwordResetDto));
 
     // Then
     assertNotNull(res);
@@ -318,7 +331,7 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
     given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
 
     // When
-    var res = appUserPasswordResetService.resetAppUserPassword(passwordResetDto);
+    var res = appUserPasswordModificationService.resetAppUserPassword(passwordResetDto);
 
     // Then
     assertTrue(res.isPresent());
@@ -341,9 +354,19 @@ class AppUserPasswordResetServiceTests extends DailyAbstractUnitTests {
         assertThrows(
             IllegalArgumentException.class,
             () ->
-                appUserPasswordResetService.findStillValidAppUserPasswordReset(passwordResetCode));
+                appUserPasswordModificationService.findStillValidAppUserPasswordReset(
+                    passwordResetCode));
 
     // Then
     assertNotNull(res);
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when change app user password with null argument")
+  void test12(PasswordChangeDto passwordChangeDto, AppUser appUser) {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> appUserPasswordModificationService.changeAppUserPassword(passwordChangeDto, appUser));
   }
 }

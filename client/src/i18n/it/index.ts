@@ -1,4 +1,17 @@
 export default {
+  daily: {
+    error: {
+      default: 'Errore imprevisto',
+      password: {
+        change: {
+          compromised:
+            'La nuova password è compromessa e non dovrebbe essere utilizzata. Sceglierne una differente e riprovare',
+          generic: 'Errore nel salvataggio della nuova password',
+          mismatch: 'Le password inserite non corrispondono',
+        },
+      },
+    },
+  },
   language: {
     label: 'Lingua',
     english: 'Inglese',
