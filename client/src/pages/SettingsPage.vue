@@ -21,10 +21,23 @@
     ></language-select>
   </section>
 
-  <q-separator></q-separator>
+  <q-separator spaced="xl"></q-separator>
 
-  <section v-if="isDailyAppUser">
-    <password-change></password-change>
+  <section>
+    <q-card flat bordered class="bg-red-1 text-red-10"
+      ><q-card-section
+        ><div class="text-h6">
+          {{ $t('settings.dangerZone.title') }}
+        </div>
+        <div class="text-subtitle-2">
+          {{ $t('settings.dangerZone.subtitle') }}
+        </div></q-card-section
+      >
+      <q-card-section
+        ><q-card-actions class="no-padding" :vertical="$q.screen.lt.sm">
+          <password-change v-if="isDailyAppUser"></password-change>
+          <delete-app-user></delete-app-user></q-card-actions></q-card-section
+    ></q-card>
   </section>
 </template>
 <script setup lang="ts">
@@ -39,7 +52,8 @@ import { isAxios401 } from 'src/utils/is-axios-401';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isDailyAuthProvider } from 'src/interfaces/AuthProvider';
 import PasswordChange from 'src/components/PasswordChange.vue';
-import { QSeparator } from 'quasar';
+import { QSeparator, QCard, QCardSection, QCardActions } from 'quasar';
+import DeleteAppUser from 'src/components/DeleteAppUser.vue';
 
 const language = useLanguageStore();
 const isDailyAppUser = ref(false);
