@@ -116,4 +116,14 @@ export default {
       error: 'Error loading tags',
     },
   },
+  settings: {
+    dangerZone: {
+      title: 'Danger zone',
+      subtitle: 'The following operations cannot be undone',
+      passwordChange: {
+        button: 'Change password',
+      },
+      deleteAppUser: { button: 'Delete account' },
+    },
+  },
 };

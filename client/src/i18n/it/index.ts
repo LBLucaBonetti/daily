@@ -113,4 +113,14 @@ export default {
       error: 'Errore nel caricamento dei tag',
     },
   },
+  settings: {
+    dangerZone: {
+      title: 'Danger zone',
+      subtitle: 'Le seguenti operazioni non sono reversibili',
+      passwordChange: {
+        button: 'Cambia password',
+      },
+      deleteAppUser: { button: 'Elimina account' },
+    },
+  },
 };
