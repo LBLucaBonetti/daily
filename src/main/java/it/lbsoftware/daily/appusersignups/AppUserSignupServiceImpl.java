@@ -74,7 +74,7 @@ public class AppUserSignupServiceImpl implements AppUserSignupService {
               Optional.ofNullable(appUserDto.getFirstName())
                   .orElse(Constants.APP_USER_UNSPECIFIED_NAME),
               // We generate the whole URI here instead of building it with the template
-              // engine because it will be simpler to change it without touching the html
+              // engine because it will be simpler to change it without touching the HTML
               // file
               "activationUri",
               appUserActivationService.getActivationUri(activationCode)));
