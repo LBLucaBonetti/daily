@@ -8,6 +8,8 @@ export default {
             'La nuova password è compromessa e non dovrebbe essere utilizzata. Sceglierne una differente e riprovare',
           generic: 'Errore nel salvataggio della nuova password',
           mismatch: 'Le password inserite non corrispondono',
+          insecure:
+            'La nuova password è troppo debole. Riprova con una più complessa',
         },
       },
     },

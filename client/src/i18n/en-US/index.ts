@@ -8,6 +8,8 @@ export default {
             'The new password is compromised and should not be used. Choose a different one and retry',
           generic: 'Error saving the new password',
           mismatch: 'The chosen passwords do not match',
+          insecure:
+            'Your new password is insecure. Please try again with a more complex one',
         },
       },
     },

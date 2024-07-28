@@ -14,6 +14,7 @@ import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.config.DailyConfig;
 import it.lbsoftware.daily.emails.EmailInfo;
 import it.lbsoftware.daily.emails.EmailService;
+import it.lbsoftware.daily.exceptions.DailyNotEnoughSecurePasswordException;
 import it.lbsoftware.daily.frontend.OperationResult;
 import java.util.Map;
 import java.util.Optional;
@@ -75,6 +76,10 @@ public class AppUserPasswordServiceImpl implements AppUserPasswordService {
       return OperationResult.error(
           Constants.PASSWORD_RESET_CODE_FAILURE,
           "Your new password is compromised and should not be used. Please choose another one");
+    } catch (DailyNotEnoughSecurePasswordException e) {
+      return OperationResult.error(
+          Constants.PASSWORD_RESET_CODE_FAILURE,
+          "Your new password is insecure. Please try again with a more complex one");
     } catch (Exception e) {
       return OperationResult.error(
           Constants.PASSWORD_RESET_CODE_FAILURE, "Invalid password reset code");
@@ -97,6 +102,8 @@ public class AppUserPasswordServiceImpl implements AppUserPasswordService {
     } catch (CompromisedPasswordException e) {
       return OperationResult.error(
           Constants.ERROR_KEY, Constants.ERROR_PASSWORD_CHANGE_COMPROMISED);
+    } catch (DailyNotEnoughSecurePasswordException e) {
+      return OperationResult.error(Constants.ERROR_KEY, Constants.ERROR_PASSWORD_CHANGE_INSECURE);
     } catch (Exception e) {
       return OperationResult.error(Constants.ERROR_KEY, Constants.ERROR_PASSWORD_CHANGE_GENERIC);
     }

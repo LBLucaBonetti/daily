@@ -331,7 +331,7 @@ class AppUserPasswordIntegrationTests extends DailyAbstractIntegrationTests {
         res.get(Constants.ERROR_KEY),
         anyOf(
             is(Constants.ERROR_PASSWORD_CHANGE_COMPROMISED),
-            is(Constants.ERROR_PASSWORD_CHANGE_GENERIC)));
+            is(Constants.ERROR_PASSWORD_CHANGE_INSECURE)));
   }
 
   @Test
@@ -365,6 +365,6 @@ class AppUserPasswordIntegrationTests extends DailyAbstractIntegrationTests {
     assertEmailMessageCount(0);
     var savedAppUser = appUserRepository.findByEmailIgnoreCase(appUser.getEmail()).orElseThrow();
     assertFalse(passwordEncoder.matches(newNotEnoughSecurePassword, savedAppUser.getPassword()));
-    assertEquals(Constants.ERROR_PASSWORD_CHANGE_GENERIC, res.get(Constants.ERROR_KEY));
+    assertEquals(Constants.ERROR_PASSWORD_CHANGE_INSECURE, res.get(Constants.ERROR_KEY));
   }
 }

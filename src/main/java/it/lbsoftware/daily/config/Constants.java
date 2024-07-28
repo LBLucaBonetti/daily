@@ -26,6 +26,8 @@ public final class Constants {
   public static final String ERROR_NOT_FOUND = ERROR_PREFIX + "not.found";
   public static final String ERROR_PASSWORD_CHANGE_COMPROMISED =
       ERROR_PREFIX + "password.change.compromised";
+  public static final String ERROR_PASSWORD_CHANGE_INSECURE =
+      ERROR_PREFIX + "password.change.insecure";
   public static final String ERROR_PASSWORD_CHANGE_GENERIC =
       ERROR_PREFIX + "password.change.generic";
   public static final String ERROR_PASSWORD_CHANGE_MISMATCH =
