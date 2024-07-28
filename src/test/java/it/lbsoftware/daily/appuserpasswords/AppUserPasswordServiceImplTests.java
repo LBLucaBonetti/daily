@@ -242,4 +242,29 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
     assertTrue(res.isOk());
     assertFalse(res.hasMessage());
   }
+
+  @Test
+  @DisplayName(
+      "Should return error with message when change password and change app user password throws because of compromised password")
+  void test9() {
+    // Given
+    var oldPassword = "oldPassword";
+    var appUser =
+        AppUser.builder()
+            .email("appUser@email.com")
+            .authProvider(AuthProvider.DAILY)
+            .password(oldPassword)
+            .build();
+    var passwordChangeDto = new PasswordChangeDto("oldPassword", "newPassword", "newPassword");
+    given(appUserPasswordModificationService.changeAppUserPassword(passwordChangeDto, appUser))
+        .willThrow(CompromisedPasswordException.class);
+
+    // When
+    var res = appUserPasswordService.changePassword(passwordChangeDto, appUser);
+
+    // Then
+    verify(emailService, times(0)).sendAsynchronously(any(), any());
+    assertTrue(res.isError());
+    assertTrue(res.hasMessage());
+  }
 }

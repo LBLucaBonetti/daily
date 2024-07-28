@@ -4,6 +4,9 @@ import static it.lbsoftware.daily.TestUtils.loginOf;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_CLEARTEXT_PASSWORD;
 import static it.lbsoftware.daily.config.Constants.LOGIN_VIEW;
 import static it.lbsoftware.daily.config.Constants.PASSWORD_RESET_VIEW;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -294,15 +297,15 @@ class AppUserPasswordIntegrationTests extends DailyAbstractIntegrationTests {
   }
 
   @Test
-  @DisplayName("Should not change daily AppUser password when the new one is compromised")
+  @DisplayName("Should not change daily AppUser password when the new one is not secure")
   void test9() throws Exception {
     // Given
     var appUser = AppUserTestUtils.saveDailyAppUser(appUserRepository, passwordEncoder);
     assertEmailMessageCount(0);
-    var newCompromisedPassword = "password";
+    var newInsecurePassword = "1Pazzword!";
     var passwordChangeDto =
         new PasswordChangeDto(
-            APP_USER_CLEARTEXT_PASSWORD, newCompromisedPassword, newCompromisedPassword);
+            APP_USER_CLEARTEXT_PASSWORD, newInsecurePassword, newInsecurePassword);
 
     // When
     Map<String, String> res =
@@ -323,7 +326,45 @@ class AppUserPasswordIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertEmailMessageCount(0);
     var savedAppUser = appUserRepository.findByEmailIgnoreCase(appUser.getEmail()).orElseThrow();
-    assertFalse(passwordEncoder.matches(newCompromisedPassword, savedAppUser.getPassword()));
-    assertEquals(Constants.ERROR_PASSWORD_CHANGE_COMPROMISED, res.get(Constants.ERROR_KEY));
+    assertFalse(passwordEncoder.matches(newInsecurePassword, savedAppUser.getPassword()));
+    assertThat(
+        res.get(Constants.ERROR_KEY),
+        anyOf(
+            is(Constants.ERROR_PASSWORD_CHANGE_COMPROMISED),
+            is(Constants.ERROR_PASSWORD_CHANGE_GENERIC)));
+  }
+
+  @Test
+  @DisplayName("Should not change daily AppUser password when the new one is not enough secure")
+  void test10() throws Exception {
+    // Given
+    var appUser = AppUserTestUtils.saveDailyAppUser(appUserRepository, passwordEncoder);
+    assertEmailMessageCount(0);
+    var newNotEnoughSecurePassword = "APasswordNotComplexEnough";
+    var passwordChangeDto =
+        new PasswordChangeDto(
+            APP_USER_CLEARTEXT_PASSWORD, newNotEnoughSecurePassword, newNotEnoughSecurePassword);
+
+    // When
+    Map<String, String> res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    put(Constants.APP_USER_PATH + "/passwords")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(passwordChangeDto))
+                        .with(user(new AppUserDetails(appUser)))
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            new TypeReference<>() {});
+
+    // Then
+    assertEmailMessageCount(0);
+    var savedAppUser = appUserRepository.findByEmailIgnoreCase(appUser.getEmail()).orElseThrow();
+    assertFalse(passwordEncoder.matches(newNotEnoughSecurePassword, savedAppUser.getPassword()));
+    assertEquals(Constants.ERROR_PASSWORD_CHANGE_GENERIC, res.get(Constants.ERROR_KEY));
   }
 }
