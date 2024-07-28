@@ -48,8 +48,8 @@ class AppUserActivationIntegrationTests extends DailyAbstractIntegrationTests {
     // Given
     var appUserDto = new AppUserDto();
     appUserDto.setEmail("appuser@email.com");
-    appUserDto.setPassword("password");
-    appUserDto.setPasswordConfirmation("password");
+    appUserDto.setPassword("91b17128-f2bd-456a-ae0a-01e7d51e8df4");
+    appUserDto.setPasswordConfirmation("91b17128-f2bd-456a-ae0a-01e7d51e8df4");
     appUserDto.setLang("en-US");
     appUserDto.setFirstName("First name");
     appUserDto.setLastName("Last name");

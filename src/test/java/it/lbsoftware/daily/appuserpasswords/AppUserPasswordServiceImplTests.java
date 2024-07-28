@@ -18,6 +18,7 @@ import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.config.DailyConfig;
 import it.lbsoftware.daily.emails.EmailService;
+import it.lbsoftware.daily.exceptions.DailyNotEnoughSecurePasswordException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -263,6 +264,29 @@ class AppUserPasswordServiceImplTests extends DailyAbstractUnitTests {
     var res = appUserPasswordService.changePassword(passwordChangeDto, appUser);
 
     // Then
+    verify(emailService, times(0)).sendAsynchronously(any(), any());
+    assertTrue(res.isError());
+    assertTrue(res.hasMessage());
+  }
+
+  @Test
+  @DisplayName(
+      "Should return error with message when reset password and reset app user password throws because of insecure password")
+  void test10() {
+    // Given
+    var password = "password";
+    var passwordResetDto = new PasswordResetDto();
+    passwordResetDto.setPassword(password);
+    passwordResetDto.setPasswordConfirmation(password);
+    passwordResetDto.setPasswordResetCode(UUID.randomUUID());
+    given(appUserPasswordModificationService.resetAppUserPassword(passwordResetDto))
+        .willThrow(DailyNotEnoughSecurePasswordException.class);
+
+    // When
+    var res = appUserPasswordService.resetPassword(passwordResetDto);
+
+    // Then
+    verify(appUserPasswordModificationService, times(1)).resetAppUserPassword(passwordResetDto);
     verify(emailService, times(0)).sendAsynchronously(any(), any());
     assertTrue(res.isError());
     assertTrue(res.hasMessage());
