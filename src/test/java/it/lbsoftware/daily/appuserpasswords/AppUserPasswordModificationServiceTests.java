@@ -10,6 +10,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -31,8 +32,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.springframework.security.authentication.password.CompromisedPasswordChecker;
-import org.springframework.security.authentication.password.CompromisedPasswordDecision;
 import org.springframework.security.authentication.password.CompromisedPasswordException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -41,8 +40,8 @@ class AppUserPasswordModificationServiceTests extends DailyAbstractUnitTests {
   private static final AppUser APP_USER = createAppUser(UUID.randomUUID(), "appuser@email.com");
   @Mock private AppUserPasswordResetRepository appUserPasswordResetRepository;
   @Mock private AppUserRepository appUserRepository;
-  @Mock private CompromisedPasswordChecker compromisedPasswordChecker;
   @Mock private PasswordEncoder passwordEncoder;
+  @Mock private AppUserPasswordSecurityService appUserPasswordSecurityService;
   private AppUserPasswordModificationService appUserPasswordModificationService;
 
   private static Stream<Arguments> test12() {
@@ -58,8 +57,8 @@ class AppUserPasswordModificationServiceTests extends DailyAbstractUnitTests {
         new AppUserPasswordModificationService(
             appUserPasswordResetRepository,
             appUserRepository,
-            compromisedPasswordChecker,
-            passwordEncoder);
+            passwordEncoder,
+            appUserPasswordSecurityService);
   }
 
   @Test
@@ -280,8 +279,9 @@ class AppUserPasswordModificationServiceTests extends DailyAbstractUnitTests {
                         LocalDateTime.now()
                             .plusMinutes(Constants.PASSWORD_RESET_NOTIFICATION_THRESHOLD_MINUTES))
                     .build()));
-    given(compromisedPasswordChecker.check(passwordResetDto.getPassword()))
-        .willReturn(new CompromisedPasswordDecision(true));
+    doThrow(new CompromisedPasswordException("The chosen password is compromised"))
+        .when(appUserPasswordSecurityService)
+        .check(passwordResetDto.getPassword());
 
     // When
     var res =
@@ -326,8 +326,6 @@ class AppUserPasswordModificationServiceTests extends DailyAbstractUnitTests {
                     .usedAt(null)
                     .expiredAt(expiredAt)
                     .build()));
-    given(compromisedPasswordChecker.check(passwordResetDto.getPassword()))
-        .willReturn(new CompromisedPasswordDecision(false));
     given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
 
     // When

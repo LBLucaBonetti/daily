@@ -12,7 +12,6 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
-import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.authentication.password.CompromisedPasswordException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,8 @@ public class AppUserPasswordModificationService {
 
   private final AppUserPasswordResetRepository appUserPasswordResetRepository;
   private final AppUserRepository appUserRepository;
-  private final CompromisedPasswordChecker compromisedPasswordChecker;
   private final PasswordEncoder passwordEncoder;
+  private final AppUserPasswordSecurityService appUserPasswordSecurityService;
 
   /**
    * Tries to find the {@link it.lbsoftware.daily.appusers.AppUser} and create a new {@link
@@ -117,10 +116,7 @@ public class AppUserPasswordModificationService {
    * @param appUser The subject
    */
   private void changeAppUserPassword(final String newCleartextPassword, final AppUser appUser) {
-    // New password should not be compromised
-    if (compromisedPasswordChecker.check(newCleartextPassword).isCompromised()) {
-      throw new CompromisedPasswordException("The chosen password is compromised");
-    }
+    appUserPasswordSecurityService.check(newCleartextPassword);
     // Encode and save the new password
     appUser.setPassword(passwordEncoder.encode(newCleartextPassword));
     log.info("The AppUser with e-mail %s is changing its password".formatted(appUser.getEmail()));
