@@ -138,6 +138,7 @@ class AppUserPasswordController {
   public ResponseEntity<Void> changePassword(
       @Valid @RequestBody PasswordChangeDto passwordChangeDto,
       @AuthenticationPrincipal Object principal) {
+    log.info("PUT request to /api/appusers/passwords; parameters: %s".formatted(passwordChangeDto));
     if (!Objects.equals(
         passwordChangeDto.newPassword(), passwordChangeDto.newPasswordConfirmation())) {
       throw new DailyBadRequestException(Constants.ERROR_PASSWORD_CHANGE_MISMATCH);
