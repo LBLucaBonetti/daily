@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 
@@ -22,6 +23,7 @@ class AppUserPasswordSecurityServiceTests extends DailyAbstractUnitTests {
 
   @ParameterizedTest
   @NullAndEmptySource
+  @ValueSource(strings = {"   "})
   @DisplayName("Should throw when check with null argument")
   void test1(final String cleartextPassword) {
     assertThrows(
