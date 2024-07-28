@@ -11,6 +11,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appuseractivations.AppUserActivation;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
+import it.lbsoftware.daily.appuserpasswords.AppUserPasswordSecurityService;
 import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
@@ -26,6 +28,7 @@ import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusersettings.AppUserSettingDto;
 import it.lbsoftware.daily.appusersettings.AppUserSettingService;
+import it.lbsoftware.daily.exceptions.DailyNotEnoughSecurePasswordException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -46,6 +49,7 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
   @Mock private AppUserSettingService appUserSettingService;
   @Mock private AppUserActivationService appUserActivationService;
   @Mock private AppUserRemovalInformationRepository appUserRemovalInformationRepository;
+  @Mock private AppUserPasswordSecurityService appUserPasswordSecurityService;
   private AppUserCreationServiceImpl appUserCreationService;
 
   private static Stream<Arguments> test9() {
@@ -71,7 +75,8 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
             passwordEncoder,
             appUserSettingService,
             appUserActivationService,
-            appUserRemovalInformationRepository);
+            appUserRemovalInformationRepository,
+            appUserPasswordSecurityService);
   }
 
   @ParameterizedTest
@@ -349,5 +354,33 @@ class AppUserCreationServiceImplTests extends DailyAbstractUnitTests {
     verify(appUserRepository, times(0)).saveAndFlush(any());
     verify(appUserSettingService, times(0)).createAppUserSettings(any(), any());
     verify(appUserRemovalInformationRepository, times(0)).save(any());
+  }
+
+  @Test
+  @DisplayName(
+      "Should not create daily app user because of insecure password and return empty optional")
+  void test14() {
+    // Given
+    var insecurePassword = "password";
+    var email = "appuser@email.com";
+    var appUserDto = new AppUserDto();
+    appUserDto.setEmail(email);
+    appUserDto.setPassword(insecurePassword);
+    appUserDto.setPasswordConfirmation(insecurePassword);
+    doThrow(new DailyNotEnoughSecurePasswordException(""))
+        .when(appUserPasswordSecurityService)
+        .check(insecurePassword);
+
+    // When
+    var res = appUserCreationService.createDailyAppUser(appUserDto);
+
+    // Then
+    assertEquals(Optional.empty(), res);
+    verify(appUserRepository, times(1)).findByEmailIgnoreCase(email);
+    verify(appUserPasswordSecurityService, times(1)).check(insecurePassword);
+    verify(appUserRepository, times(0)).saveAndFlush(any());
+    verify(appUserSettingService, times(0)).createAppUserSettings(any(), any());
+    verify(appUserRemovalInformationRepository, times(0)).save(any());
+    verify(appUserActivationService, times(0)).createAppUserActivation(any());
   }
 }

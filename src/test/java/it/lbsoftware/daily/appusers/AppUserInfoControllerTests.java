@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
+import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,26 +17,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-class AppUserControllerTests extends DailyAbstractUnitTests {
+class AppUserInfoControllerTests extends DailyAbstractUnitTests {
 
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
-  private AppUserController appUserController;
+  private AppUserInfoController appUserInfoController;
 
   @BeforeEach
   void beforeEach() {
-    appUserController = new AppUserController(appUserService);
+    appUserInfoController = new AppUserInfoController(appUserService);
   }
 
   @Test
   @DisplayName("Should read info and return info")
   void test1() {
     // Given
-    InfoDto info = new InfoDto(APP_USER_FULLNAME, APP_USER_EMAIL);
+    InfoDto info = new InfoDto(APP_USER_FULLNAME, APP_USER_EMAIL, AuthProvider.GOOGLE);
     given(appUserService.getAppUserInfo(appUser)).willReturn(info);
 
     // When
-    ResponseEntity<InfoDto> res = appUserController.readInfo(appUser);
+    ResponseEntity<InfoDto> res = appUserInfoController.readInfo(appUser);
 
     // Then
     verify(appUserService, times(1)).getAppUserInfo(appUser);

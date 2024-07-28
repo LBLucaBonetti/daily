@@ -1,5 +1,7 @@
 package it.lbsoftware.daily.appusers;
 
+import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.DAILY;
+import static it.lbsoftware.daily.appusers.AppUser.AuthProvider.GOOGLE;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_EMAIL;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.APP_USER_FULLNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,6 +83,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     // Then
     assertEquals(APP_USER_EMAIL, res.email());
     assertEquals(APP_USER_FULLNAME, res.fullName());
+    assertEquals(GOOGLE, res.authProvider());
   }
 
   @Test
@@ -97,6 +100,7 @@ class AppUserServiceImplTests extends DailyAbstractUnitTests {
     // Then
     assertEquals(APP_USER_EMAIL, res.email());
     assertEquals(APP_USER_FULLNAME, res.fullName());
+    assertEquals(DAILY, res.authProvider());
   }
 
   @ParameterizedTest

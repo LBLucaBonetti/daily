@@ -126,7 +126,7 @@ class AppUserActivationServiceImplTests extends DailyAbstractUnitTests {
     var activationCode = UUID.randomUUID();
     given(
             appUserActivationRepository.findNonActivatedAndStillValidAppUserActivationFetchAppUser(
-                activationCode))
+                any(), any()))
         .willReturn(Optional.empty());
 
     // When
@@ -148,7 +148,7 @@ class AppUserActivationServiceImplTests extends DailyAbstractUnitTests {
             activationCode, createAppUser(UUID.randomUUID(), "appuser@email.com"));
     given(
             appUserActivationRepository.findNonActivatedAndStillValidAppUserActivationFetchAppUser(
-                activationCode))
+                any(), any()))
         .willReturn(Optional.of(appUserActivation));
 
     // When

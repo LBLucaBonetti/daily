@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -34,7 +35,7 @@ public class WebSecurityConfiguration {
     final List<String> allowedPaths = new ArrayList<>();
     allowedPaths.addAll(Constants.ALLOWED_STATIC_ASSETS);
     allowedPaths.addAll(Constants.ALLOWED_STATIC_TEMPLATES);
-    // The login template is already allowed by default
+    // The login template and the login?error endpoint are already allowed
 
     return allowedPaths.toArray(new String[0]);
   }
@@ -54,8 +55,14 @@ public class WebSecurityConfiguration {
         headers ->
             headers
                 .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
-                .referrerPolicy(
-                    referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                .referrerPolicy(referrer -> referrer.policy(Constants.REFERRER_POLICY))
+                // The referrer policy for the password reset requests should be no-referrer to
+                // avoid referrer leakage
+                .addHeaderWriter(
+                    new DelegatingRequestMatcherHeaderWriter(
+                        new AntPathRequestMatcher(Constants.PASSWORD_RESET_PATH),
+                        new DailyReferrerPolicyHeaderWriter(
+                            ReferrerPolicy.NO_REFERRER.getPolicy())))
                 .permissionsPolicy(permissions -> permissions.policy(PERMISSIONS_POLICY)));
     // Authorization & authentication
     http.authorizeHttpRequests(

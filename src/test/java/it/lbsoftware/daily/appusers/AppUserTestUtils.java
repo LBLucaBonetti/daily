@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -23,6 +24,7 @@ public final class AppUserTestUtils {
   public static final String APP_USER_LASTNAME = "LastName";
   public static final String APP_USER_FULLNAME = APP_USER_FIRSTNAME + " " + APP_USER_LASTNAME;
   public static final String APP_USER_EMAIL = "appUser@gmail.com";
+  public static final String APP_USER_CLEARTEXT_PASSWORD = "appUserCleartextPassword";
   public static final String OTHER_APP_USER_AUTH_PROVIDER_ID = "otherAppUserAuthProviderId";
   public static final String OTHER_APP_USER_FIRSTNAME = "OtherFirstName";
   public static final String OTHER_APP_USER_LASTNAME = "OtherLastName";
@@ -62,13 +64,16 @@ public final class AppUserTestUtils {
   }
 
   /**
-   * {@link AppUser} generator with default values; the created instance is persisted with the
-   * provided repository.
+   * OAuth2 {@link AppUser} generator with default values; the created instance is persisted with
+   * the provided repository and its password is encoded with the provided encoder.
    *
    * @param appUserRepository Repository used to persist the created instance
+   * @param passwordEncoder The encoder used to encode the password
    * @return The saved entity
    */
-  public static AppUser saveOauth2AppUser(@NonNull final AppUserRepository appUserRepository) {
+  public static AppUser saveOauth2AppUser(
+      @NonNull final AppUserRepository appUserRepository,
+      @NonNull final PasswordEncoder passwordEncoder) {
     return appUserRepository.save(
         AppUser.builder()
             .enabled(true)
@@ -77,17 +82,45 @@ public final class AppUserTestUtils {
             .firstName(APP_USER_FIRSTNAME)
             .lastName(APP_USER_LASTNAME)
             .email(APP_USER_EMAIL)
+            .password(passwordEncoder.encode(APP_USER_CLEARTEXT_PASSWORD))
             .build());
   }
 
   /**
-   * App user generator with different default values; the created instance is persisted with the
-   * provided repository
+   * Daily {@link AppUser} generator with default values (it is saved as enabled even if no {@link
+   * it.lbsoftware.daily.appuseractivations.AppUserActivation} is created); the created instance is
+   * persisted with the provided repository and its password is encoded with the provided encoder.
    *
    * @param appUserRepository Repository used to persist the created instance
+   * @param passwordEncoder The encoder used to encode the password
    * @return The saved entity
    */
-  public static AppUser saveOauth2OtherAppUser(@NonNull final AppUserRepository appUserRepository) {
+  public static AppUser saveDailyAppUser(
+      @NonNull final AppUserRepository appUserRepository,
+      @NonNull final PasswordEncoder passwordEncoder) {
+    return appUserRepository.save(
+        AppUser.builder()
+            .enabled(true)
+            .authProviderId(APP_USER_AUTH_PROVIDER_ID)
+            .authProvider(AuthProvider.DAILY)
+            .firstName(APP_USER_FIRSTNAME)
+            .lastName(APP_USER_LASTNAME)
+            .email(APP_USER_EMAIL)
+            .password(passwordEncoder.encode(APP_USER_CLEARTEXT_PASSWORD))
+            .build());
+  }
+
+  /**
+   * OAuth2 {@link AppUser} generator with different default values; the created instance is
+   * persisted with the provided repository and its password is encoded with the provided encoder.
+   *
+   * @param appUserRepository Repository used to persist the created instance
+   * @param passwordEncoder The encoder used to encode the password
+   * @return The saved entity
+   */
+  public static AppUser saveOauth2OtherAppUser(
+      @NonNull final AppUserRepository appUserRepository,
+      @NonNull final PasswordEncoder passwordEncoder) {
     return appUserRepository.save(
         AppUser.builder()
             .enabled(true)
@@ -96,6 +129,7 @@ public final class AppUserTestUtils {
             .firstName(OTHER_APP_USER_FIRSTNAME)
             .lastName(OTHER_APP_USER_LASTNAME)
             .email(OTHER_APP_USER_EMAIL)
+            .password(passwordEncoder.encode(APP_USER_CLEARTEXT_PASSWORD))
             .build());
   }
 

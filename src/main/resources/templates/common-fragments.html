@@ -13,3 +13,29 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         th:fragment="bootstrap-js"></script>
+<th:block th:fragment="email-common-style">
+  <style>
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #2f2e41;
+      padding: 1rem;
+    }
+    .daily-logo {
+      width: 160px;
+      margin-bottom: 1rem;
+    }
+    .daily-link {
+      text-decoration: underline;
+      color: #ea580c;
+    }
+    .daily-hr {
+      border: 0;
+      border-top: 1px solid;
+      color: inherit;
+      opacity: .25;
+      margin: 1rem 0;
+    }
+
+  </style>
+</th:block>

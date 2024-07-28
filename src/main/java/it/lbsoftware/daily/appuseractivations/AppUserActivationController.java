@@ -1,6 +1,6 @@
 package it.lbsoftware.daily.appuseractivations;
 
-import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
+import static it.lbsoftware.daily.frontend.TemplateUtils.redirectIfAuthenticated;
 
 import it.lbsoftware.daily.config.Constants;
 import java.util.UUID;

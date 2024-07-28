@@ -1,0 +1,1 @@
+ALTER TABLE app_user_password_reset ADD COLUMN used_at TIMESTAMP WITHOUT TIME ZONE;

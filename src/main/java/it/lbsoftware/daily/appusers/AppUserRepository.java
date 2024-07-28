@@ -15,6 +15,9 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
   Optional<AppUser> findByEmailIgnoreCaseAndAuthProvider(String email, AuthProvider authProvider);
 
+  Optional<AppUser> findByEmailIgnoreCaseAndAuthProviderAndEnabledTrue(
+      String email, AuthProvider authProvider);
+
   Optional<AppUser> findByAuthProviderIdAndAuthProvider(
       String authProviderId, AuthProvider authProvider);
 

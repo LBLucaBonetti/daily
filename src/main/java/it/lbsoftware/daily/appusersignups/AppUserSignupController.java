@@ -1,7 +1,7 @@
 package it.lbsoftware.daily.appusersignups;
 
 import static it.lbsoftware.daily.config.Constants.SIGNUP_VIEW;
-import static it.lbsoftware.daily.templates.TemplateUtils.redirectIfAuthenticated;
+import static it.lbsoftware.daily.frontend.TemplateUtils.redirectIfAuthenticated;
 
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.config.Constants;
@@ -39,13 +39,13 @@ class AppUserSignupController {
   @PostMapping
   public String signup(
       @ModelAttribute(APP_USER_DTO_PARAMETER) @Valid AppUserDto appUserDto,
-      BindingResult result,
+      BindingResult bindingResult,
       Model model,
       Authentication authentication) {
     return redirectIfAuthenticated(authentication)
         .orElseGet(
             () -> {
-              appUserSignupService.signup(appUserDto, result, model);
+              appUserSignupService.signup(appUserDto, bindingResult, model);
               return SIGNUP_VIEW;
             });
   }

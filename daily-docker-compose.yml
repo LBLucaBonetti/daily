@@ -28,7 +28,7 @@ services:
     ports:
       - "8081:8080"
     healthcheck:
-      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080;echo -e \"GET /health/ready HTTP/1.1\r\nhost: http://localhost:8080\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3" ]
+      test: "{ printf >&3 'GET /realms/daily/.well-known/openid-configuration HTTP/1.0\r\nHost: localhost\r\n\r\n'; cat <&3; } 3<>/dev/tcp/localhost/8080 | head -1 | grep 200"
       start_period: 30s
       interval: 10s
       timeout: 5s
