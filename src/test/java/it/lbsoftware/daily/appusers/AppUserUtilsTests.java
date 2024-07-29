@@ -105,7 +105,7 @@ class AppUserUtilsTests extends DailyAbstractUnitTests {
 
   @ParameterizedTest
   @NullAndEmptySource
-  @DisplayName("Should return default first name when app user is null")
+  @DisplayName("Should return default first name when app user first name is null")
   void test7(final String firstName) {
     // Given
     AppUser appUser = AppUser.builder().firstName(firstName).build();

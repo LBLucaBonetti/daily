@@ -25,6 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @DisplayName("Tag search integration tests")
@@ -36,6 +37,7 @@ class TagSearchIntegrationTests extends DailyAbstractIntegrationTests {
   @Autowired private TagDtoMapper tagDtoMapper;
   @Autowired private NoteRepository noteRepository;
   @Autowired private AppUserRepository appUserRepository;
+  @Autowired private PasswordEncoder passwordEncoder;
 
   @BeforeEach
   void beforeEach() {
@@ -50,8 +52,9 @@ class TagSearchIntegrationTests extends DailyAbstractIntegrationTests {
     var name = "name";
     var otherName = "otherName";
     var wrongName = "wrong";
-    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
-    final var appUser2 = AppUserTestUtils.saveOauth2OtherAppUser(appUserRepository);
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var appUser2 =
+        AppUserTestUtils.saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
     TagDto tagDto1 =
         tagDtoMapper.convertToDto(
             tagRepository.save(createTag(name, "#123456", Collections.emptySet(), appUser)));
@@ -105,8 +108,9 @@ class TagSearchIntegrationTests extends DailyAbstractIntegrationTests {
     var colorHex = "#abcdef";
     var otherColorHex = "#ABCDEF";
     var wrongColorHex = "#123456";
-    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository);
-    final var appUser2 = AppUserTestUtils.saveOauth2OtherAppUser(appUserRepository);
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var appUser2 =
+        AppUserTestUtils.saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
     TagDto tagDto1 =
         tagDtoMapper.convertToDto(
             tagRepository.save(createTag("name", colorHex, Collections.emptySet(), appUser)));

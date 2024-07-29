@@ -14,6 +14,7 @@ import it.lbsoftware.daily.appuserevents.AppUserLoginEvent;
 import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformation;
 import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.appusers.InfoDto;
@@ -53,7 +54,7 @@ class AppUserLoginEventListenerTests extends DailyAbstractUnitTests {
   void test1() {
     // Given
     var authentication = mock(Authentication.class);
-    var infoDto = new InfoDto("Full name", "user@email.com");
+    var infoDto = new InfoDto("Full name", "user@email.com", AuthProvider.DAILY);
     given(appUserService.getAppUserInfo(any())).willReturn(infoDto);
     var event = new AuthenticationSuccessEvent(authentication);
 

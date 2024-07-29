@@ -14,6 +14,7 @@ import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.appusers.AppUserDto;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.config.Constants;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+@DisplayName("App user activation integration tests")
 class AppUserActivationIntegrationTests extends DailyAbstractIntegrationTests {
 
   private static final String BASE_URL = Constants.ACTIVATION_PATH;
@@ -46,8 +48,8 @@ class AppUserActivationIntegrationTests extends DailyAbstractIntegrationTests {
     // Given
     var appUserDto = new AppUserDto();
     appUserDto.setEmail("appuser@email.com");
-    appUserDto.setPassword("password");
-    appUserDto.setPasswordConfirmation("password");
+    appUserDto.setPassword("91b17128-f2bd-456a-ae0a-01e7d51e8df4");
+    appUserDto.setPasswordConfirmation("91b17128-f2bd-456a-ae0a-01e7d51e8df4");
     appUserDto.setLang("en-US");
     appUserDto.setFirstName("First name");
     appUserDto.setLastName("Last name");
@@ -74,7 +76,8 @@ class AppUserActivationIntegrationTests extends DailyAbstractIntegrationTests {
     // Then
     assertTrue(
         appUserActivationRepository
-            .findNonActivatedAndStillValidAppUserActivationFetchAppUser(activationCode)
+            .findNonActivatedAndStillValidAppUserActivationFetchAppUser(
+                activationCode, LocalDateTime.now())
             .isEmpty());
     var appUserActivation = appUserActivationRepository.findAll().get(0);
     assertNotNull(appUserActivation.getActivatedAt());

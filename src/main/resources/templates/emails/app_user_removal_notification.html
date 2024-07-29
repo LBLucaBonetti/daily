@@ -11,30 +11,7 @@
   <title th:text="${title}"></title>
 
   <link th:replace="~{common-fragments :: fonts-bunny}">
-  <style>
-
-    body {
-      font-family: 'Inter', sans-serif;
-      color: #2f2e41;
-      padding: 1rem;
-    }
-    .daily-logo {
-      width: 160px;
-      margin-bottom: 1rem;
-    }
-    .daily-hr {
-      border: 0;
-      border-top: 1px solid;
-      color: inherit;
-      opacity: .25;
-      margin: 1rem 0;
-    }
-    .daily-link {
-      text-decoration: underline;
-      color: #ea580c;
-    }
-
-  </style>
+  <style th:replace="~{common-fragments :: email-common-style}"></style>
 </head>
 <body>
 <main>

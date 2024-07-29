@@ -30,6 +30,7 @@ public final class TestUtils {
     "app_user_activation",
     "app_user_setting",
     "app_user_removal_information",
+    "app_user_password_reset",
     "app_user"
   };
 

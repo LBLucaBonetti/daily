@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationRepository;
+import it.lbsoftware.daily.appuserpasswords.AppUserPasswordResetRepository;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusersettings.AppUserSettingRepository;
@@ -41,6 +42,7 @@ class AppUserRemoverServiceTests extends DailyAbstractUnitTests {
   @Mock private AppUserActivationRepository appUserActivationRepository;
   @Mock private AppUserSettingRepository appUserSettingRepository;
   @Mock private AppUserRemovalInformationRepository appUserRemovalInformationRepository;
+  @Mock private AppUserPasswordResetRepository appUserPasswordResetRepository;
   @Mock private AppUserRepository appUserRepository;
   @Mock private EmailService emailService;
   @Mock private DailyConfig dailyConfig;
@@ -55,6 +57,7 @@ class AppUserRemoverServiceTests extends DailyAbstractUnitTests {
             appUserActivationRepository,
             appUserSettingRepository,
             appUserRemovalInformationRepository,
+            appUserPasswordResetRepository,
             appUserRepository,
             emailService,
             dailyConfig);

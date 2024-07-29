@@ -44,7 +44,8 @@ public class AppUserActivationServiceImpl implements AppUserActivationService {
   public boolean setNonActivatedAndStillValidAppUserActivationActivated(
       @NonNull UUID activationCode) {
     return appUserActivationRepository
-        .findNonActivatedAndStillValidAppUserActivationFetchAppUser(activationCode)
+        .findNonActivatedAndStillValidAppUserActivationFetchAppUser(
+            activationCode, LocalDateTime.now())
         .map(
             appUserActivation -> {
               appUserActivation.setActivatedAt(LocalDateTime.now());
@@ -63,7 +64,6 @@ public class AppUserActivationServiceImpl implements AppUserActivationService {
                 UriComponentsBuilder.fromUriString(dailyConfig.getBaseUri())
                     .pathSegment(Constants.ACTIVATIONS_VIEW, appUserActivationCode.toString())
                     .build()
-                    .encode()
                     .toUriString())
         .orElseThrow(
             () -> new IllegalArgumentException("The provided activation code is malformed"));

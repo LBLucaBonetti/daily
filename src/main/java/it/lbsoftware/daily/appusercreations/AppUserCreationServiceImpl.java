@@ -5,6 +5,7 @@ import static it.lbsoftware.daily.appusersettings.AppUserSettingUtils.getAppUser
 
 import it.lbsoftware.daily.appuseractivations.AppUserActivation;
 import it.lbsoftware.daily.appuseractivations.AppUserActivationService;
+import it.lbsoftware.daily.appuserpasswords.AppUserPasswordSecurityService;
 import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformation;
 import it.lbsoftware.daily.appuserremovers.AppUserRemovalInformationRepository;
 import it.lbsoftware.daily.appusers.AppUser;
@@ -32,6 +33,7 @@ public class AppUserCreationServiceImpl implements AppUserCreationService {
   private final AppUserSettingService appUserSettingService;
   private final AppUserActivationService appUserActivationService;
   private final AppUserRemovalInformationRepository appUserRemovalInformationRepository;
+  private final AppUserPasswordSecurityService appUserPasswordSecurityService;
 
   @Override
   @Transactional
@@ -40,6 +42,13 @@ public class AppUserCreationServiceImpl implements AppUserCreationService {
     if (appUserRepository.findByEmailIgnoreCase(email).isPresent()) {
       log.warn(
           "Rejecting app user creation for e-mail %s because it is already taken".formatted(email));
+      return Optional.empty();
+    }
+    // Password security checks
+    if (!passwordSecurityChecksPass(appUserDto.getPassword())) {
+      log.warn(
+          "Rejecting app user creation for e-mail %s because password security checks failed"
+              .formatted(email));
       return Optional.empty();
     }
     var appUser = buildDailyAppUser(appUserDto);
@@ -54,6 +63,16 @@ public class AppUserCreationServiceImpl implements AppUserCreationService {
     return appUserActivationService
         .createAppUserActivation(savedAppUser)
         .map(AppUserActivation::getActivationCode);
+  }
+
+  private boolean passwordSecurityChecksPass(final String cleartextPassword) {
+    try {
+      appUserPasswordSecurityService.check(cleartextPassword);
+      return true;
+    } catch (Exception e) {
+      log.warn("Password security checks failed", e);
+    }
+    return false;
   }
 
   private AppUser buildDailyAppUser(final AppUserDto appUserDto) {

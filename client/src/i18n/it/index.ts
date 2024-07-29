@@ -1,4 +1,19 @@
 export default {
+  daily: {
+    error: {
+      default: 'Errore imprevisto',
+      password: {
+        change: {
+          compromised:
+            'La nuova password è compromessa e non dovrebbe essere utilizzata. Sceglierne una differente e riprovare',
+          generic: 'Errore nel salvataggio della nuova password',
+          mismatch: 'Le password inserite non corrispondono',
+          insecure:
+            'La nuova password è troppo debole. Riprova con una più complessa',
+        },
+      },
+    },
+  },
   language: {
     label: 'Lingua',
     english: 'Inglese',
@@ -98,6 +113,36 @@ export default {
     },
     loading: {
       error: 'Errore nel caricamento dei tag',
+    },
+  },
+  settings: {
+    dangerZone: {
+      title: 'Danger zone',
+      subtitle: 'Le seguenti operazioni non sono reversibili',
+      passwordChange: {
+        button: 'Cambia password',
+        dialog: {
+          title: 'Cambia password',
+          subtitle:
+            'Inserisci la password corrente e la nuova ripetendola per conferma',
+          oldPassword: {
+            placeholder: 'Password corrente',
+            empty: 'Inserisci la password corrente',
+          },
+          newPassword: {
+            placeholder: 'Nuova password',
+            empty: 'Inserisci la nuova password',
+          },
+          newPasswordConfirmation: {
+            placeholder: 'Ripeti la nuova password',
+            empty: 'Ripeti la nuova password',
+          },
+          confirm:
+            "Vuoi davvero cambiare la password? L'operazione non è reversibile",
+        },
+        ok: 'Password cambiata correttamente, verrà richiesta a partire dal prossimo accesso',
+      },
+      deleteAppUser: { button: 'Elimina account' },
     },
   },
 };

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
+@DisplayName("App user schedules service integration tests")
 class AppUserSchedulesServiceIntegrationTests extends DailyAbstractIntegrationTests {
 
   @Autowired private AppUserRepository appUserRepository;

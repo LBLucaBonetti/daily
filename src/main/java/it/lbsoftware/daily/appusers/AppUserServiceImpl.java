@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.appusers;
 
+import it.lbsoftware.daily.appusers.AppUser.AuthProvider;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +22,18 @@ public class AppUserServiceImpl implements AppUserService {
   public InfoDto getAppUserInfo(@NonNull Object principal) {
     String fullName;
     String email;
+    AuthProvider authProvider;
     switch (principal) {
       case OidcUser appUserOidcUser -> {
         fullName = appUserOidcUser.getFullName();
         email = appUserOidcUser.getEmail();
+        // TODO Improve by retrieving the correct AuthProvider based on the OidcUser
+        authProvider = AuthProvider.GOOGLE;
       }
       case AppUserDetails appUserDetails -> {
         fullName = appUserDetails.getFullname();
         email = appUserDetails.getUsername();
+        authProvider = AuthProvider.DAILY;
       }
       default -> {
         log.warn("Invalid AppUser instance detected");
@@ -37,7 +42,8 @@ public class AppUserServiceImpl implements AppUserService {
     }
     return new InfoDto(
         StringUtils.defaultIfBlank(fullName, StringUtils.EMPTY),
-        StringUtils.defaultIfBlank(email, StringUtils.EMPTY));
+        StringUtils.defaultIfBlank(email, StringUtils.EMPTY),
+        authProvider);
   }
 
   @Override

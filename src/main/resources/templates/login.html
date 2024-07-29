@@ -16,7 +16,7 @@
   <script defer th:src="@{/public-login.js}"></script>
 </head>
 <body class="login-body">
-<main class="d-flex text-center justify-content-center pt-5">
+<main class="d-flex text-center justify-content-center pt-4">
 
   <section class="container">
     <div class="row justify-content-center">
@@ -34,11 +34,20 @@
              th:if="${activationCodeSuccess}" th:text="${activationCodeSuccess}">
         </div>
 
+        <div class="alert alert-success" id="password-reset-notification-success-alert" role="alert"
+             th:if="${passwordResetNotificationSuccess}"
+             th:text="${passwordResetNotificationSuccess}">
+        </div>
+
+        <div class="alert alert-success" id="password-reset-code-success-alert" role="alert"
+             th:if="${passwordResetCodeSuccess}"
+             th:text="${passwordResetCodeSuccess}">
+        </div>
+
         <form id="login-form" method="post" th:action="@{/login}">
 
           <div class="alert alert-danger" id="invalid-credentials-alert" role="alert"
-               th:if="${param.error}">
-            Invalid email or password
+               th:if="${invalidCredentialsError}" th:text="${invalidCredentialsError}">
           </div>
           <div class="alert alert-success" id="logout-alert" role="alert" th:if="${param.logout}">
             You have been logged out
@@ -46,9 +55,9 @@
 
           <div class="form-floating mb-3">
             <input autofocus class="form-control" id="email" maxlength="320" name="email"
-                   placeholder="Email"
+                   placeholder="E-mail"
                    required type="email"/>
-            <label for="email">Email</label>
+            <label for="email">E-mail</label>
           </div>
 
           <div class="form-floating mb-3">
@@ -56,6 +65,10 @@
                    required
                    type="password"/>
             <label for="password">Password</label>
+            <div class="text-end mt-2">
+              <a class="daily-link small" th:href="@{/password-reset-notification}">Reset
+                password</a>
+            </div>
           </div>
 
           <div class="d-grid">

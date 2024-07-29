@@ -8,7 +8,9 @@ import org.springframework.validation.BindingResult;
 public interface AppUserSignupService {
 
   /**
-   * Tries to sign a new {@code AppUser} up with the auth provider {@code DAILY}.
+   * Tries to sign a new {@code AppUser} up with the auth provider {@code DAILY}. This method should
+   * avoid leaking sensible information that could lead to security vulnerabilities such as user
+   * enumeration.
    *
    * @param appUserDto The {@code AppUser} data
    * @param bindingResult The result of validating the provided {@code AppUser} data
