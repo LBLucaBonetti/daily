@@ -1,6 +1,5 @@
 package it.lbsoftware.daily;
 
-
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import org.junit.jupiter.api.AfterEach;
@@ -16,7 +15,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public non-sealed abstract class DailyAbstractIntegrationTests extends DailyAbstractTests {
+public abstract non-sealed class DailyAbstractIntegrationTests extends DailyAbstractTests {
 
   private static final Integer MAILHOG_HTTP_PORT;
   private static final String MAILHOG_HOST_ADDRESS;
@@ -29,11 +28,12 @@ public non-sealed abstract class DailyAbstractIntegrationTests extends DailyAbst
     System.setProperty("spring.data.redis.host", redis.getHost());
     System.setProperty("spring.data.redis.port", redis.getMappedPort(6379).toString());
     // Initialize MailHog
-    GenericContainer<?> mailhog = new GenericContainer<>(DockerImageName.parse("mailhog/mailhog"))
-        .withExposedPorts(1025, 8025);
+    GenericContainer<?> mailhog =
+        new GenericContainer<>(DockerImageName.parse("mailhog/mailhog"))
+            .withExposedPorts(1025, 8025);
     mailhog.start();
-    System.setProperty("spring.mail.host",mailhog.getHost());
-    System.setProperty("spring.mail.port",mailhog.getMappedPort(1025).toString());
+    System.setProperty("spring.mail.host", mailhog.getHost());
+    System.setProperty("spring.mail.port", mailhog.getMappedPort(1025).toString());
     MAILHOG_HTTP_PORT = mailhog.getMappedPort(8025);
     MAILHOG_HOST_ADDRESS = mailhog.getHost();
   }
@@ -47,14 +47,14 @@ public non-sealed abstract class DailyAbstractIntegrationTests extends DailyAbst
     RestAssured.baseURI = "http://" + MAILHOG_HOST_ADDRESS;
     RestAssured.port = MAILHOG_HTTP_PORT;
     RestAssured.basePath = "/api/v2";
-    var actualCount = new JsonPath(RestAssured.get("/messages").getBody().asString())
-        .getInt("count");
-    if(actualCount != expectedEmailMessageCount) {
+    var actualCount =
+        new JsonPath(RestAssured.get("/messages").getBody().asString()).getInt("count");
+    if (actualCount != expectedEmailMessageCount) {
       throw new AssertionFailedError(
-          "The actual count of e-mail messages differs from the expected one; actual: " +
-              actualCount +
-              ", expected: " +
-              expectedEmailMessageCount);
+          "The actual count of e-mail messages differs from the expected one; actual: "
+              + actualCount
+              + ", expected: "
+              + expectedEmailMessageCount);
     }
   }
 
