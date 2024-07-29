@@ -250,7 +250,7 @@
       <artifactId>rest-assured</artifactId>
       <groupId>io.rest-assured</groupId>
       <scope>test</scope>
-      <version>5.4.0</version>
+      <version>5.5.0</version>
     </dependency>
     <dependency>
       <artifactId>flyway-core</artifactId>
