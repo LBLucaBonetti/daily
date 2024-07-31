@@ -89,3 +89,15 @@ body {
   outline: 0 !important;
   border-color: #dee2e6 !important;
 }
+
+.password-eye-btn {
+  background: #ffffff !important;
+  border-color: #dee2e6 !important;
+  border-left: 0px !important;
+}
+
+.password-eye-btn:focus-visible {
+  border-color: #86b7fe !important;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}

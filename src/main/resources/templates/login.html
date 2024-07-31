@@ -60,15 +60,20 @@
             <label for="email">E-mail</label>
           </div>
 
-          <div class="form-floating mb-3">
-            <input class="form-control" id="password" name="password" placeholder="Password"
-                   required
-                   type="password"/>
-            <label for="password">Password</label>
-            <div class="text-end mt-2">
-              <a class="daily-link small" th:href="@{/password-reset-notification}">Reset
-                password</a>
+          <div class="input-group">
+            <div class="form-floating">
+              <input class="form-control" id="password" name="password" placeholder="Password"
+                     required
+                     type="password"/>
+              <label for="password">Password</label>
             </div>
+            <button class="btn btn-light password-eye-btn" type="button">
+              <img alt="show or hide" th:src="@{/img/eye-open.svg}">
+            </button>
+          </div>
+          <div class=" text-end mt-2 mb-3">
+            <a class="daily-link small" th:href="@{/password-reset-notification}">Reset
+              password</a>
           </div>
 
           <div class="d-grid">
