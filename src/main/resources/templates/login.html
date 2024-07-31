@@ -67,8 +67,10 @@
                      type="password"/>
               <label for="password">Password</label>
             </div>
-            <button class="btn btn-light password-eye-btn" type="button">
-              <img alt="show or hide" th:src="@{/img/eye-open.svg}">
+            <button class="btn btn-light password-eye-btn" id="toggle-password-visibility-btn"
+                    type="button">
+              <img alt="show" id="password-show" th:src="@{/img/eye-open.svg}">
+              <img alt="hide" hidden id="password-hide" th:src="@{/img/eye-closed.svg}">
             </button>
           </div>
           <div class=" text-end mt-2 mb-3">
