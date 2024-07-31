@@ -88,13 +88,10 @@ public final class Constants {
   public static final List<String> ALLOWED_STATIC_ASSETS =
       List.of(
           "/public-style.css",
-          "/img/daily-logo.svg",
           "/favicon.ico",
-          "/img/google-logo.svg",
-          "/img/github-logo.svg",
           "/public-login.js",
           "/public-signup.js",
-          "/img/logo.svg");
+          "/img/*.svg");
   public static final String NOT_BLANK_MESSAGE = "Please fill out this field";
   public static final String EMAIL_SUBJECT_PREFIX = "daily | ";
   public static final String EMAIL_PATH_PREFIX = "emails/";
