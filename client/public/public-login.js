@@ -14,5 +14,5 @@ const togglePasswordVisibility = () => {
 };
 
 document
-  .getElementById('toggle-password-visibility-btn')
+  .getElementById('toggle-password-visibility')
   .addEventListener('click', togglePasswordVisibility);
