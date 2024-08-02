@@ -12,13 +12,13 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.16.12",
-    "axios": "^1.7.2",
+    "axios": "^1.7.3",
     "pinia": "^2.2.0",
     "quasar": "^2.16.6",
     "vue": "^3.4.35",
     "quasar-extras-svg-icons": "^1.37.0",
     "vue-i18n": "^9.13.1",
-    "vue-router": "^4.4.1"
+    "vue-router": "^4.4.2"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
