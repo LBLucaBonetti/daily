@@ -8,8 +8,8 @@ const togglePasswordVisibility = () => {
     passwordInput.type = 'text';
     return;
   }
-  passwordShowImg.hidden = false;
   passwordHideImg.hidden = true;
+  passwordShowImg.hidden = false;
   passwordInput.type = 'password';
 };
 
