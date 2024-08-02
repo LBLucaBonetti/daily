@@ -91,7 +91,8 @@ public final class Constants {
           "/favicon.ico",
           "/public-login.js",
           "/public-signup.js",
-          "/img/*.svg");
+          "/img/*.svg",
+          "/public-passwords.js");
   public static final String NOT_BLANK_MESSAGE = "Please fill out this field";
   public static final String EMAIL_SUBJECT_PREFIX = "daily | ";
   public static final String EMAIL_PATH_PREFIX = "emails/";

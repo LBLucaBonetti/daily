@@ -14,6 +14,7 @@
   <link th:replace="~{common-fragments :: fonts-bunny}">
   <link th:replace="~{common-fragments :: public-style}">
   <script defer th:src="@{/public-login.js}"></script>
+  <script defer th:src="@{/public-passwords.js}"></script>
 </head>
 <body class="login-body">
 <main class="d-flex text-center justify-content-center pt-4">
@@ -62,16 +63,18 @@
 
           <div class="input-group">
             <div class="form-floating">
-              <input class="form-control" id="password" name="password" placeholder="Password"
-                     required
-                     type="password"/>
+              <input class="form-control" data-role="password-input" id="password" name="password"
+                     placeholder="Password"
+                     required type="password"/>
               <label for="password">Password</label>
             </div>
             <button class="btn btn-light toggle-password-visibility-btn"
-                    id="toggle-password-visibility"
-                    type="button">
-              <img alt="show" id="password-show" th:src="@{/img/eye-open.svg}">
-              <img alt="hide" hidden id="password-hide" th:src="@{/img/eye-closed.svg}">
+                    data-role="password-button"
+                    id="toggle-password-visibility" type="button">
+              <img alt="show" data-role="password-show-image" id="password-show"
+                   th:src="@{/img/eye-open.svg}">
+              <img alt="hide" data-role="password-hide-image" hidden id="password-hide"
+                   th:src="@{/img/eye-closed.svg}">
             </button>
           </div>
           <div class=" text-end mt-2 mb-3">
