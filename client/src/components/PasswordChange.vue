@@ -26,7 +26,7 @@
         ><q-input
           outlined
           autofocus
-          type="password"
+          :type="passwordChangeCurrentPasswordType"
           input-class="text-1"
           v-model="passwordChangeCurrentPassword"
           :placeholder="
@@ -46,11 +46,20 @@
           lazy-rules="ondemand"
           class="password-change-input q-mb-md"
           ref="passwordChangeCurrentPasswordInput"
-        >
-        </q-input
+          ><template v-slot:append
+            ><q-btn
+              flat
+              :icon="passwordChangeCurrentPasswordToggleVisibilityIcon"
+              padding="none"
+              dense
+              ripple="false"
+              round
+              @click="
+                togglePasswordChangeCurrentPasswordVisibility
+              " /></template></q-input
         ><q-input
           outlined
-          type="password"
+          :type="passwordChangeNewPasswordType"
           input-class="text-1"
           v-model="passwordChangeNewPassword"
           :placeholder="
@@ -70,11 +79,20 @@
           lazy-rules="ondemand"
           class="password-change-input q-mb-md"
           ref="passwordChangeNewPasswordInput"
-        >
-        </q-input
+          ><template v-slot:append
+            ><q-btn
+              flat
+              :icon="passwordChangeNewPasswordToggleVisibilityIcon"
+              padding="none"
+              dense
+              ripple="false"
+              round
+              @click="
+                togglePasswordChangeNewPasswordVisibility
+              " /></template></q-input
         ><q-input
           outlined
-          type="password"
+          :type="passwordChangeNewPasswordConfirmationType"
           input-class="text-1"
           v-model="passwordChangeNewPasswordConfirmation"
           :placeholder="
@@ -94,8 +112,17 @@
           lazy-rules="ondemand"
           class="password-change-input"
           ref="passwordChangeNewPasswordConfirmationInput"
-        >
-        </q-input></q-card-section
+          ><template v-slot:append
+            ><q-btn
+              flat
+              :icon="passwordChangeNewPasswordConfirmationToggleVisibilityIcon"
+              padding="none"
+              dense
+              ripple="false"
+              round
+              @click="
+                togglePasswordChangeNewPasswordConfirmationVisibility
+              " /></template></q-input></q-card-section
       ><q-card-actions align="right">
         <q-btn
           class="bg-1 text-1"
@@ -121,8 +148,9 @@ import {
   QCardSection,
   QCardActions,
   QInput,
+  QInputType,
 } from 'quasar';
-import { ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PasswordChangeDto from 'src/interfaces/PasswordChangeDto';
 import ErrorDto from 'src/interfaces/ErrorDto';
@@ -143,10 +171,22 @@ const { t } = useI18n();
 const passwordChangeDialog = ref(false);
 const passwordChangeCurrentPassword = ref('');
 const passwordChangeCurrentPasswordInput = ref<QInput | null>(null);
+const passwordChangeCurrentPasswordType = ref<QInputType>('password');
+const passwordChangeCurrentPasswordToggleVisibilityIcon = ref(
+  'svguse:icons/svg-defs.svg#eye-open|0 0 256 256',
+);
 const passwordChangeNewPassword = ref('');
 const passwordChangeNewPasswordInput = ref<QInput | null>(null);
+const passwordChangeNewPasswordType = ref<QInputType>('password');
+const passwordChangeNewPasswordToggleVisibilityIcon = ref(
+  'svguse:icons/svg-defs.svg#eye-open|0 0 256 256',
+);
 const passwordChangeNewPasswordConfirmation = ref('');
 const passwordChangeNewPasswordConfirmationInput = ref<QInput | null>(null);
+const passwordChangeNewPasswordConfirmationType = ref<QInputType>('password');
+const passwordChangeNewPasswordConfirmationToggleVisibilityIcon = ref(
+  'svguse:icons/svg-defs.svg#eye-open|0 0 256 256',
+);
 const passwordChangeCancelBtn = ref<QBtn | null>(null);
 
 const onShowPasswordChangeDialog = () => {
@@ -263,6 +303,45 @@ const changePassword = async () => {
     passwordChangeDialog.value = false;
     resetPasswordChangeFields();
   }
+};
+
+const togglePasswordChangeCurrentPasswordVisibility = () => {
+  togglePasswordInputVisibility(
+    passwordChangeCurrentPasswordType,
+    passwordChangeCurrentPasswordToggleVisibilityIcon,
+  );
+};
+
+const togglePasswordChangeNewPasswordVisibility = () => {
+  togglePasswordInputVisibility(
+    passwordChangeNewPasswordType,
+    passwordChangeNewPasswordToggleVisibilityIcon,
+  );
+};
+
+const togglePasswordChangeNewPasswordConfirmationVisibility = () => {
+  togglePasswordInputVisibility(
+    passwordChangeNewPasswordConfirmationType,
+    passwordChangeNewPasswordConfirmationToggleVisibilityIcon,
+  );
+};
+
+const togglePasswordInputVisibility = (
+  inputTypeRef: Ref<QInputType>,
+  toggleVisibilityIconRef: Ref<string>,
+) => {
+  if (!inputTypeRef.value) {
+    return;
+  }
+  if (inputTypeRef.value === 'password') {
+    inputTypeRef.value = 'text';
+    toggleVisibilityIconRef.value =
+      'svguse:icons/svg-defs.svg#eye-closed|0 0 256 256';
+    return;
+  }
+  inputTypeRef.value = 'password';
+  toggleVisibilityIconRef.value =
+    'svguse:icons/svg-defs.svg#eye-open|0 0 256 256';
 };
 </script>
 <style>
