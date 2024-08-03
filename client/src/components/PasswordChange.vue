@@ -150,7 +150,7 @@ import {
   QInput,
   QInputType,
 } from 'quasar';
-import { ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PasswordChangeDto from 'src/interfaces/PasswordChangeDto';
 import ErrorDto from 'src/interfaces/ErrorDto';
@@ -306,47 +306,41 @@ const changePassword = async () => {
 };
 
 const togglePasswordChangeCurrentPasswordVisibility = () => {
-  if (!passwordChangeCurrentPasswordType.value) {
-    return;
-  }
-  if (passwordChangeCurrentPasswordType.value === 'password') {
-    passwordChangeCurrentPasswordType.value = 'text';
-    passwordChangeCurrentPasswordToggleVisibilityIcon.value =
-      'svguse:icons/svg-defs.svg#eye-closed|0 0 256 256';
-    return;
-  }
-  passwordChangeCurrentPasswordType.value = 'password';
-  passwordChangeCurrentPasswordToggleVisibilityIcon.value =
-    'svguse:icons/svg-defs.svg#eye-open|0 0 256 256';
+  togglePasswordInputVisibility(
+    passwordChangeCurrentPasswordType,
+    passwordChangeCurrentPasswordToggleVisibilityIcon,
+  );
 };
 
 const togglePasswordChangeNewPasswordVisibility = () => {
-  if (!passwordChangeNewPasswordType.value) {
-    return;
-  }
-  if (passwordChangeNewPasswordType.value === 'password') {
-    passwordChangeNewPasswordType.value = 'text';
-    passwordChangeNewPasswordToggleVisibilityIcon.value =
-      'svguse:icons/svg-defs.svg#eye-closed|0 0 256 256';
-    return;
-  }
-  passwordChangeNewPasswordType.value = 'password';
-  passwordChangeNewPasswordToggleVisibilityIcon.value =
-    'svguse:icons/svg-defs.svg#eye-open|0 0 256 256';
+  togglePasswordInputVisibility(
+    passwordChangeNewPasswordType,
+    passwordChangeNewPasswordToggleVisibilityIcon,
+  );
 };
 
 const togglePasswordChangeNewPasswordConfirmationVisibility = () => {
-  if (!passwordChangeNewPasswordConfirmationType.value) {
+  togglePasswordInputVisibility(
+    passwordChangeNewPasswordConfirmationType,
+    passwordChangeNewPasswordConfirmationToggleVisibilityIcon,
+  );
+};
+
+const togglePasswordInputVisibility = (
+  inputTypeRef: Ref<QInputType>,
+  toggleVisibilityIconRef: Ref<string>,
+) => {
+  if (!inputTypeRef.value) {
     return;
   }
-  if (passwordChangeNewPasswordConfirmationType.value === 'password') {
-    passwordChangeNewPasswordConfirmationType.value = 'text';
-    passwordChangeNewPasswordConfirmationToggleVisibilityIcon.value =
+  if (inputTypeRef.value === 'password') {
+    inputTypeRef.value = 'text';
+    toggleVisibilityIconRef.value =
       'svguse:icons/svg-defs.svg#eye-closed|0 0 256 256';
     return;
   }
-  passwordChangeNewPasswordConfirmationType.value = 'password';
-  passwordChangeNewPasswordConfirmationToggleVisibilityIcon.value =
+  inputTypeRef.value = 'password';
+  toggleVisibilityIconRef.value =
     'svguse:icons/svg-defs.svg#eye-open|0 0 256 256';
 };
 </script>
