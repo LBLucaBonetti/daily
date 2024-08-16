@@ -15,7 +15,7 @@
     "axios": "^1.7.4",
     "pinia": "^2.2.2",
     "quasar": "^2.16.8",
-    "vue": "^3.4.37",
+    "vue": "^3.4.38",
     "quasar-extras-svg-icons": "^1.37.0",
     "vue-i18n": "^9.13.1",
     "vue-router": "^4.4.3"
