@@ -64,6 +64,11 @@
             svg-id="tags"
             :translated-label="$t('pages.tags.title')"
           ></page-selector>
+          <page-selector
+            to="/budget"
+            svg-id="budget"
+            :translated-label="$t('pages.budget.title')"
+          ></page-selector>
 
           <page-selector
             to="/settings"

@@ -27,6 +27,14 @@ const routes: RouteRecordRaw[] = [
             .catch(refreshPage),
       },
       {
+        name: 'budget',
+        path: 'budget',
+        component: () =>
+          import('src/pages/BudgetPage.vue')
+            .then((budgetPage) => budgetPage)
+            .catch(refreshPage),
+      },
+      {
         name: 'settings',
         path: 'settings',
         component: () =>
