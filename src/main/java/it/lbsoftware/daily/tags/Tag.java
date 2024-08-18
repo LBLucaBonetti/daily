@@ -3,6 +3,7 @@ package it.lbsoftware.daily.tags;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.bases.BaseEntity;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.money.Money;
 import it.lbsoftware.daily.notes.Note;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,6 +53,11 @@ public class Tag extends BaseEntity {
   @Builder.Default
   private Set<Note> notes = new HashSet<>();
 
+  /** Money set with this tag. */
+  @ManyToMany(mappedBy = "tags")
+  @Builder.Default
+  private Set<Money> money = new HashSet<>();
+
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(
       name = "app_user_id",
@@ -62,7 +68,7 @@ public class Tag extends BaseEntity {
   private AppUser appUser;
 
   /**
-   * Adds a tag to the specified note and vise versa.
+   * Adds this tag to the specified note and vise versa.
    *
    * @param note Note object to link
    */
@@ -72,13 +78,33 @@ public class Tag extends BaseEntity {
   }
 
   /**
-   * Removes a tag from the specified note and vise versa.
+   * Removes this tag from the specified note and vise versa.
    *
    * @param note Note object to unlink
    */
   public void removeFromNote(Note note) {
     note.getTags().remove(this);
     this.getNotes().remove(note);
+  }
+
+  /**
+   * Adds this tag to the specified money and vise versa.
+   *
+   * @param money Money object to link
+   */
+  public void addToMoney(Money money) {
+    money.getTags().add(this);
+    this.getMoney().add(money);
+  }
+
+  /**
+   * Removes this tag from the specified money and vise versa.
+   *
+   * @param money Money object to unlink
+   */
+  public void removeFromMoney(Money money) {
+    money.getTags().remove(this);
+    this.getMoney().remove(money);
   }
 
   @Override
