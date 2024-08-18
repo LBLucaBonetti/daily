@@ -18,7 +18,7 @@ public record TagSearch(String name, String colorHex) implements SearchCriteriaR
 
   @Override
   public Tag get() {
-    return new Tag(name, colorHex, Collections.emptySet(), null);
+    return new Tag(name, colorHex, Collections.emptySet(), Collections.emptySet(), null);
   }
 
   @Override
