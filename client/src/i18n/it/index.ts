@@ -37,6 +37,10 @@ export default {
       subtitle:
         'Etichette da associare per distinguere meglio le entità. Tocca un tag per modificarlo',
     },
+    budget: {
+      title: 'Budget e spese',
+      subtitle: 'Tieni traccia di spese mensili e budget',
+    },
     settings: {
       title: 'Impostazioni',
       subtitle: 'Le preferenze vengono salvate automaticamente',

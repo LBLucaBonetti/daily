@@ -40,6 +40,10 @@ export default {
       subtitle:
         'Labels to associate to better distinguish entities. Touch a tag to edit it',
     },
+    budget: {
+      title: 'Budget and expenses',
+      subtitle: 'Keep track of monthly expenses and budget',
+    },
     settings: {
       title: 'Settings',
       subtitle: 'Options are automatically saved',
