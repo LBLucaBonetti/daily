@@ -9,6 +9,10 @@ import java.util.Set;
 
 public final class MoneyTestUtils {
 
+  private MoneyTestUtils() {
+    throw new UnsupportedOperationException("This class cannot be instantiated!");
+  }
+
   /**
    * {@link Money} generator; the created instance is not persisted.
    *

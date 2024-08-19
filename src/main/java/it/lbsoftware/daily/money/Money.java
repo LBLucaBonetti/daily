@@ -41,11 +41,14 @@ import lombok.Setter;
 public class Money extends BaseEntity {
 
   /** The date this money refers to, such as the withdrawal date of a certain amount. */
+  @NotNull
   @Column(nullable = false)
   private LocalDate operationDate;
 
   /** The amount of money. */
-  @NotNull private BigDecimal amount;
+  @NotNull
+  @Column(nullable = false)
+  private BigDecimal amount;
 
   /** The money operation type. */
   @Enumerated(EnumType.STRING)
