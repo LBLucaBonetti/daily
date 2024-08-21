@@ -2,6 +2,8 @@ package it.lbsoftware.daily.money;
 
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoneyDto;
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -60,15 +62,18 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
     var moneyDto =
         createMoneyDto(UUID.randomUUID(), OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION);
     Page<MoneyDto> readMoney = new PageImpl<>(List.of(moneyDto));
-    var from = LocalDate.now().minusDays(1);
-    given(moneyService.readMoney(pageable, from, APP_USER)).willReturn(readMoney);
+    var yearMonthDate = LocalDate.now().minusDays(1);
+    var from = yearMonthDate.with(firstDayOfMonth());
+    var to = yearMonthDate.with(lastDayOfMonth());
+    given(moneyService.readMoney(pageable, from, to, APP_USER)).willReturn(readMoney);
 
     // When
-    ResponseEntity<PageDto<MoneyDto>> res = moneyController.readMoney(pageable, from, appUser);
+    ResponseEntity<PageDto<MoneyDto>> res =
+        moneyController.readMoney(pageable, yearMonthDate, appUser);
 
     // Then
     verify(appUserService, times(1)).getAppUser(appUser);
-    verify(moneyService, times(1)).readMoney(pageable, from, APP_USER);
+    verify(moneyService, times(1)).readMoney(pageable, from, to, APP_USER);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertNotNull(res.getBody());
     assertNotNull(res.getBody().getContent());
@@ -81,20 +86,22 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
       "Should not read money because of wrong money field name as sort parameter and return bad request")
   void test2() {
     // Given
-    var from = LocalDate.now().minusDays(1);
+    var yearMonthDate = LocalDate.now().minusDays(1);
+    var from = yearMonthDate.with(firstDayOfMonth());
+    var to = yearMonthDate.with(lastDayOfMonth());
     doThrow(new RuntimeException("Wrong field name as sort parameter"))
         .when(moneyService)
-        .readMoney(pageable, from, APP_USER);
+        .readMoney(pageable, from, to, APP_USER);
 
     // When
     DailyBadRequestException res =
         assertThrows(
             DailyBadRequestException.class,
-            () -> moneyController.readMoney(pageable, from, appUser));
+            () -> moneyController.readMoney(pageable, yearMonthDate, appUser));
 
     // Then
     assertNotNull(res);
-    verify(moneyService, times(1)).readMoney(pageable, from, APP_USER);
+    verify(moneyService, times(1)).readMoney(pageable, from, to, APP_USER);
     assertNull(res.getMessage());
   }
 }

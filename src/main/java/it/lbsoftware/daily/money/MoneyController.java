@@ -1,5 +1,8 @@
 package it.lbsoftware.daily.money;
 
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
+
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.exceptions.DailyBadRequestException;
@@ -26,11 +29,15 @@ class MoneyController {
 
   @GetMapping
   public ResponseEntity<PageDto<MoneyDto>> readMoney(
-      Pageable pageable, @RequestParam LocalDate from, @AuthenticationPrincipal Object principal) {
-    log.info("GET request to /api/money with paging; parameters: %s".formatted(from));
+      Pageable pageable,
+      @RequestParam(name = "year-month-date") LocalDate yearMonthDate,
+      @AuthenticationPrincipal Object principal) {
+    log.info("GET request to /api/money with paging; parameters: %s".formatted(yearMonthDate));
+    var from = yearMonthDate.with(firstDayOfMonth());
+    var to = yearMonthDate.with(lastDayOfMonth());
     Page<MoneyDto> readMoney;
     try {
-      readMoney = moneyService.readMoney(pageable, from, appUserService.getAppUser(principal));
+      readMoney = moneyService.readMoney(pageable, from, to, appUserService.getAppUser(principal));
     } catch (Exception e) {
       log.error(e);
       throw new DailyBadRequestException(null);
