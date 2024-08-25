@@ -29,7 +29,7 @@ public abstract non-sealed class DailyAbstractIntegrationTests extends DailyAbst
     System.setProperty("spring.data.redis.port", redis.getMappedPort(6379).toString());
     // Initialize MailHog
     GenericContainer<?> mailhog =
-        new GenericContainer<>(DockerImageName.parse("mailhog/mailhog"))
+        new GenericContainer<>(DockerImageName.parse("corpusops/mailhog"))
             .withExposedPorts(1025, 8025);
     mailhog.start();
     System.setProperty("spring.mail.host", mailhog.getHost());
