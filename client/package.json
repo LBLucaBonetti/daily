@@ -17,13 +17,13 @@
     "quasar": "^2.16.9",
     "vue": "^3.4.38",
     "quasar-extras-svg-icons": "^1.37.0",
-    "vue-i18n": "^9.13.1",
+    "vue-i18n": "^9.14.0",
     "vue-router": "^4.4.3"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@quasar/app-vite": "^1.9.5",
-    "@types/node": "^22.4.2",
+    "@types/node": "^22.5.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.21.0",
     "autoprefixer": "^10.4.20",
