@@ -292,7 +292,7 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <groupId>org.springframework.boot</groupId>
     <relativePath/>
-    <version>3.3.2</version> <!-- lookup parent from repository -->
+    <version>3.3.3</version> <!-- lookup parent from repository -->
   </parent>
   <properties>
     <apache-commons-lang3.version>3.16.0</apache-commons-lang3.version>
@@ -301,7 +301,7 @@
     <java.version>21</java.version>
     <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     <mapstruct.version>1.6.0</mapstruct.version>
-    <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
+    <maven-checkstyle-plugin.version>3.5.0</maven-checkstyle-plugin.version>
     <nbvcxz.version>1.5.1</nbvcxz.version>
     <node.version>v20.14.0</node.version>
     <npm.version>10.7.0</npm.version>
