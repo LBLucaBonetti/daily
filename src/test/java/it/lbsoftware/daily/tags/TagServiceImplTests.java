@@ -192,7 +192,7 @@ class TagServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(tagRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(tagRepository, times(0)).save(any());
+    verify(tagRepository, times(0)).saveAndFlush(any());
     assertEquals(Optional.empty(), res);
   }
 
