@@ -18,7 +18,7 @@ public class MoneyService {
   private final MoneyDtoMapper moneyDtoMapper;
 
   /**
-   * Reads money of the period indicated by the given dates
+   * Reads money of the period indicated by the given dates.
    *
    * @param pageable Pagination and sorting object
    * @param from The starting date to search money operations by
