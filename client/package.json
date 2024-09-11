@@ -17,14 +17,14 @@
     "quasar": "^2.16.11",
     "vue": "^3.5.4",
     "quasar-extras-svg-icons": "^1.37.0",
-    "vue-i18n": "^9.14.0",
+    "vue-i18n": "^10.0.0",
     "vue-router": "^4.4.4"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@quasar/app-vite": "^1.9.5",
     "@types/node": "^22.5.4",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
