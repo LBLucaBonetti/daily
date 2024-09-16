@@ -300,7 +300,7 @@
     <jacoco.version>0.8.12</jacoco.version>
     <java.version>21</java.version>
     <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-    <mapstruct.version>1.6.0</mapstruct.version>
+    <mapstruct.version>1.6.1</mapstruct.version>
     <maven-checkstyle-plugin.version>3.5.0</maven-checkstyle-plugin.version>
     <nbvcxz.version>1.5.1</nbvcxz.version>
     <node.version>v20.14.0</node.version>
