@@ -7,14 +7,17 @@ import static it.lbsoftware.daily.appusers.AppUserTestUtils.OTHER_APP_USER_EMAIL
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.OTHER_APP_USER_FULLNAME;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.saveOauth2OtherAppUser;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoney;
+import static it.lbsoftware.daily.money.MoneyTestUtils.createMoneyDto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,9 +32,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,13 +52,61 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
   private static final LocalDate OPERATION_DATE = LocalDate.now();
   private static final LocalDate OTHER_OPERATION_DATE = LocalDate.now().minusDays(1);
   private static final BigDecimal AMOUNT = BigDecimal.TEN;
+  private static final BigDecimal OTHER_AMOUNT = BigDecimal.ONE;
   private static final OperationType OPERATION_TYPE = OperationType.INCOME;
+  private static final OperationType OTHER_OPERATION_TYPE = OperationType.OUTCOME;
   private static final String DESCRIPTION = "description";
+  private static final String OTHER_DESCRIPTION = "other description";
   @Autowired private ObjectMapper objectMapper;
   @Autowired private MoneyRepository moneyRepository;
   @Autowired private MoneyDtoMapper moneyDtoMapper;
   @Autowired private AppUserRepository appUserRepository;
   @Autowired private PasswordEncoder passwordEncoder;
+
+  private static Stream<MoneyDto> test5() {
+    var nullOperationDateMoneyDto = new MoneyDto();
+    nullOperationDateMoneyDto.setOperationDate(null);
+    nullOperationDateMoneyDto.setAmount(OTHER_AMOUNT);
+    nullOperationDateMoneyDto.setOperationType(OTHER_OPERATION_TYPE);
+    nullOperationDateMoneyDto.setDescription(OTHER_DESCRIPTION);
+    var nullAmountMoneyDto = new MoneyDto();
+    nullAmountMoneyDto.setOperationDate(OTHER_OPERATION_DATE);
+    nullAmountMoneyDto.setAmount(null);
+    nullAmountMoneyDto.setOperationType(OTHER_OPERATION_TYPE);
+    nullAmountMoneyDto.setDescription(OTHER_DESCRIPTION);
+    var nullOperationTypeMoneyDto = new MoneyDto();
+    nullOperationTypeMoneyDto.setOperationDate(OTHER_OPERATION_DATE);
+    nullOperationTypeMoneyDto.setAmount(OTHER_AMOUNT);
+    nullOperationTypeMoneyDto.setOperationType(null);
+    nullOperationTypeMoneyDto.setDescription(OTHER_DESCRIPTION);
+    var tooLongDescriptionMoneyDto = new MoneyDto();
+    tooLongDescriptionMoneyDto.setOperationDate(OTHER_OPERATION_DATE);
+    tooLongDescriptionMoneyDto.setAmount(OTHER_AMOUNT);
+    tooLongDescriptionMoneyDto.setOperationType(OTHER_OPERATION_TYPE);
+    var tooLongDescription =
+        "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678";
+    tooLongDescriptionMoneyDto.setDescription(tooLongDescription);
+    return Stream.of(
+        nullOperationDateMoneyDto,
+        nullAmountMoneyDto,
+        nullOperationTypeMoneyDto,
+        tooLongDescriptionMoneyDto);
+  }
 
   @BeforeEach
   void beforeEach() {
@@ -216,5 +272,145 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
     assertThat(moneyDtos)
         .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAd", "updatedAt")
         .doesNotContain(moneyDto4);
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @MethodSource
+  @DisplayName("Should return bad request when update money with wrong arguments")
+  void test5(final MoneyDto moneyDto) throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE,
+                AMOUNT,
+                OPERATION_TYPE,
+                DESCRIPTION,
+                Collections.emptySet(),
+                appUser));
+
+    // When
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}", money.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(moneyDto))
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+
+    // Then
+    money = moneyRepository.findByUuidAndAppUserFetchTags(money.getUuid(), appUser).get();
+    assertEquals(OPERATION_DATE, money.getOperationDate());
+    assertEquals(AMOUNT, money.getAmount());
+    assertEquals(OPERATION_TYPE, money.getOperationType());
+    assertEquals(DESCRIPTION, money.getDescription());
+    assertEquals(Collections.emptySet(), money.getTags());
+    assertEquals(appUser, money.getAppUser());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when update money with wrong uuid")
+  void test6() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    String uuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when update money of another app user")
+  void test7() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var otherAppUser = saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE,
+                AMOUNT,
+                OPERATION_TYPE,
+                DESCRIPTION,
+                Collections.emptySet(),
+                appUser));
+    var moneyDto =
+        createMoneyDto(
+            null, OTHER_OPERATION_DATE, OTHER_AMOUNT, OTHER_OPERATION_TYPE, OTHER_DESCRIPTION);
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}", money.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(moneyDto))
+                .with(csrf())
+                .with(
+                    loginOf(otherAppUser.getUuid(), OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should update money")
+  void test8() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE,
+                AMOUNT,
+                OPERATION_TYPE,
+                DESCRIPTION,
+                Collections.emptySet(),
+                appUser));
+    var moneyDto =
+        createMoneyDto(
+            null, OTHER_OPERATION_DATE, OTHER_AMOUNT, OTHER_OPERATION_TYPE, OTHER_DESCRIPTION);
+
+    // When
+    var res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    put(BASE_URL + "/{uuid}", money.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(moneyDto))
+                        .with(csrf())
+                        .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            MoneyDto.class);
+
+    // Then
+    assertEquals(OTHER_OPERATION_DATE, res.getOperationDate());
+    assertEquals(OTHER_AMOUNT, res.getAmount());
+    assertEquals(OTHER_OPERATION_TYPE, res.getOperationType());
+    assertEquals(OTHER_DESCRIPTION, res.getDescription());
+  }
+
+  @Test
+  @DisplayName("Should return unauthorized when update money, csrf and no auth")
+  void test9() throws Exception {
+    mockMvc
+        .perform(put(BASE_URL + "/{uuid}", UUID.randomUUID()).with(csrf()))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @DisplayName("Should return forbidden when update money, no csrf and no auth")
+  void test10() throws Exception {
+    mockMvc.perform(put(BASE_URL + "/{uuid}", UUID.randomUUID())).andExpect(status().isForbidden());
   }
 }

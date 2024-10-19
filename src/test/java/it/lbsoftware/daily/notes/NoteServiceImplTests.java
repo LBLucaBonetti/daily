@@ -239,7 +239,7 @@ class NoteServiceImplTests extends DailyAbstractUnitTests {
 
     // Then
     verify(noteRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
-    verify(noteRepository, times(0)).save(any());
+    verify(noteRepository, times(0)).saveAndFlush(any());
     assertEquals(Optional.empty(), res);
   }
 

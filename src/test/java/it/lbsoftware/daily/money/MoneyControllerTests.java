@@ -22,6 +22,7 @@ import it.lbsoftware.daily.money.Money.OperationType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -103,5 +104,43 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
     assertNotNull(res);
     verify(moneyService, times(1)).readMoney(pageable, from, to, APP_USER);
     assertNull(res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should not update money and return not found")
+  void test3() {
+    // Given
+    var uuid = UUID.randomUUID();
+    var moneyDto = createMoneyDto(uuid, OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION);
+    Optional<MoneyDto> updatedMoneyDto = Optional.empty();
+    given(moneyService.updateMoney(uuid, moneyDto, APP_USER)).willReturn(updatedMoneyDto);
+
+    // When
+    var res = moneyController.updateMoney(uuid, moneyDto, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).updateMoney(uuid, moneyDto, APP_USER);
+    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+    assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should update money and return ok")
+  void test4() {
+    // Given
+    var uuid = UUID.randomUUID();
+    var moneyDto = createMoneyDto(uuid, OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION);
+    var updatedMoney = Optional.of(moneyDto);
+    given(moneyService.updateMoney(uuid, moneyDto, APP_USER)).willReturn(updatedMoney);
+
+    // When
+    var res = moneyController.updateMoney(uuid, moneyDto, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).updateMoney(uuid, moneyDto, APP_USER);
+    assertEquals(HttpStatus.OK, res.getStatusCode());
+    assertEquals(moneyDto, res.getBody());
   }
 }
