@@ -8,6 +8,7 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -97,6 +98,20 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
   }
 
   private static Stream<Arguments> test13() {
+    // Uuid, tagUuid, appUser
+    UUID uuid = UUID.randomUUID();
+    UUID tagUuid = UUID.randomUUID();
+    return Stream.of(
+        arguments(null, null, null),
+        arguments(null, null, APP_USER),
+        arguments(null, tagUuid, null),
+        arguments(null, tagUuid, APP_USER),
+        arguments(uuid, null, null),
+        arguments(uuid, null, APP_USER),
+        arguments(uuid, tagUuid, null));
+  }
+
+  private static Stream<Arguments> test18() {
     // Uuid, tagUuid, appUser
     UUID uuid = UUID.randomUUID();
     UUID tagUuid = UUID.randomUUID();
@@ -415,5 +430,93 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
     verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
     verify(moneyRepository, times(0)).save(any());
     assertEquals(Constants.ERROR_MONEY_TAGS_MAX, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should not remove tag from money because of money not found")
+  void test15() {
+    // Given
+    Optional<Money> moneyOptional = Optional.empty();
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+
+    // When
+    var res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> moneyService.removeTagFromMoney(uuid, tagUuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(0)).findByUuidAndAppUser(any(), any());
+    verify(moneyRepository, times(0)).save(any());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should not remove tag from money because of tag not found")
+  void test16() {
+    // Given
+    var moneyOptional =
+        Optional.of(
+            createMoney(
+                OPERATION_DATE,
+                AMOUNT,
+                OPERATION_TYPE,
+                DESCRIPTION,
+                Collections.emptySet(),
+                APP_USER));
+    Optional<Tag> tagOptional = Optional.empty();
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
+
+    // When
+    var res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> moneyService.removeTagFromMoney(uuid, tagUuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
+    verify(moneyRepository, times(0)).save(any());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should remove tag from money")
+  void test17() {
+    // Given
+    var money =
+        createMoney(OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, new HashSet<>(), APP_USER);
+    var moneyOptional = Optional.of(money);
+    var tag = createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER);
+    var tagOptional = Optional.of(tag);
+    tag.addToMoney(money);
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
+
+    // When
+    assertDoesNotThrow(() -> moneyService.removeTagFromMoney(uuid, tagUuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
+    assertFalse(money.getTags().contains(tag));
+    assertFalse(tag.getMoney().contains(money));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when remove tag from money with null argument")
+  void test18(UUID uuid, UUID tagUuid, AppUser appUser) {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> moneyService.removeTagFromMoney(uuid, tagUuid, appUser));
   }
 }

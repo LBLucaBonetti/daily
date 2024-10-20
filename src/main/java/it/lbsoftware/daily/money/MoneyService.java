@@ -110,4 +110,26 @@ public class MoneyService {
     }
     tag.addToMoney(money);
   }
+
+  /**
+   * Removes a tag from money.
+   *
+   * @param uuid Money uuid
+   * @param tagUuid Tag uuid
+   * @param appUser The owner
+   */
+  @Transactional
+  @CacheEvict(key = MONEY_TAGS_CACHE_KEY_SPEL)
+  public void removeTagFromMoney(
+      @NonNull UUID uuid, @NonNull UUID tagUuid, @NonNull AppUser appUser) {
+    var money =
+        moneyRepository
+            .findByUuidAndAppUser(uuid, appUser)
+            .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
+    var tag =
+        tagRepository
+            .findByUuidAndAppUser(tagUuid, appUser)
+            .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
+    tag.removeFromMoney(money);
+  }
 }
