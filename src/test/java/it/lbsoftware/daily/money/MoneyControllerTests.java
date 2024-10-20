@@ -19,6 +19,7 @@ import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exceptions.DailyBadRequestException;
+import it.lbsoftware.daily.exceptions.DailyConflictException;
 import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.money.Money.OperationType;
 import java.math.BigDecimal;
@@ -180,5 +181,65 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
     verify(moneyService, times(1)).deleteMoney(uuid, APP_USER);
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should not add tag to money and throw not found")
+  void test7() {
+    // Given
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(moneyService)
+        .addTagToMoney(uuid, tagUuid, APP_USER);
+
+    // When
+    var res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> moneyController.addTagToMoney(uuid, tagUuid, appUser));
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).addTagToMoney(uuid, tagUuid, APP_USER);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should add tag to money and return no content")
+  void test8() {
+    // Given
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+
+    // When
+    var res = moneyController.addTagToMoney(uuid, tagUuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).addTagToMoney(uuid, tagUuid, APP_USER);
+    assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
+    assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should not add tag to money because of money tag limits and return conflict")
+  void test9() {
+    // Given
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    doThrow(new DailyConflictException(Constants.ERROR_MONEY_TAGS_MAX))
+        .when(moneyService)
+        .addTagToMoney(uuid, tagUuid, APP_USER);
+
+    // When
+    var res =
+        assertThrows(
+            DailyConflictException.class,
+            () -> moneyController.addTagToMoney(uuid, tagUuid, appUser));
+
+    // Then
+    assertNotNull(res);
+    assertEquals(Constants.ERROR_MONEY_TAGS_MAX, res.getMessage());
   }
 }

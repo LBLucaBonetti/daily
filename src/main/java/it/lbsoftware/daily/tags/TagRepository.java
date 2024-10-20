@@ -43,6 +43,18 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
   Optional<Tag> findByUuidAndAppUserFetchNotes(
       @Param("uuid") UUID uuid, @Param("appUser") AppUser appUser);
 
+  /**
+   * Finds a tag by its uuid and AppUser fetching the associated money.
+   *
+   * @param uuid Tag uuid
+   * @param appUser The appUser
+   * @return Found tag or empty value
+   */
+  @Query(
+      "select t from Tag t left join fetch t.money where t.uuid = :uuid and t.appUser = :appUser")
+  Optional<Tag> findByUuidAndAppUserFetchMoney(
+      @Param("uuid") UUID uuid, @Param("appUser") AppUser appUser);
+
   @Query("delete from Tag t where t.appUser = :appUser")
   @Modifying
   void deleteByAppUser(@Param("appUser") AppUser appUser);

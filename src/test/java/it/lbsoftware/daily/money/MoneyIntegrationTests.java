@@ -530,9 +530,9 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
     assertEquals(1, tagRepository.count());
     assertTrue(
         tagRepository
-            .findByUuidAndAppUserFetchNotes(tag.getUuid(), appUser)
+            .findByUuidAndAppUserFetchMoney(tag.getUuid(), appUser)
             .get()
-            .getNotes()
+            .getMoney()
             .isEmpty());
   }
 
@@ -562,5 +562,212 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
 
     // Then
     assertEquals(0, moneyRepository.count());
+  }
+
+  @Test
+  @DisplayName("Should return unauthorized when add tag to money, csrf and no auth")
+  void test18() throws Exception {
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), UUID.randomUUID())
+                .with(csrf()))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @DisplayName("Should return forbidden when add tag to money, no csrf and no auth")
+  void test19() throws Exception {
+    mockMvc
+        .perform(put(BASE_URL + "/{uuid}/tags/{tagsUuid}", UUID.randomUUID(), UUID.randomUUID()))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when add tag to money with wrong uuid")
+  void test20() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when add tag to money with wrong tagUuid")
+  void test21() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var tagUuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when add tag to money with wrong uuid and tagUuid")
+  void test22() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid = "not-a-uuid";
+    var tagUuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when add tag to money and money does not exist")
+  void test23() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid = UUID.randomUUID();
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when add tag to money and tag does not exist")
+  void test24() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid =
+        moneyRepository
+            .save(
+                createMoney(
+                    OPERATION_DATE,
+                    AMOUNT,
+                    OPERATION_TYPE,
+                    DESCRIPTION,
+                    Collections.emptySet(),
+                    appUser))
+            .getUuid();
+    var tagUuid = UUID.randomUUID();
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when add tag to money and money is of another app user")
+  void test25() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var otherAppUser = saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
+    var uuid =
+        moneyRepository
+            .save(
+                createMoney(
+                    OPERATION_DATE,
+                    AMOUNT,
+                    OPERATION_TYPE,
+                    DESCRIPTION,
+                    Collections.emptySet(),
+                    otherAppUser))
+            .getUuid();
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when add tag to money and tag is of another app user")
+  void test26() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var otherAppUser = saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
+    var uuid =
+        moneyRepository
+            .save(
+                createMoney(
+                    OPERATION_DATE,
+                    AMOUNT,
+                    OPERATION_TYPE,
+                    DESCRIPTION,
+                    Collections.emptySet(),
+                    appUser))
+            .getUuid();
+    var tagUuid =
+        tagRepository
+            .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), otherAppUser))
+            .getUuid();
+
+    // When and then
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should add tag to money")
+  void test27() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid =
+        moneyRepository
+            .save(
+                createMoney(
+                    OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, new HashSet<>(), appUser))
+            .getUuid();
+    var tagUuid =
+        tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser)).getUuid();
+
+    // When
+    mockMvc
+        .perform(
+            put(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    var money = moneyRepository.findByUuidAndAppUserFetchTags(uuid, appUser).get();
+    var tag = tagRepository.findByUuidAndAppUserFetchMoney(tagUuid, appUser).get();
+    assertEquals(1, money.getTags().size());
+    assertTrue(money.getTags().contains(tag));
+    assertEquals(1, tag.getMoney().size());
+    assertTrue(tag.getMoney().contains(money));
   }
 }

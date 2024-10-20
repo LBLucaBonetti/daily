@@ -6,6 +6,7 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.exceptions.DailyBadRequestException;
+import it.lbsoftware.daily.tags.TagDto;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -72,6 +73,17 @@ class MoneyController {
       @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
     log.info("DELETE request to /api/money/%s".formatted(uuid.toString()));
     moneyService.deleteMoney(uuid, appUserService.getAppUser(principal));
+
+    return ResponseEntity.noContent().build();
+  }
+
+  @PutMapping(value = "/{uuid}/tags/{tagUuid}")
+  public ResponseEntity<TagDto> addTagToMoney(
+      @PathVariable("uuid") UUID uuid,
+      @PathVariable("tagUuid") UUID tagUuid,
+      @AuthenticationPrincipal Object principal) {
+    log.info("PUT request to /api/money/%s/tags/%s".formatted(uuid.toString(), tagUuid.toString()));
+    moneyService.addTagToMoney(uuid, tagUuid, appUserService.getAppUser(principal));
 
     return ResponseEntity.noContent().build();
   }
