@@ -39,10 +39,11 @@ public final class Constants {
       BASIC_APP_USER_ENTITY_CACHE_KEY_SPEL + "'notes:' + #uuid + ':tags'";
   public static final String MONEY_TAGS_CACHE_KEY_SPEL =
       BASIC_APP_USER_ENTITY_CACHE_KEY_SPEL + "'money:' + #uuid + ':tags'";
-  public static final String TAG_CACHE = "tag";
   public static final String TAGS_CACHE_KEY_SPEL =
       BASIC_APP_USER_ENTITY_CACHE_KEY_SPEL + "'tags:' + #uuid";
-  public static final String NOTE_CACHE = "note";
+  public static final String TAG_CACHE = "tags";
+  public static final String NOTE_CACHE = "notes";
+  public static final String MONEY_CACHE = "money";
   public static final int NOTE_TEXT_MAX = 255;
   public static final int TAG_NAME_MAX = 30;
   public static final int NOTE_TAGS_MAX = 5;

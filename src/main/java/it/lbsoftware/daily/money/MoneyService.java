@@ -1,11 +1,18 @@
 package it.lbsoftware.daily.money;
 
+import static it.lbsoftware.daily.config.Constants.MONEY_CACHE;
+import static it.lbsoftware.daily.config.Constants.MONEY_TAGS_CACHE_KEY_SPEL;
+
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 /** Main {@link Money} service implementation. */
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = MONEY_CACHE)
 public class MoneyService {
 
   private final MoneyRepository moneyRepository;
@@ -36,6 +44,14 @@ public class MoneyService {
         .map(moneyDtoMapper::convertToDto);
   }
 
+  /**
+   * Updates money.
+   *
+   * @param uuid Money uuid
+   * @param money Money object with new data
+   * @param appUser The owner
+   * @return Updated money or empty value
+   */
   @Transactional
   public Optional<MoneyDto> updateMoney(
       @NonNull UUID uuid, @NonNull MoneyDto money, @NonNull AppUser appUser) {
@@ -50,5 +66,21 @@ public class MoneyService {
               return moneyRepository.saveAndFlush(prevMoney);
             })
         .map(moneyDtoMapper::convertToDto);
+  }
+
+  /**
+   * Deletes money.
+   *
+   * @param uuid Money uuid
+   * @param appUser The owner
+   */
+  @Transactional
+  @CacheEvict(key = MONEY_TAGS_CACHE_KEY_SPEL)
+  public void deleteMoney(@NonNull UUID uuid, @NonNull AppUser appUser) {
+    var money =
+        moneyRepository
+            .findByUuidAndAppUser(uuid, appUser)
+            .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
+    moneyRepository.delete(money);
   }
 }
