@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,5 +65,14 @@ class MoneyController {
         .updateMoney(uuid, moneyDto, appUserService.getAppUser(principal))
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
+  }
+
+  @DeleteMapping(value = "/{uuid}")
+  public ResponseEntity<MoneyDto> deleteMoney(
+      @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
+    log.info("DELETE request to /api/money/%s".formatted(uuid.toString()));
+    moneyService.deleteMoney(uuid, appUserService.getAppUser(principal));
+
+    return ResponseEntity.noContent().build();
   }
 }

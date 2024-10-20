@@ -17,7 +17,9 @@ import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.appusers.AppUserService;
 import it.lbsoftware.daily.bases.PageDto;
+import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exceptions.DailyBadRequestException;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.money.Money.OperationType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -142,5 +144,41 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
     verify(moneyService, times(1)).updateMoney(uuid, moneyDto, APP_USER);
     assertEquals(HttpStatus.OK, res.getStatusCode());
     assertEquals(moneyDto, res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should not delete money and throw not found")
+  void test5() {
+    // Given
+    var uuid = UUID.randomUUID();
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(moneyService)
+        .deleteMoney(uuid, APP_USER);
+
+    // When
+    var res =
+        assertThrows(
+            DailyNotFoundException.class, () -> moneyController.deleteMoney(uuid, appUser));
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).deleteMoney(uuid, APP_USER);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should delete money and return no content")
+  void test6() {
+    // Given
+    var uuid = UUID.randomUUID();
+
+    // When
+    var res = moneyController.deleteMoney(uuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).deleteMoney(uuid, APP_USER);
+    assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
+    assertNull(res.getBody());
   }
 }

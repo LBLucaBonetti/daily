@@ -1,8 +1,8 @@
 package it.lbsoftware.daily.tags;
 
-import static it.lbsoftware.daily.config.Constants.BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL;
 import static it.lbsoftware.daily.config.Constants.DO_NOT_STORE_NULL_SPEL;
 import static it.lbsoftware.daily.config.Constants.NOTE_CACHE;
+import static it.lbsoftware.daily.config.Constants.TAGS_CACHE_KEY_SPEL;
 import static it.lbsoftware.daily.config.Constants.TAG_CACHE;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.contains;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
@@ -47,10 +47,7 @@ public class TagServiceImpl implements TagService {
 
   @Override
   @Transactional(readOnly = true)
-  @Cacheable(
-      cacheNames = TAG_CACHE,
-      key = BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL,
-      unless = DO_NOT_STORE_NULL_SPEL)
+  @Cacheable(cacheNames = TAG_CACHE, key = TAGS_CACHE_KEY_SPEL, unless = DO_NOT_STORE_NULL_SPEL)
   public Optional<TagDto> readTag(@NonNull UUID uuid, @NonNull AppUser appUser) {
     return tagRepository.findByUuidAndAppUser(uuid, appUser).map(tagDtoMapper::convertToDto);
   }
@@ -67,7 +64,7 @@ public class TagServiceImpl implements TagService {
       put = {
         @CachePut(
             cacheNames = TAG_CACHE,
-            key = BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL,
+            key = TAGS_CACHE_KEY_SPEL,
             unless = DO_NOT_STORE_NULL_SPEL)
       },
       evict = {@CacheEvict(cacheNames = NOTE_CACHE, allEntries = true)})
@@ -88,7 +85,7 @@ public class TagServiceImpl implements TagService {
   @Transactional
   @Caching(
       evict = {
-        @CacheEvict(cacheNames = TAG_CACHE, key = BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL),
+        @CacheEvict(cacheNames = TAG_CACHE, key = TAGS_CACHE_KEY_SPEL),
         @CacheEvict(cacheNames = NOTE_CACHE, allEntries = true)
       })
   public void deleteTag(@NonNull UUID uuid, @NonNull AppUser appUser) {

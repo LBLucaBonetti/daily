@@ -33,12 +33,17 @@ public final class Constants {
   public static final String ERROR_PASSWORD_CHANGE_MISMATCH =
       ERROR_PREFIX + "password.change.mismatch";
   public static final String DO_NOT_STORE_NULL_SPEL = "#result == null";
-  public static final String BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL =
-      "'appUser:' + #appUser + ':' + #uuid";
+  public static final String BASIC_APP_USER_ENTITY_CACHE_KEY_SPEL =
+      "'appUser:' + #appUser.uuid + ':' + ";
   public static final String NOTE_TAGS_CACHE_KEY_SPEL =
-      BASIC_SINGLE_ENTITY_CACHE_KEY_SPEL + " + ':tags'";
-  public static final String TAG_CACHE = "tag";
-  public static final String NOTE_CACHE = "note";
+      BASIC_APP_USER_ENTITY_CACHE_KEY_SPEL + "'notes:' + #uuid + ':tags'";
+  public static final String MONEY_TAGS_CACHE_KEY_SPEL =
+      BASIC_APP_USER_ENTITY_CACHE_KEY_SPEL + "'money:' + #uuid + ':tags'";
+  public static final String TAGS_CACHE_KEY_SPEL =
+      BASIC_APP_USER_ENTITY_CACHE_KEY_SPEL + "'tags:' + #uuid";
+  public static final String TAG_CACHE = "tags";
+  public static final String NOTE_CACHE = "notes";
+  public static final String MONEY_CACHE = "money";
   public static final int NOTE_TEXT_MAX = 255;
   public static final int TAG_NAME_MAX = 30;
   public static final int NOTE_TAGS_MAX = 5;

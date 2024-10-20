@@ -822,7 +822,11 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     // When
     Optional<TagDto> res =
         Optional.ofNullable(cacheManager.getCache(Constants.TAG_CACHE))
-            .map(r -> r.get("appUser:" + appUser + ":" + tag.getUuid().toString(), TagDto.class));
+            .map(
+                r ->
+                    r.get(
+                        "appUser:" + appUser.getUuid() + ":tags:" + tag.getUuid().toString(),
+                        TagDto.class));
 
     // Then
     assertTrue(res.isPresent());
@@ -858,7 +862,11 @@ class TagIntegrationTests extends DailyAbstractIntegrationTests {
     // When
     Optional<TagDto> res =
         Optional.ofNullable(cacheManager.getCache(Constants.TAG_CACHE))
-            .map(r -> r.get("appUser:" + appUser + ":" + tag.getUuid().toString(), TagDto.class));
+            .map(
+                r ->
+                    r.get(
+                        "appUser:" + appUser.getUuid() + ":tags:" + tag.getUuid().toString(),
+                        TagDto.class));
 
     // Then
     assertTrue(res.isPresent());

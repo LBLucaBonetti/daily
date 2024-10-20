@@ -8,6 +8,7 @@ import static it.lbsoftware.daily.appusers.AppUserTestUtils.OTHER_APP_USER_FULLN
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.saveOauth2OtherAppUser;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoney;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoneyDto;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,9 +30,11 @@ import it.lbsoftware.daily.appusers.AppUserTestUtils;
 import it.lbsoftware.daily.bases.PageDto;
 import it.lbsoftware.daily.exceptions.DailyBadRequestException;
 import it.lbsoftware.daily.money.Money.OperationType;
+import it.lbsoftware.daily.tags.TagRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -57,11 +61,14 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
   private static final OperationType OTHER_OPERATION_TYPE = OperationType.OUTCOME;
   private static final String DESCRIPTION = "description";
   private static final String OTHER_DESCRIPTION = "other description";
+  private static final String NAME = "name";
+  private static final String COLOR_HEX = "#123456";
   @Autowired private ObjectMapper objectMapper;
   @Autowired private MoneyRepository moneyRepository;
   @Autowired private MoneyDtoMapper moneyDtoMapper;
   @Autowired private AppUserRepository appUserRepository;
   @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired private TagRepository tagRepository;
 
   private static Stream<MoneyDto> test5() {
     var nullOperationDateMoneyDto = new MoneyDto();
@@ -412,5 +419,148 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
   @DisplayName("Should return forbidden when update money, no csrf and no auth")
   void test10() throws Exception {
     mockMvc.perform(put(BASE_URL + "/{uuid}", UUID.randomUUID())).andExpect(status().isForbidden());
+  }
+
+  @Test
+  @DisplayName("Should return unauthorized when delete money, csrf and no auth")
+  void test11() throws Exception {
+    mockMvc
+        .perform(delete(BASE_URL + "/{uuid}", UUID.randomUUID()).with(csrf()))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @DisplayName("Should return forbidden when delete money, no csrf and no auth")
+  void test12() throws Exception {
+    mockMvc
+        .perform(delete(BASE_URL + "/{uuid}", UUID.randomUUID()))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when delete money with wrong uuid")
+  void test13() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when delete money of another app user")
+  void test14() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var otherAppUser = saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE,
+                AMOUNT,
+                OPERATION_TYPE,
+                DESCRIPTION,
+                Collections.emptySet(),
+                appUser));
+
+    // When
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", money.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(
+                    loginOf(otherAppUser.getUuid(), OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+
+    // Then
+    assertEquals(1, moneyRepository.count());
+  }
+
+  @Test
+  @DisplayName("Should return not found when delete money and it does not exist")
+  void test15() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid = UUID.randomUUID();
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should not delete tag and should remove money from tag money when delete money")
+  void test16() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, new HashSet<>(), appUser));
+    var tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
+    tag.addToMoney(money);
+    moneyRepository.save(money);
+    assertTrue(money.getTags().contains(tag));
+    assertTrue(tag.getMoney().contains(money));
+
+    // When
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", money.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    assertEquals(0, moneyRepository.count());
+    assertEquals(1, tagRepository.count());
+    assertTrue(
+        tagRepository
+            .findByUuidAndAppUserFetchNotes(tag.getUuid(), appUser)
+            .get()
+            .getNotes()
+            .isEmpty());
+  }
+
+  @Test
+  @DisplayName("Should delete money")
+  void test17() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE,
+                AMOUNT,
+                OPERATION_TYPE,
+                DESCRIPTION,
+                Collections.emptySet(),
+                appUser));
+
+    // When
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}", money.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    assertEquals(0, moneyRepository.count());
   }
 }

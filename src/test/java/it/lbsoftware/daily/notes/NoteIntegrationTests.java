@@ -1268,7 +1268,11 @@ class NoteIntegrationTests extends DailyAbstractIntegrationTests {
             .map(
                 r ->
                     r.get(
-                        "appUser:" + appUser + ":" + note.getUuid().toString() + ":tags",
+                        "appUser:"
+                            + appUser.getUuid()
+                            + ":notes:"
+                            + note.getUuid().toString()
+                            + ":tags",
                         Set.class));
 
     // Then

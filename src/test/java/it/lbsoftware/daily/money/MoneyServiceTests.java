@@ -5,6 +5,7 @@ import static it.lbsoftware.daily.money.MoneyTestUtils.createMoney;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoneyDto;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,6 +17,8 @@ import static org.mockito.Mockito.verify;
 
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser;
+import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.money.Money.OperationType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,6 +40,10 @@ import org.springframework.data.domain.Pageable;
 
 class MoneyServiceTests extends DailyAbstractUnitTests {
 
+  private static final LocalDate OPERATION_DATE = LocalDate.now();
+  private static final BigDecimal AMOUNT = BigDecimal.TEN;
+  private static final OperationType OPERATION_TYPE = OperationType.INCOME;
+  private static final String DESCRIPTION = "description";
   private static final String EMAIL = "appuser@email.com";
   private static final UUID UNIQUE_ID = UUID.randomUUID();
   private static final AppUser APP_USER = createAppUser(UNIQUE_ID, EMAIL);
@@ -73,6 +80,12 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
         arguments(uuid, null, null),
         arguments(uuid, null, APP_USER),
         arguments(uuid, money, null));
+  }
+
+  private static Stream<Arguments> test7() {
+    // Uuid, appUser
+    UUID uuid = UUID.randomUUID();
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(uuid, null));
   }
 
   @BeforeEach
@@ -214,5 +227,54 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
   void test6(UUID uuid, MoneyDto money, AppUser appUser) {
     assertThrows(
         IllegalArgumentException.class, () -> moneyService.updateMoney(uuid, money, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when delete money with null argument")
+  void test7(UUID uuid, AppUser appUser) {
+    assertThrows(IllegalArgumentException.class, () -> moneyService.deleteMoney(uuid, appUser));
+  }
+
+  @Test
+  @DisplayName("Should not delete money and throw")
+  void test8() {
+    // Given
+    Optional<Money> moneyOptional = Optional.empty();
+    var uuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+
+    // When
+    var res =
+        assertThrows(DailyNotFoundException.class, () -> moneyService.deleteMoney(uuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(moneyRepository, times(0)).delete(any());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should delete money")
+  void test9() {
+    // Given
+    Optional<Money> moneyOptional =
+        Optional.of(
+            createMoney(
+                OPERATION_DATE,
+                AMOUNT,
+                OPERATION_TYPE,
+                DESCRIPTION,
+                Collections.emptySet(),
+                APP_USER));
+    var uuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+
+    // When
+    assertDoesNotThrow(() -> moneyService.deleteMoney(uuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(moneyRepository, times(1)).delete(moneyOptional.get());
   }
 }
