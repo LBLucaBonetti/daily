@@ -3,6 +3,7 @@ package it.lbsoftware.daily.money;
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoney;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoneyDto;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -18,11 +19,15 @@ import static org.mockito.Mockito.verify;
 import it.lbsoftware.daily.DailyAbstractUnitTests;
 import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
+import it.lbsoftware.daily.exceptions.DailyConflictException;
 import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.money.Money.OperationType;
+import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,9 +52,12 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
   private static final String EMAIL = "appuser@email.com";
   private static final UUID UNIQUE_ID = UUID.randomUUID();
   private static final AppUser APP_USER = createAppUser(UNIQUE_ID, EMAIL);
+  private static final String NAME = "name";
+  private static final String COLOR_HEX = "#123456";
   @Mock private Pageable pageable;
   @Mock private MoneyRepository moneyRepository;
   @Mock private MoneyDtoMapper moneyDtoMapper;
+  @Mock private TagRepository tagRepository;
   private MoneyService moneyService;
 
   private static Stream<Arguments> test1() {
@@ -88,9 +96,23 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
     return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(uuid, null));
   }
 
+  private static Stream<Arguments> test13() {
+    // Uuid, tagUuid, appUser
+    UUID uuid = UUID.randomUUID();
+    UUID tagUuid = UUID.randomUUID();
+    return Stream.of(
+        arguments(null, null, null),
+        arguments(null, null, APP_USER),
+        arguments(null, tagUuid, null),
+        arguments(null, tagUuid, APP_USER),
+        arguments(uuid, null, null),
+        arguments(uuid, null, APP_USER),
+        arguments(uuid, tagUuid, null));
+  }
+
   @BeforeEach
   void beforeEach() {
-    moneyService = new MoneyService(moneyRepository, moneyDtoMapper);
+    moneyService = new MoneyService(moneyRepository, moneyDtoMapper, tagRepository);
   }
 
   @ParameterizedTest
@@ -276,5 +298,122 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
     // Then
     verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
     verify(moneyRepository, times(1)).delete(moneyOptional.get());
+  }
+
+  @Test
+  @DisplayName("Should not add tag to money because of money not found")
+  void test10() {
+    // Given
+    Optional<Money> moneyOptional = Optional.empty();
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+
+    // When
+    var res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> moneyService.addTagToMoney(uuid, tagUuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(0)).findByUuidAndAppUser(any(), any());
+    verify(moneyRepository, times(0)).save(any());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should not add tag to money because of tag not found")
+  void test11() {
+    // Given
+    var moneyOptional =
+        Optional.of(
+            createMoney(
+                OPERATION_DATE,
+                AMOUNT,
+                OPERATION_TYPE,
+                DESCRIPTION,
+                Collections.emptySet(),
+                APP_USER));
+    Optional<Tag> tagOptional = Optional.empty();
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
+
+    // When
+    var res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> moneyService.addTagToMoney(uuid, tagUuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
+    verify(moneyRepository, times(0)).save(any());
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should add tag to money")
+  void test12() {
+    // Given
+    var money =
+        createMoney(OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, new HashSet<>(), APP_USER);
+    var moneyOptional = Optional.of(money);
+    var tag = createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER);
+    var tagOptional = Optional.of(tag);
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
+
+    // When
+    assertDoesNotThrow(() -> moneyService.addTagToMoney(uuid, tagUuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
+    assertTrue(money.getTags().contains(tag));
+    assertTrue(tag.getMoney().contains(money));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when add tag to money with null argument")
+  void test13(UUID uuid, UUID tagUuid, AppUser appUser) {
+    assertThrows(
+        IllegalArgumentException.class, () -> moneyService.addTagToMoney(uuid, tagUuid, appUser));
+  }
+
+  @Test
+  @DisplayName("Should not add tag to money because of money tag limits and throw")
+  void test14() {
+    // Given
+    var money =
+        createMoney(OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, new HashSet<>(), APP_USER);
+    var moneyOptional = Optional.of(money);
+    var tagOptional = Optional.of(createTag(NAME, COLOR_HEX, new HashSet<>(), APP_USER));
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUser(uuid, APP_USER)).willReturn(moneyOptional);
+    given(tagRepository.findByUuidAndAppUser(tagUuid, APP_USER)).willReturn(tagOptional);
+    createTag("name1", "#123456", new HashSet<>(), APP_USER).addToMoney(money);
+    createTag("name2", "#234567", new HashSet<>(), APP_USER).addToMoney(money);
+    createTag("name3", "#345678", new HashSet<>(), APP_USER).addToMoney(money);
+    createTag("name4", "#456789", new HashSet<>(), APP_USER).addToMoney(money);
+    createTag("name5", "#567890", new HashSet<>(), APP_USER).addToMoney(money);
+
+    // When
+    var res =
+        assertThrows(
+            DailyConflictException.class,
+            () -> moneyService.addTagToMoney(uuid, tagUuid, APP_USER));
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUser(uuid, APP_USER);
+    verify(tagRepository, times(1)).findByUuidAndAppUser(tagUuid, APP_USER);
+    verify(moneyRepository, times(0)).save(any());
+    assertEquals(Constants.ERROR_MONEY_TAGS_MAX, res.getMessage());
   }
 }
