@@ -770,4 +770,213 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
     assertEquals(1, tag.getMoney().size());
     assertTrue(tag.getMoney().contains(money));
   }
+
+  @Test
+  @DisplayName("Should return unauthorized when remove tag from money, csrf and no auth")
+  void test28() throws Exception {
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), UUID.randomUUID())
+                .with(csrf()))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @DisplayName("Should return forbidden when remove tag from money, no csrf and no auth")
+  void test29() throws Exception {
+    mockMvc
+        .perform(delete(BASE_URL + "/{uuid}/tags/{tagsUuid}", UUID.randomUUID(), UUID.randomUUID()))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when remove tag from money with wrong uuid")
+  void test30() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when remove tag from money with wrong tagUuid")
+  void test31() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var tagUuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", UUID.randomUUID(), tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when remove tag from money with wrong uuid and tagUuid")
+  void test32() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid = "not-a-uuid";
+    var tagUuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when remove tag from money and money does not exist")
+  void test33() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid = UUID.randomUUID();
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when remove tag from money and tag does not exist")
+  void test34() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var uuid =
+        moneyRepository
+            .save(
+                createMoney(
+                    OPERATION_DATE,
+                    AMOUNT,
+                    OPERATION_TYPE,
+                    DESCRIPTION,
+                    Collections.emptySet(),
+                    appUser))
+            .getUuid();
+    var tagUuid = UUID.randomUUID();
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName(
+      "Should return not found when remove tag from money and money is of another app user")
+  void test35() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var otherAppUser = saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
+    var uuid =
+        moneyRepository
+            .save(
+                createMoney(
+                    OPERATION_DATE,
+                    AMOUNT,
+                    OPERATION_TYPE,
+                    DESCRIPTION,
+                    Collections.emptySet(),
+                    otherAppUser))
+            .getUuid();
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when remove tag from money and tag is of another app user")
+  void test36() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var otherAppUser = saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
+    var uuid =
+        moneyRepository
+            .save(
+                createMoney(
+                    OPERATION_DATE,
+                    AMOUNT,
+                    OPERATION_TYPE,
+                    DESCRIPTION,
+                    Collections.emptySet(),
+                    appUser))
+            .getUuid();
+    var tagUuid =
+        tagRepository
+            .save(createTag(NAME, COLOR_HEX, Collections.emptySet(), otherAppUser))
+            .getUuid();
+
+    // When and then
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", uuid, tagUuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should remove tag from money")
+  void test37() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, new HashSet<>(), appUser));
+    var tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
+    tag.addToMoney(money);
+    moneyRepository.save(money);
+    assertTrue(money.getTags().contains(tag));
+    assertTrue(tag.getMoney().contains(money));
+
+    // When
+    mockMvc
+        .perform(
+            delete(BASE_URL + "/{uuid}/tags/{tagUuid}", money.getUuid(), tag.getUuid())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNoContent());
+
+    // Then
+    money = moneyRepository.findByUuidAndAppUserFetchTags(money.getUuid(), appUser).get();
+    tag = tagRepository.findByUuidAndAppUserFetchMoney(tag.getUuid(), appUser).get();
+    assertEquals(0, money.getTags().size());
+    assertFalse(money.getTags().contains(tag));
+    assertEquals(0, tag.getMoney().size());
+    assertFalse(tag.getMoney().contains(money));
+  }
 }

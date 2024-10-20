@@ -87,4 +87,16 @@ class MoneyController {
 
     return ResponseEntity.noContent().build();
   }
+
+  @DeleteMapping(value = "/{uuid}/tags/{tagUuid}")
+  public ResponseEntity<TagDto> removeTagFromMoney(
+      @PathVariable("uuid") UUID uuid,
+      @PathVariable("tagUuid") UUID tagUuid,
+      @AuthenticationPrincipal Object principal) {
+    log.info(
+        "DELETE request to /api/money/%s/tags/%s".formatted(uuid.toString(), tagUuid.toString()));
+    moneyService.removeTagFromMoney(uuid, tagUuid, appUserService.getAppUser(principal));
+
+    return ResponseEntity.noContent().build();
+  }
 }

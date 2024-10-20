@@ -242,4 +242,43 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
     assertNotNull(res);
     assertEquals(Constants.ERROR_MONEY_TAGS_MAX, res.getMessage());
   }
+
+  @Test
+  @DisplayName("Should not remove tag from money and return not found")
+  void test10() {
+    // Given
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+    doThrow(new DailyNotFoundException(Constants.ERROR_NOT_FOUND))
+        .when(moneyService)
+        .removeTagFromMoney(uuid, tagUuid, APP_USER);
+
+    // When
+    var res =
+        assertThrows(
+            DailyNotFoundException.class,
+            () -> moneyController.removeTagFromMoney(uuid, tagUuid, appUser));
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).removeTagFromMoney(uuid, tagUuid, APP_USER);
+    assertEquals(Constants.ERROR_NOT_FOUND, res.getMessage());
+  }
+
+  @Test
+  @DisplayName("Should remove tag from money and return no content")
+  void test11() {
+    // Given
+    var uuid = UUID.randomUUID();
+    var tagUuid = UUID.randomUUID();
+
+    // When
+    var res = moneyController.removeTagFromMoney(uuid, tagUuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).removeTagFromMoney(uuid, tagUuid, APP_USER);
+    assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
+    assertNull(res.getBody());
+  }
 }
