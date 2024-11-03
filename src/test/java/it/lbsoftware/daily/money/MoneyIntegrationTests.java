@@ -30,14 +30,20 @@ import it.lbsoftware.daily.DailyAbstractIntegrationTests;
 import it.lbsoftware.daily.appusers.AppUserRepository;
 import it.lbsoftware.daily.appusers.AppUserTestUtils;
 import it.lbsoftware.daily.bases.PageDto;
+import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exceptions.DailyBadRequestException;
 import it.lbsoftware.daily.money.Money.OperationType;
+import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDto;
+import it.lbsoftware.daily.tags.TagDtoMapper;
 import it.lbsoftware.daily.tags.TagRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,12 +71,15 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
   private static final String OTHER_DESCRIPTION = "other description";
   private static final String NAME = "name";
   private static final String COLOR_HEX = "#123456";
+  private static final String OTHER_NAME = "otherName";
+  private static final String OTHER_COLOR_HEX = "#654321";
   @Autowired private ObjectMapper objectMapper;
   @Autowired private MoneyRepository moneyRepository;
   @Autowired private MoneyDtoMapper moneyDtoMapper;
   @Autowired private AppUserRepository appUserRepository;
   @Autowired private PasswordEncoder passwordEncoder;
   @Autowired private TagRepository tagRepository;
+  @Autowired private TagDtoMapper tagDtoMapper;
 
   private static Stream<MoneyDto> test5() {
     var nullOperationDateMoneyDto = new MoneyDto();
@@ -1101,5 +1110,155 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
     assertEquals(appUser, resEntity.getAppUser());
     assertNotNull(resEntity.getId());
     assertEquals(0, resEntity.getTags().size());
+  }
+
+  @Test
+  @DisplayName("Should return unauthorized when read money tags and no auth")
+  void test42() throws Exception {
+    mockMvc
+        .perform(get(BASE_URL + "/{uuid}/tags", UUID.randomUUID()))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @DisplayName("Should return bad request when read money tags with wrong uuid")
+  void test43() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    String uuid = "not-a-uuid";
+
+    // When and then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}/tags", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return not found when read money tags and money does not exist")
+  void test44() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    UUID uuid = UUID.randomUUID();
+
+    // When and then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}/tags", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return not found when read money tags and money is of another app user")
+  void test45() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    final var otherAppUser = saveOauth2OtherAppUser(appUserRepository, passwordEncoder);
+    UUID uuid =
+        moneyRepository
+            .save(
+                createMoney(
+                    OPERATION_DATE,
+                    AMOUNT,
+                    OPERATION_TYPE,
+                    DESCRIPTION,
+                    Collections.emptySet(),
+                    appUser))
+            .getUuid();
+
+    // When and then
+    mockMvc
+        .perform(
+            get(BASE_URL + "/{uuid}/tags", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(
+                    loginOf(otherAppUser.getUuid(), OTHER_APP_USER_FULLNAME, OTHER_APP_USER_EMAIL)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should read money tags")
+  void test46() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, new HashSet<>(), appUser));
+    Tag tag1 = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
+    Tag tag2 = tagRepository.save(createTag(OTHER_NAME, OTHER_COLOR_HEX, new HashSet<>(), appUser));
+    tag1.addToMoney(money);
+    tag2.addToMoney(money);
+    moneyRepository.save(money);
+
+    // When
+    Set<TagDto> res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL + "/{uuid}/tags", money.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            new TypeReference<>() {});
+
+    // Then
+    assertEquals(2, res.size());
+    assertThat(res)
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
+        .contains(tagDtoMapper.convertToDto(tag1));
+    assertThat(res)
+        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
+        .contains(tagDtoMapper.convertToDto(tag2));
+  }
+
+  @Test
+  @DisplayName("Should cache when read money tags")
+  void test59() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var money =
+        moneyRepository.save(
+            createMoney(
+                OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, new HashSet<>(), appUser));
+    Tag tag = tagRepository.save(createTag(NAME, COLOR_HEX, new HashSet<>(), appUser));
+    tag.addToMoney(money);
+    moneyRepository.save(money);
+    Set<TagDto> tagDtos =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    get(BASE_URL + "/{uuid}/tags", money.getUuid())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            new TypeReference<>() {});
+    TagDto tagDto = tagDtos.stream().findFirst().get();
+
+    // When
+    var res =
+        Optional.ofNullable(cacheManager.getCache(Constants.MONEY_CACHE))
+            .map(
+                r ->
+                    r.get(
+                        "appUser:"
+                            + appUser.getUuid()
+                            + ":money:"
+                            + money.getUuid().toString()
+                            + ":tags",
+                        Set.class));
+
+    // Then
+    assertTrue(res.isPresent());
+    assertTrue(res.get().contains(tagDto));
   }
 }

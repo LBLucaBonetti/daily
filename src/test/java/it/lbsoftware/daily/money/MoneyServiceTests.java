@@ -4,6 +4,7 @@ import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoney;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoneyDto;
 import static it.lbsoftware.daily.tags.TagTestUtils.createTag;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -25,6 +26,7 @@ import it.lbsoftware.daily.exceptions.DailyConflictException;
 import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.money.Money.OperationType;
 import it.lbsoftware.daily.tags.Tag;
+import it.lbsoftware.daily.tags.TagDtoMapper;
 import it.lbsoftware.daily.tags.TagRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,6 +34,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,6 +63,7 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
   @Mock private MoneyRepository moneyRepository;
   @Mock private MoneyDtoMapper moneyDtoMapper;
   @Mock private TagRepository tagRepository;
+  @Mock private TagDtoMapper tagDtoMapper;
   private MoneyService moneyService;
 
   private static Stream<Arguments> test1() {
@@ -135,7 +139,7 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
 
   @BeforeEach
   void beforeEach() {
-    moneyService = new MoneyService(moneyRepository, moneyDtoMapper, tagRepository);
+    moneyService = new MoneyService(moneyRepository, moneyDtoMapper, tagRepository, tagDtoMapper);
   }
 
   @ParameterizedTest
@@ -530,7 +534,7 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
 
   @ParameterizedTest
   @MethodSource
-  @DisplayName("Should throw when create note with null argument")
+  @DisplayName("Should throw when create money with null argument")
   void test19(MoneyDto money, AppUser appUser) {
     assertThrows(IllegalArgumentException.class, () -> moneyService.createMoney(money, appUser));
   }
@@ -564,5 +568,42 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
     assertEquals(OPERATION_TYPE, res.getOperationType());
     assertEquals(DESCRIPTION, res.getDescription());
     assertNotNull(res.getUuid());
+  }
+
+  @Test
+  @DisplayName("Should not read money tags and return empty optional")
+  void test21() {
+    // Given
+    Optional<Money> moneyOptional = Optional.empty();
+    var uuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER)).willReturn(moneyOptional);
+
+    // When
+    var res = moneyService.readMoneyTags(uuid, APP_USER);
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUserFetchTags(uuid, APP_USER);
+    assertEquals(Optional.empty(), res);
+  }
+
+  @Test
+  @DisplayName("Should read money tags and return tag set optional")
+  void test22() {
+    // Given
+    Set<Tag> tags = Set.of(createTag(NAME, COLOR_HEX, Collections.emptySet(), APP_USER));
+    var tagDto = createTagDto(UUID.randomUUID(), NAME, COLOR_HEX);
+    Optional<Money> moneyOptional =
+        Optional.of(
+            createMoney(OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, tags, APP_USER));
+    var uuid = UUID.randomUUID();
+    given(moneyRepository.findByUuidAndAppUserFetchTags(uuid, APP_USER)).willReturn(moneyOptional);
+    given(tagDtoMapper.convertToDto(tags)).willReturn(Set.of(tagDto));
+
+    // When
+    var res = moneyService.readMoneyTags(uuid, APP_USER);
+
+    // Then
+    verify(moneyRepository, times(1)).findByUuidAndAppUserFetchTags(uuid, APP_USER);
+    assertEquals(Optional.of(Set.of(tagDto)), res);
   }
 }

@@ -9,6 +9,7 @@ import it.lbsoftware.daily.exceptions.DailyBadRequestException;
 import it.lbsoftware.daily.tags.TagDto;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
@@ -109,5 +110,15 @@ class MoneyController {
     var createdMoneyDto = moneyService.createMoney(moneyDto, appUserService.getAppUser(principal));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdMoneyDto);
+  }
+
+  @GetMapping(value = "/{uuid}/tags")
+  public ResponseEntity<Set<TagDto>> readMoneyTags(
+      @PathVariable("uuid") UUID uuid, @AuthenticationPrincipal Object principal) {
+    log.info("GET request to /api/money/%s/tags".formatted(uuid.toString()));
+    return moneyService
+        .readMoneyTags(uuid, appUserService.getAppUser(principal))
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 }

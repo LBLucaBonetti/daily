@@ -1,5 +1,6 @@
 package it.lbsoftware.daily.money;
 
+import static it.lbsoftware.daily.config.Constants.DO_NOT_STORE_NULL_SPEL;
 import static it.lbsoftware.daily.config.Constants.MONEY_CACHE;
 import static it.lbsoftware.daily.config.Constants.MONEY_TAGS_CACHE_KEY_SPEL;
 
@@ -7,14 +8,18 @@ import it.lbsoftware.daily.appusers.AppUser;
 import it.lbsoftware.daily.config.Constants;
 import it.lbsoftware.daily.exceptions.DailyConflictException;
 import it.lbsoftware.daily.exceptions.DailyNotFoundException;
+import it.lbsoftware.daily.tags.TagDto;
+import it.lbsoftware.daily.tags.TagDtoMapper;
 import it.lbsoftware.daily.tags.TagRepository;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,7 @@ public class MoneyService {
   private final MoneyRepository moneyRepository;
   private final MoneyDtoMapper moneyDtoMapper;
   private final TagRepository tagRepository;
+  private final TagDtoMapper tagDtoMapper;
 
   /**
    * Reads money of the period indicated by the given dates.
@@ -147,5 +153,21 @@ public class MoneyService {
     var savedMoneyEntity = moneyRepository.saveAndFlush(moneyEntity);
 
     return moneyDtoMapper.convertToDto(savedMoneyEntity);
+  }
+
+  /**
+   * Reads money tags.
+   *
+   * @param uuid Money uuid
+   * @param appUser The owner
+   * @return Read money tags or empty value if the money does not exist
+   */
+  @Transactional(readOnly = true)
+  @Cacheable(key = MONEY_TAGS_CACHE_KEY_SPEL, unless = DO_NOT_STORE_NULL_SPEL)
+  public Optional<Set<TagDto>> readMoneyTags(@NonNull UUID uuid, @NonNull AppUser appUser) {
+    return moneyRepository
+        .findByUuidAndAppUserFetchTags(uuid, appUser)
+        .map(Money::getTags)
+        .map(tagDtoMapper::convertToDto);
   }
 }

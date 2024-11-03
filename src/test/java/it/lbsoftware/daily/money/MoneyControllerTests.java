@@ -2,6 +2,7 @@ package it.lbsoftware.daily.money;
 
 import static it.lbsoftware.daily.appusers.AppUserTestUtils.createAppUser;
 import static it.lbsoftware.daily.money.MoneyTestUtils.createMoneyDto;
+import static it.lbsoftware.daily.tags.TagTestUtils.createTagDto;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,10 +23,12 @@ import it.lbsoftware.daily.exceptions.DailyBadRequestException;
 import it.lbsoftware.daily.exceptions.DailyConflictException;
 import it.lbsoftware.daily.exceptions.DailyNotFoundException;
 import it.lbsoftware.daily.money.Money.OperationType;
+import it.lbsoftware.daily.tags.TagDto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +50,8 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
   private static final String EMAIL = "appuser@email.com";
   private static final UUID UNIQUE_ID = UUID.randomUUID();
   private static final AppUser APP_USER = createAppUser(UNIQUE_ID, EMAIL);
+  private static final String NAME = "name";
+  private static final String COLOR_HEX = "#123456";
   @Mock private MoneyService moneyService;
   @Mock private AppUserService appUserService;
   @Mock private OidcUser appUser;
@@ -299,5 +304,41 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
     verify(moneyService, times(1)).createMoney(moneyDto, APP_USER);
     assertEquals(HttpStatus.CREATED, res.getStatusCode());
     assertEquals(createdMoneyDto, res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should not read money tags and return not found")
+  void test13() {
+    // Given
+    Optional<Set<TagDto>> readMoneyTags = Optional.empty();
+    var uuid = UUID.randomUUID();
+    given(moneyService.readMoneyTags(uuid, APP_USER)).willReturn(readMoneyTags);
+
+    // When
+    var res = moneyController.readMoneyTags(uuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).readMoneyTags(uuid, APP_USER);
+    assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+    assertNull(res.getBody());
+  }
+
+  @Test
+  @DisplayName("Should read money tags and return ok")
+  void test14() {
+    // Given
+    var uuid = UUID.randomUUID();
+    Set<TagDto> readMoneyTagDtos = Set.of(createTagDto(uuid, NAME, COLOR_HEX));
+    given(moneyService.readMoneyTags(uuid, APP_USER)).willReturn(Optional.of(readMoneyTagDtos));
+
+    // When
+    var res = moneyController.readMoneyTags(uuid, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).readMoneyTags(uuid, APP_USER);
+    assertEquals(HttpStatus.OK, res.getStatusCode());
+    assertEquals(readMoneyTagDtos, res.getBody());
   }
 }
