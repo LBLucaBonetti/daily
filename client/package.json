@@ -13,23 +13,23 @@
   "dependencies": {
     "@quasar/extras": "^1.16.12",
     "axios": "^1.7.7",
-    "pinia": "^2.2.4",
+    "pinia": "^2.2.5",
     "quasar": "^2.17.1",
-    "quasar-extras-svg-icons": "^1.37.0",
     "vue": "^3.5.12",
+    "quasar-extras-svg-icons": "^1.37.0",
     "vue-i18n": "^10.0.4",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@quasar/app-vite": "^1.10.2",
-    "@types/node": "^22.7.6",
+    "@types/node": "^22.8.6",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-vue": "^9.29.0",
+    "eslint-plugin-vue": "^9.30.0",
     "prettier": "^3.3.3",
     "typescript": "^5.6.3"
   },
