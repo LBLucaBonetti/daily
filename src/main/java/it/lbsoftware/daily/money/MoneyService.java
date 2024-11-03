@@ -132,4 +132,20 @@ public class MoneyService {
             .orElseThrow(() -> new DailyNotFoundException(Constants.ERROR_NOT_FOUND));
     tag.removeFromMoney(money);
   }
+
+  /**
+   * Creates money.
+   *
+   * @param money Money object to be created
+   * @param appUser The owner
+   * @return Created money
+   */
+  @Transactional
+  public MoneyDto createMoney(@NonNull MoneyDto money, @NonNull AppUser appUser) {
+    var moneyEntity = moneyDtoMapper.convertToEntity(money);
+    moneyEntity.setAppUser(appUser);
+    var savedMoneyEntity = moneyRepository.saveAndFlush(moneyEntity);
+
+    return moneyDtoMapper.convertToDto(savedMoneyEntity);
+  }
 }

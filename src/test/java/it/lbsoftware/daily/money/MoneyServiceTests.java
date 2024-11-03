@@ -9,6 +9,7 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -123,6 +124,13 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
         arguments(uuid, null, null),
         arguments(uuid, null, APP_USER),
         arguments(uuid, tagUuid, null));
+  }
+
+  private static Stream<Arguments> test19() {
+    // Money, appUser
+    var money =
+        createMoneyDto(null, LocalDate.now(), BigDecimal.TEN, OperationType.INCOME, "description");
+    return Stream.of(arguments(null, null), arguments(null, APP_USER), arguments(money, null));
   }
 
   @BeforeEach
@@ -518,5 +526,43 @@ class MoneyServiceTests extends DailyAbstractUnitTests {
     assertThrows(
         IllegalArgumentException.class,
         () -> moneyService.removeTagFromMoney(uuid, tagUuid, appUser));
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  @DisplayName("Should throw when create note with null argument")
+  void test19(MoneyDto money, AppUser appUser) {
+    assertThrows(IllegalArgumentException.class, () -> moneyService.createMoney(money, appUser));
+  }
+
+  @Test
+  @DisplayName("Should create money and return money")
+  void test20() {
+    // Given
+    var money = createMoneyDto(null, OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION);
+    var moneyEntity =
+        createMoney(
+            OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, Collections.emptySet(), null);
+    var savedMoneyEntity =
+        createMoney(
+            OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION, Collections.emptySet(), APP_USER);
+    var moneyDto =
+        createMoneyDto(UUID.randomUUID(), OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION);
+    given(moneyDtoMapper.convertToEntity(money)).willReturn(moneyEntity);
+    given(moneyRepository.saveAndFlush(moneyEntity)).willReturn(savedMoneyEntity);
+    given(moneyDtoMapper.convertToDto(savedMoneyEntity)).willReturn(moneyDto);
+
+    // When
+    var res = moneyService.createMoney(money, APP_USER);
+
+    // Then
+    verify(moneyDtoMapper, times(1)).convertToEntity(money);
+    verify(moneyRepository, times(1)).saveAndFlush(moneyEntity);
+    verify(moneyDtoMapper, times(1)).convertToDto(savedMoneyEntity);
+    assertEquals(OPERATION_DATE, res.getOperationDate());
+    assertEquals(AMOUNT, res.getAmount());
+    assertEquals(OPERATION_TYPE, res.getOperationType());
+    assertEquals(DESCRIPTION, res.getDescription());
+    assertNotNull(res.getUuid());
   }
 }
