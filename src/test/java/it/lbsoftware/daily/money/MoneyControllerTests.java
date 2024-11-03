@@ -281,4 +281,23 @@ class MoneyControllerTests extends DailyAbstractUnitTests {
     assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
     assertNull(res.getBody());
   }
+
+  @Test
+  @DisplayName("Should create money and return created")
+  void test12() {
+    // Given
+    var moneyDto = createMoneyDto(null, OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION);
+    var createdMoneyDto =
+        createMoneyDto(UUID.randomUUID(), OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION);
+    given(moneyService.createMoney(moneyDto, APP_USER)).willReturn(createdMoneyDto);
+
+    // When
+    var res = moneyController.createMoney(moneyDto, appUser);
+
+    // Then
+    verify(appUserService, times(1)).getAppUser(appUser);
+    verify(moneyService, times(1)).createMoney(moneyDto, APP_USER);
+    assertEquals(HttpStatus.CREATED, res.getStatusCode());
+    assertEquals(createdMoneyDto, res.getBody());
+  }
 }

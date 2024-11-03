@@ -13,12 +13,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -71,6 +73,51 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
   @Autowired private TagRepository tagRepository;
 
   private static Stream<MoneyDto> test5() {
+    var nullOperationDateMoneyDto = new MoneyDto();
+    nullOperationDateMoneyDto.setOperationDate(null);
+    nullOperationDateMoneyDto.setAmount(OTHER_AMOUNT);
+    nullOperationDateMoneyDto.setOperationType(OTHER_OPERATION_TYPE);
+    nullOperationDateMoneyDto.setDescription(OTHER_DESCRIPTION);
+    var nullAmountMoneyDto = new MoneyDto();
+    nullAmountMoneyDto.setOperationDate(OTHER_OPERATION_DATE);
+    nullAmountMoneyDto.setAmount(null);
+    nullAmountMoneyDto.setOperationType(OTHER_OPERATION_TYPE);
+    nullAmountMoneyDto.setDescription(OTHER_DESCRIPTION);
+    var nullOperationTypeMoneyDto = new MoneyDto();
+    nullOperationTypeMoneyDto.setOperationDate(OTHER_OPERATION_DATE);
+    nullOperationTypeMoneyDto.setAmount(OTHER_AMOUNT);
+    nullOperationTypeMoneyDto.setOperationType(null);
+    nullOperationTypeMoneyDto.setDescription(OTHER_DESCRIPTION);
+    var tooLongDescriptionMoneyDto = new MoneyDto();
+    tooLongDescriptionMoneyDto.setOperationDate(OTHER_OPERATION_DATE);
+    tooLongDescriptionMoneyDto.setAmount(OTHER_AMOUNT);
+    tooLongDescriptionMoneyDto.setOperationType(OTHER_OPERATION_TYPE);
+    var tooLongDescription =
+        "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678"
+            + "1234567812345678";
+    tooLongDescriptionMoneyDto.setDescription(tooLongDescription);
+    return Stream.of(
+        nullOperationDateMoneyDto,
+        nullAmountMoneyDto,
+        nullOperationTypeMoneyDto,
+        tooLongDescriptionMoneyDto);
+  }
+
+  private static Stream<MoneyDto> test40() {
     var nullOperationDateMoneyDto = new MoneyDto();
     nullOperationDateMoneyDto.setOperationDate(null);
     nullOperationDateMoneyDto.setAmount(OTHER_AMOUNT);
@@ -978,5 +1025,81 @@ class MoneyIntegrationTests extends DailyAbstractIntegrationTests {
     assertFalse(money.getTags().contains(tag));
     assertEquals(0, tag.getMoney().size());
     assertFalse(tag.getMoney().contains(money));
+  }
+
+  @Test
+  @DisplayName("Should return unauthorized when create money, csrf and no auth")
+  void test38() throws Exception {
+    mockMvc.perform(post(BASE_URL).with(csrf())).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @DisplayName("Should return forbidden when create money, no csrf and no auth")
+  void test39() throws Exception {
+    mockMvc.perform(post(BASE_URL)).andExpect(status().isForbidden());
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @MethodSource
+  @DisplayName("Should return bad request when create money with wrong arguments")
+  void test40(final MoneyDto moneyDto) throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+
+    // When
+    mockMvc
+        .perform(
+            post(BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(moneyDto))
+                .with(csrf())
+                .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+        .andExpect(status().isBadRequest());
+
+    // Then
+    assertEquals(0, moneyRepository.count());
+  }
+
+  @Test
+  @DisplayName("Should create money")
+  void test41() throws Exception {
+    // Given
+    final var appUser = AppUserTestUtils.saveOauth2AppUser(appUserRepository, passwordEncoder);
+    var moneyDto = createMoneyDto(null, OPERATION_DATE, AMOUNT, OPERATION_TYPE, DESCRIPTION);
+
+    // When
+    var res =
+        objectMapper.readValue(
+            mockMvc
+                .perform(
+                    post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(moneyDto))
+                        .with(csrf())
+                        .with(loginOf(appUser.getUuid(), APP_USER_FULLNAME, APP_USER_EMAIL)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            MoneyDto.class);
+
+    // Then
+    assertNotNull(res.getUuid());
+    assertEquals(OPERATION_DATE, res.getOperationDate());
+    assertEquals(AMOUNT, res.getAmount());
+    assertEquals(OPERATION_TYPE, res.getOperationType());
+    assertEquals(DESCRIPTION, res.getDescription());
+    var resEntity = moneyRepository.findByUuidAndAppUserFetchTags(res.getUuid(), appUser).get();
+    assertNotNull(resEntity.getUuid());
+    assertEquals(OPERATION_DATE, resEntity.getOperationDate());
+    assertEquals(AMOUNT, resEntity.getAmount());
+    assertEquals(OPERATION_TYPE, resEntity.getOperationType());
+    assertEquals(DESCRIPTION, resEntity.getDescription());
+    assertNotNull(resEntity.getCreatedAt());
+    assertNotNull(resEntity.getUpdatedAt());
+    assertEquals(appUser, resEntity.getAppUser());
+    assertNotNull(resEntity.getId());
+    assertEquals(0, resEntity.getTags().size());
   }
 }
