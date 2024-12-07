@@ -1,4 +1,4 @@
-import { AuthProvider } from './AuthProvider';
+import type { AuthProvider } from './AuthProvider';
 
 export default interface InfoDto {
   fullName: string;
