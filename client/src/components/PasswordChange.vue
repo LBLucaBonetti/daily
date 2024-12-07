@@ -148,13 +148,13 @@ import {
   QCardSection,
   QCardActions,
   QInput,
-  QInputType,
+  type QInputType,
 } from 'quasar';
-import { Ref, ref } from 'vue';
+import { type Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import PasswordChangeDto from 'src/interfaces/PasswordChangeDto';
-import ErrorDto from 'src/interfaces/ErrorDto';
-import { AxiosError, AxiosResponse } from 'axios';
+import type PasswordChangeDto from 'src/interfaces/PasswordChangeDto';
+import type ErrorDto from 'src/interfaces/ErrorDto';
+import type { AxiosError, AxiosResponse } from 'axios';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { refreshPage } from 'src/utils/refresh-page';

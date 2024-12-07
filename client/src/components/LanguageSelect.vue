@@ -13,12 +13,12 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import LocaleOptions from 'src/interfaces/LocaleOptions';
+import type LocaleOptions from 'src/interfaces/LocaleOptions';
 import { useLanguageStore } from 'src/stores/languageStore';
-import { PropType, onMounted, watch } from 'vue';
+import { type PropType, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { api } from 'src/boot/axios';
-import SettingsDto from 'src/interfaces/SettingsDto';
+import type SettingsDto from 'src/interfaces/SettingsDto';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { refreshPage } from 'src/utils/refresh-page';
 

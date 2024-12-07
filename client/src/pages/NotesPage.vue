@@ -80,14 +80,14 @@
 </template>
 
 <script setup lang="ts">
-import { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import { QBtn, QInfiniteScroll, QInput, QSkeleton, useQuasar } from 'quasar';
 import { api } from 'src/boot/axios';
 import { ref } from 'vue';
 import NoteCard from '../components/NoteCard.vue';
-import NoteDto from 'src/interfaces/NoteDto';
+import type NoteDto from 'src/interfaces/NoteDto';
 import { validateNote } from 'src/validators/note-validator';
-import PageDto from 'src/interfaces/PageDto';
+import type PageDto from 'src/interfaces/PageDto';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
