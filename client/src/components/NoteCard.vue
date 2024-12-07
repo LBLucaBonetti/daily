@@ -133,7 +133,7 @@
 
 <script setup lang="ts">
 import { validateNote } from 'src/validators/note-validator';
-import { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import {
   QCard,
   QCardSection,
@@ -143,17 +143,17 @@ import {
   QInput,
 } from 'quasar';
 import { api } from 'src/boot/axios';
-import NoteDto from 'src/interfaces/NoteDto';
-import { onMounted, PropType, ref } from 'vue';
+import type NoteDto from 'src/interfaces/NoteDto';
+import { onMounted, type PropType, ref } from 'vue';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { useNotesInEditStateStore } from 'src/stores/noteEditingStore';
 import { useI18n } from 'vue-i18n';
 import { useLanguageStore } from 'src/stores/languageStore';
-import TagDto from 'src/interfaces/TagDto';
+import type TagDto from 'src/interfaces/TagDto';
 import TagChip from '../components/TagChip.vue';
-import PageDto from 'src/interfaces/PageDto';
+import type PageDto from 'src/interfaces/PageDto';
 
 const { t } = useI18n();
 const $q = useQuasar();
