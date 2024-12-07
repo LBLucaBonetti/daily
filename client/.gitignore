@@ -32,3 +32,6 @@ yarn-error.log*
 
 # local .env files
 .env.local*
+
+# frontend-maven-plugin directories and files
+node
