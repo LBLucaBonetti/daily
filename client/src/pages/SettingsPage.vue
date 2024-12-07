@@ -43,11 +43,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { api } from 'src/boot/axios';
-import { AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
 import LanguageSelect from 'src/components/LanguageSelect.vue';
 import { useLanguageStore } from 'src/stores/languageStore';
 import PageTitle from 'src/components/PageTitle.vue';
-import InfoDto from 'src/interfaces/InfoDto';
+import type InfoDto from 'src/interfaces/InfoDto';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isDailyAuthProvider } from 'src/interfaces/AuthProvider';
