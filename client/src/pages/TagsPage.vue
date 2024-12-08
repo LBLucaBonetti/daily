@@ -145,9 +145,9 @@
 <script setup lang="ts">
 import PageTitle from 'src/components/PageTitle.vue';
 import { api } from 'src/boot/axios';
-import { AxiosError, AxiosResponse } from 'axios';
-import PageDto from 'src/interfaces/PageDto';
-import TagDto from 'src/interfaces/TagDto';
+import type { AxiosError, AxiosResponse } from 'axios';
+import type PageDto from 'src/interfaces/PageDto';
+import type TagDto from 'src/interfaces/TagDto';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { refreshPage } from 'src/utils/refresh-page';

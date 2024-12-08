@@ -1,4 +1,4 @@
-import { route } from 'quasar/wrappers';
+import { defineRouter } from '#q-app/wrappers';
 import {
   createMemoryHistory,
   createRouter,
@@ -19,7 +19,7 @@ import routes from './routes';
  * The function defined takes { store, ssrContext } as optional params
  */
 
-export default route(function () {
+export default defineRouter(function () {
   let createHistory;
   if (process.env.SERVER) createHistory = createMemoryHistory;
   else {
