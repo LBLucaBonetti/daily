@@ -1,4 +1,4 @@
-import MoneyDto from 'src/interfaces/MoneyDto';
+import type MoneyDto from 'src/interfaces/MoneyDto';
 
 export function validateMoney(
   money: MoneyDto,

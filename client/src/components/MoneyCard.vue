@@ -133,7 +133,7 @@
 
 <script setup lang="ts">
 import { validateMoney } from 'src/validators/money-validator';
-import { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import {
   QCard,
   QCardSection,
@@ -143,17 +143,17 @@ import {
   QInput,
 } from 'quasar';
 import { api } from 'src/boot/axios';
-import moneyDto from 'src/interfaces/moneyDto';
-import { onMounted, PropType, ref } from 'vue';
+import type MoneyDto from 'src/interfaces/MoneyDto';
+import { onMounted, type PropType, ref } from 'vue';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
 import { usemoneysInEditStateStore } from 'src/stores/moneyEditingStore';
 import { useI18n } from 'vue-i18n';
 import { useLanguageStore } from 'src/stores/languageStore';
-import TagDto from 'src/interfaces/TagDto';
+import type TagDto from 'src/interfaces/TagDto';
 import TagChip from '../components/TagChip.vue';
-import PageDto from 'src/interfaces/PageDto';
+import type PageDto from 'src/interfaces/PageDto';
 
 const { t } = useI18n();
 const $q = useQuasar();
@@ -170,7 +170,7 @@ const addTagTomoneySelectModel = ref<TagDto | null>(null);
 const addTagTomoneySelectOptions = ref<TagDto[]>([]);
 
 const props = defineProps({
-  money: { type: Object as PropType<moneyDto>, required: true },
+  money: { type: Object as PropType<MoneyDto>, required: true },
 });
 
 const emit = defineEmits(['reloadmoneys']);
@@ -201,7 +201,7 @@ function loadTags() {
     });
 }
 
-async function updatemoney() {
+async function updateMoney() {
   // Validate first
   if (!moneyUpdateInput.value || moneyUpdateInput.value.validate() !== true)
     return;
@@ -212,7 +212,7 @@ async function updatemoney() {
       text: moneyUpdateText.value,
       uuid: props.money.uuid,
     };
-    const res: AxiosResponse<moneyDto> = await api.put(
+    const res: AxiosResponse<MoneyDto> = await api.put(
       '/moneys/' + updatemoneyDto.uuid,
       updatemoneyDto,
     );
@@ -254,18 +254,18 @@ async function updatemoney() {
   }
 }
 
-function editmoney() {
+function editMoney() {
   moneyUpdateText.value = moneyText.value;
   moneysInEditStateCounter.incrementmoneysInEditState();
   moneyEditable.value = true;
 }
 
-function cancelEditmoney() {
+function cancelEditMoney() {
   moneysInEditStateCounter.decrementmoneysInEditState();
   moneyEditable.value = false;
 }
 
-function askConfirmationToDeletemoney() {
+function askConfirmationToDeleteMoney() {
   $q.dialog({
     title: t('dialog.confirm'),
     message: t('money.delete.confirm'),
@@ -281,14 +281,14 @@ function askConfirmationToDeletemoney() {
     },
     focus: 'cancel',
   }).onOk(() => {
-    deletemoney();
+    deleteMoney();
   });
 }
 
-async function deletemoney() {
+async function deleteMoney() {
   moneyDeleteBtnLoading.value = true;
   try {
-    const res: AxiosResponse<moneyDto> = await api.delete(
+    const res: AxiosResponse<MoneyDto> = await api.delete(
       '/moneys/' + props.money.uuid,
     );
     if (res.status === 204) {
@@ -327,7 +327,7 @@ async function deletemoney() {
   }
 }
 
-function addTagTomoneySelectFilter(
+function addTagToMoneySelectFilter(
   userProvidedName: string,
   update: (doneFn: () => void) => void,
 ) {
@@ -350,7 +350,7 @@ function addTagTomoneySelectFilter(
   });
 }
 
-async function addTagTomoney(value: TagDto) {
+async function addTagToMoney(value: TagDto) {
   try {
     if (!value) {
       return;
@@ -397,7 +397,7 @@ async function addTagTomoney(value: TagDto) {
   }
 }
 
-async function removeTagFrommoney(tag: TagDto) {
+async function removeTagFromMoney(tag: TagDto) {
   try {
     // Remove tag from money
     const res: AxiosResponse<TagDto> = await api.delete(

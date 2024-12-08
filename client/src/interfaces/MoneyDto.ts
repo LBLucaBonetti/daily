@@ -1,4 +1,4 @@
-import { OperationType } from './OperationType';
+import type { OperationType } from './OperationType';
 
 export default interface MoneyDto {
   uuid: string;

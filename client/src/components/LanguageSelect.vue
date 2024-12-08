@@ -44,7 +44,11 @@ onMounted(() => {
 });
 
 function updateLang(val: object | string) {
-  langList[`../../node_modules/quasar/lang/${val}.js`]().then((lang) => {
+  const effectiveLang = langList[`../../node_modules/quasar/lang/${val}.js`];
+  if(!effectiveLang) {
+    return;
+  }
+  effectiveLang().then((lang: any) => {
     $q.lang.set(lang.default);
     const langIso = locale.value.toString();
     language.setLanguage(langIso);
