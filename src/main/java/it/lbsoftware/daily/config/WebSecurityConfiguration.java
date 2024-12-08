@@ -63,7 +63,7 @@ public class WebSecurityConfiguration {
                         new AntPathRequestMatcher(Constants.PASSWORD_RESET_PATH),
                         new DailyReferrerPolicyHeaderWriter(
                             ReferrerPolicy.NO_REFERRER.getPolicy())))
-                .permissionsPolicy(permissions -> permissions.policy(PERMISSIONS_POLICY)));
+                .permissionsPolicyHeader(permissions -> permissions.policy(PERMISSIONS_POLICY)));
     // Authorization & authentication
     http.authorizeHttpRequests(
         authorizeHttpRequests ->
