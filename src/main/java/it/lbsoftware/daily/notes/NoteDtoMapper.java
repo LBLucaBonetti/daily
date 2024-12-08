@@ -1,9 +1,10 @@
 package it.lbsoftware.daily.notes;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 /** Mapper for {@link Note} entities. */
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface NoteDtoMapper {
 
   Note convertToEntity(NoteDto noteDto);
