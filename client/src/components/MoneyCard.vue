@@ -35,7 +35,7 @@
         <q-input
           autogrow
           input-class="text-1"
-          v-model="moneyText"
+          v-model="moneyText" <!-- TODO https://www.npmjs.com/package/v-money3 & https://github.com/jonathanpmartins/v-money3 -->
           min-height="15rem"
           counter
           maxlength="255"
@@ -148,7 +148,7 @@ import { onMounted, type PropType, ref } from 'vue';
 import { refreshPage } from 'src/utils/refresh-page';
 import { isAxios401 } from 'src/utils/is-axios-401';
 import { notifyPosition } from 'src/utils/notify-position';
-import { usemoneysInEditStateStore } from 'src/stores/moneyEditingStore';
+import { useMoneyInEditStateStore } from 'src/stores/moneyEditingStore';
 import { useI18n } from 'vue-i18n';
 import { useLanguageStore } from 'src/stores/languageStore';
 import type TagDto from 'src/interfaces/TagDto';
@@ -163,17 +163,17 @@ const moneyEditable = ref(false);
 const moneyUpdateText = ref('');
 const moneyUpdateBtnLoading = ref(false);
 const moneyUpdateInput = ref<QInput | null>(null);
-const moneysInEditStateCounter = usemoneysInEditStateStore();
+const moneyInEditStateCounter = useMoneyInEditStateStore();
 const languageStore = useLanguageStore();
 const tags = ref<TagDto[]>([]);
-const addTagTomoneySelectModel = ref<TagDto | null>(null);
-const addTagTomoneySelectOptions = ref<TagDto[]>([]);
+const addTagToMoneySelectModel = ref<TagDto | null>(null);
+const addTagToMoneySelectOptions = ref<TagDto[]>([]);
 
 const props = defineProps({
   money: { type: Object as PropType<MoneyDto>, required: true },
 });
 
-const emit = defineEmits(['reloadmoneys']);
+const emit = defineEmits(['reloadMoney']);
 
 onMounted(() => {
   moneyText.value = props.money.text;
@@ -186,7 +186,7 @@ function reloadTags() {
 
 function loadTags() {
   api
-    .get('/moneys/' + props.money.uuid + '/tags')
+    .get('/money/' + props.money.uuid + '/tags')
     .then((res: AxiosResponse<TagDto[]>) => {
       tags.value = [...res.data];
     })
@@ -208,13 +208,13 @@ async function updateMoney() {
   // Set loading and do stuff
   moneyUpdateBtnLoading.value = true;
   try {
-    const updatemoneyDto: moneyDto = {
+    const updateMoneyDto: MoneyDto = {
       text: moneyUpdateText.value,
       uuid: props.money.uuid,
     };
     const res: AxiosResponse<MoneyDto> = await api.put(
-      '/moneys/' + updatemoneyDto.uuid,
-      updatemoneyDto,
+      '/money/' + updateMoneyDto.uuid,
+      updateMoneyDto,
     );
     if (res.status === 200) {
       $q.notify({
@@ -230,7 +230,7 @@ async function updateMoney() {
       });
       // Restore non-editable state
       moneyText.value = moneyUpdateText.value;
-      moneysInEditStateCounter.decrementmoneysInEditState();
+      moneyInEditStateCounter.decrementMoneyInEditState();
       moneyEditable.value = false;
     }
   } catch (err) {
@@ -256,12 +256,12 @@ async function updateMoney() {
 
 function editMoney() {
   moneyUpdateText.value = moneyText.value;
-  moneysInEditStateCounter.incrementmoneysInEditState();
+  moneyInEditStateCounter.incrementMoneyInEditState();
   moneyEditable.value = true;
 }
 
 function cancelEditMoney() {
-  moneysInEditStateCounter.decrementmoneysInEditState();
+  moneyInEditStateCounter.decrementMoneyInEditState();
   moneyEditable.value = false;
 }
 
@@ -289,7 +289,7 @@ async function deleteMoney() {
   moneyDeleteBtnLoading.value = true;
   try {
     const res: AxiosResponse<MoneyDto> = await api.delete(
-      '/moneys/' + props.money.uuid,
+      '/money/' + props.money.uuid,
     );
     if (res.status === 204) {
       $q.notify({
@@ -304,7 +304,7 @@ async function deleteMoney() {
         iconSize: '20px',
       });
       // Reload moneys
-      emit('reloadmoneys');
+      emit('reloadMoney');
     }
   } catch (err) {
     if (isAxios401(err)) {
@@ -338,7 +338,7 @@ function addTagToMoneySelectFilter(
       .get('/tags', { params: { name: userProvidedName } })
       .then((res: AxiosResponse<PageDto<TagDto>>) => {
         // Replace the content of the options each time
-        addTagTomoneySelectOptions.value = [...res.data.content];
+        addTagToMoneySelectOptions.value = [...res.data.content];
       })
       .catch((err: Error | AxiosError) => {
         if (isAxios401(err)) {
@@ -358,14 +358,14 @@ async function addTagToMoney(value: TagDto) {
 
     // Add tag to money, if it's already present for the current money, it should not be a problem
     const res: AxiosResponse<TagDto> = await api.put(
-      '/moneys/' + props.money.uuid + '/tags/' + value.uuid,
+      '/money/' + props.money.uuid + '/tags/' + value.uuid,
     );
     if (res.status === 204) {
       $q.notify({
         classes: 'q-px-lg',
         position: notifyPosition($q),
         progress: true,
-        message: t('tag.addTomoney.ok'),
+        message: t('tag.addToMoney.ok'),
         color: 'white',
         textColor: 'info',
         icon: 'img:icons/success.svg',
@@ -383,7 +383,7 @@ async function addTagToMoney(value: TagDto) {
       classes: 'q-px-lg',
       position: notifyPosition($q),
       progress: true,
-      message: t('tag.addTomoney.error'),
+      message: t('tag.addToMoney.error'),
       color: 'white',
       textColor: 'info',
       icon: 'img:icons/error.svg',
@@ -392,8 +392,8 @@ async function addTagToMoney(value: TagDto) {
     });
   } finally {
     // Reset select options anyway
-    addTagTomoneySelectModel.value = null;
-    addTagTomoneySelectOptions.value = [];
+    addTagToMoneySelectModel.value = null;
+    addTagToMoneySelectOptions.value = [];
   }
 }
 
@@ -401,14 +401,14 @@ async function removeTagFromMoney(tag: TagDto) {
   try {
     // Remove tag from money
     const res: AxiosResponse<TagDto> = await api.delete(
-      '/moneys/' + props.money.uuid + '/tags/' + tag.uuid,
+      '/money/' + props.money.uuid + '/tags/' + tag.uuid,
     );
     if (res.status === 204) {
       $q.notify({
         classes: 'q-px-lg',
         position: notifyPosition($q),
         progress: true,
-        message: t('tag.removeFrommoney.ok'),
+        message: t('tag.removeFromMoney.ok'),
         color: 'white',
         textColor: 'info',
         icon: 'img:icons/success.svg',
@@ -425,7 +425,7 @@ async function removeTagFromMoney(tag: TagDto) {
       classes: 'q-px-lg',
       position: notifyPosition($q),
       progress: true,
-      message: t('tag.removeFrommoney.error'),
+      message: t('tag.removeFromMoney.error'),
       color: 'white',
       textColor: 'info',
       icon: 'img:icons/error.svg',
