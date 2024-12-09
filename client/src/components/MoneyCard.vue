@@ -32,10 +32,11 @@
           v-if="moneyEditable"
         >
         </q-input>
+        <!-- TODO https://www.npmjs.com/package/v-money3 & https://github.com/jonathanpmartins/v-money3 -->
         <q-input
           autogrow
           input-class="text-1"
-          v-model="moneyText" <!-- TODO https://www.npmjs.com/package/v-money3 & https://github.com/jonathanpmartins/v-money3 -->
+          v-model="moneyText"
           min-height="15rem"
           counter
           maxlength="255"
