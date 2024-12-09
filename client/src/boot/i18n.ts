@@ -30,7 +30,6 @@ export default defineBoot(async ({ app }) => {
   const i18n = createI18n<{ message: MessageSchema }, MessageLanguages>({
     locale: langIso,
     globalInjection: true,
-    legacy: false,
     messages,
   });
 
