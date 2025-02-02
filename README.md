@@ -1,7 +1,7 @@
 # daily
 
 > [!WARNING]
-> This project is currently archived. No updates (security, bugs, features, dependencies) will be made. I want to focus on something else.
+> This project is currently archived. No updates (security, bugs, features, dependencies) will be made. I want to focus on something else. I was working on the <a href="https://github.com/LBLucaBonetti/daily/tree/GH-867">GH-867</a> branch of the <a href="https://github.com/LBLucaBonetti/daily/tree/GH-864_Budget_and_expenses_feature">GH-864_Budget_and_expenses_feature</a> feature. You can track the project status as it was archived <a href="https://github.com/users/LBLucaBonetti/projects/1">here</a>.
 
 [daily](https://trydaily.click) is an app for organizing everyday life.
 <br>
