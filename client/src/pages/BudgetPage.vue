@@ -4,6 +4,24 @@
     :translatedSubtitle="$t('pages.budget.subtitle')"
   ></page-title>
 
+  <money-input
+  :model-value="moneyValue"
+  currency="EUR"
+  >
+  </money-input>
+  <div class="row justify-end">
+    <q-btn
+      unelevated
+      padding="sm xl"
+      :aria-label="$t('money.save.button')"
+      class="q-mt-sm bg-2 text-2"
+      @click="askConfirmationIfThereAreMoneysInEditState"
+      :label="$t('money.save.button')"
+      ref="moneySaveBtn"
+      :loading="moneySaveBtnLoading"
+    ></q-btn>
+  </div>
+
   <q-infinite-scroll @load="onLoad" ref="infiniteScroll">
     <money-card
       v-for="money in moneys"
@@ -54,6 +72,7 @@
 <script setup lang="ts">
 import PageTitle from 'src/components/PageTitle.vue';
 import MoneyCard from 'src/components/MoneyCard.vue';
+import MoneyInput from 'src/components/MoneyInput.vue';
 import { api } from 'boot/axios';
 import type { AxiosError, AxiosResponse } from 'axios';
 import type PageDto from 'src/interfaces/PageDto';
@@ -62,7 +81,7 @@ import { isAxios401 } from 'src/utils/is-axios-401';
 import { refreshPage } from 'src/utils/refresh-page';
 import { notifyPosition } from 'src/utils/notify-position';
 import { useI18n } from 'vue-i18n';
-import { QInfiniteScroll, QSkeleton, useQuasar } from 'quasar';
+import { QInfiniteScroll, QSkeleton, useQuasar, date, QBtn } from 'quasar';
 import { ref } from 'vue';
 import { useMoneyInEditStateStore } from 'stores/moneyEditingStore';
 
@@ -71,6 +90,59 @@ const $q = useQuasar();
 const moneys = ref<MoneyDto[]>([]);
 const infiniteScroll = ref<QInfiniteScroll | null>(null);
 const moneyInEditStateCounter = useMoneyInEditStateStore();
+const moneySaveBtnLoading = ref(false);
+const moneyValue = ref(1.00); // FIXME This ref never changes its value
+
+async function saveMoney() {
+  // Set loading and do stuff
+  moneySaveBtnLoading.value = true;
+  try {
+    const moneyDto: MoneyDto = {
+      uuid: '',
+      amount: moneyValue.value,
+      operationDate: new Date(),
+      operationType: 'INCOME'
+    };
+    const res: AxiosResponse<MoneyDto> = await api.post('/money', moneyDto);
+    if (res.status === 201) {
+      $q.notify({
+        classes: 'q-px-lg',
+        position: notifyPosition($q),
+        progress: true,
+        message: t('money.save.ok'),
+        color: 'white',
+        textColor: 'info',
+        icon: 'img:icons/success.svg',
+        iconColor: 'primary',
+        iconSize: '20px',
+      });
+      // Reload money
+      reloadMoney();
+      // Reset money text
+      moneyValue.value = 1.00;
+      // Set focus back to input
+      // moneyInput.value.focus();
+    }
+  } catch (err) {
+    if (isAxios401(err)) {
+      refreshPage();
+      return;
+    }
+    $q.notify({
+      classes: 'q-px-lg',
+      position: notifyPosition($q),
+      progress: true,
+      message: t('money.save.error'),
+      color: 'white',
+      textColor: 'info',
+      icon: 'img:icons/error.svg',
+      iconColor: 'primary',
+      iconSize: '20px',
+    });
+  } finally {
+    moneySaveBtnLoading.value = false;
+  }
+}
 
 function onLoad(index: number, done: () => void) {
   api
@@ -79,6 +151,7 @@ function onLoad(index: number, done: () => void) {
         sort: 'createdAt,DESC',
         size: 10,
         page: index - 1,
+        'year-month-date': date.formatDate(new Date(), "YYYY-MM-DD"),
       },
     })
     .then((res: AxiosResponse<PageDto<MoneyDto>>) => {
@@ -118,6 +191,31 @@ function reloadMoney() {
   moneys.value = [];
   infiniteScroll.value.resume();
   infiniteScroll.value.trigger();
+}
+
+function askConfirmationIfThereAreMoneysInEditState() {
+  if (moneyInEditStateCounter.counter <= 0) {
+    saveMoney();
+    return;
+  }
+  $q.dialog({
+    title: t('dialog.confirm'),
+    message: t('money.save.beingEdited'),
+    html: true,
+    persistent: true,
+    class: 'bg-1 text-1',
+    ok: {
+      flat: true,
+      class: 'bg-1 text-1',
+    },
+    cancel: {
+      flat: true,
+      class: 'bg-1 text-1',
+    },
+    focus: 'cancel',
+  }).onOk(() => {
+    saveMoney();
+  });
 }
 </script>
 

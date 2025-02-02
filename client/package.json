@@ -21,6 +21,7 @@
     "quasar": "^2.16.0",
     "quasar-extras-svg-icons": "^1.37.0",
     "vue": "^3.5.13",
+    "vue-currency-input": "^3.1.0",
     "vue-i18n": "^10.0.5",
     "vue-router": "^4.0.12"
   },

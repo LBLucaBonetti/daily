@@ -19,27 +19,18 @@
           autofocus
           clearable
           input-class="text-1"
-          v-model="moneyUpdateText"
+          v-model="moneyUpdateValue"
           min-height="15rem"
-          counter
-          maxlength="255"
           borderless
-          :rules="[
-            (val) => validateMoney(val, $t('money.save.validation.empty')),
-          ]"
-          lazy-rules="ondemand"
           ref="moneyUpdateInput"
           v-if="moneyEditable"
         >
         </q-input>
-        <!-- TODO https://www.npmjs.com/package/v-money3 & https://github.com/jonathanpmartins/v-money3 -->
         <q-input
           autogrow
           input-class="text-1"
-          v-model="moneyText"
+          v-model="moneyValue"
           min-height="15rem"
-          counter
-          maxlength="255"
           borderless
           readonly
           v-else
@@ -103,7 +94,7 @@
             <q-btn
               unelevated
               :loading="moneyUpdateBtnLoading"
-              :disable="moneyText === moneyUpdateText"
+              :disable="moneyValue === moneyUpdateValue"
               :label="$t('dialog.save')"
               aria-label="Save"
               @click="updateMoney"
@@ -133,7 +124,6 @@
 </template>
 
 <script setup lang="ts">
-import { validateMoney } from 'src/validators/money-validator';
 import type { AxiosError, AxiosResponse } from 'axios';
 import {
   QCard,
@@ -141,7 +131,7 @@ import {
   QCardActions,
   QBtn,
   useQuasar,
-  QInput,
+  type QInput,
 } from 'quasar';
 import { api } from 'src/boot/axios';
 import type MoneyDto from 'src/interfaces/MoneyDto';
@@ -158,10 +148,10 @@ import type PageDto from 'src/interfaces/PageDto';
 
 const { t } = useI18n();
 const $q = useQuasar();
-const moneyText = ref('');
+const moneyValue = ref(0);
 const moneyDeleteBtnLoading = ref(false);
 const moneyEditable = ref(false);
-const moneyUpdateText = ref('');
+const moneyUpdateValue = ref(0);
 const moneyUpdateBtnLoading = ref(false);
 const moneyUpdateInput = ref<QInput | null>(null);
 const moneyInEditStateCounter = useMoneyInEditStateStore();
@@ -177,7 +167,7 @@ const props = defineProps({
 const emit = defineEmits(['reloadMoney']);
 
 onMounted(() => {
-  moneyText.value = props.money.text;
+  moneyValue.value = props.money?.amount;
   loadTags();
 });
 
@@ -210,8 +200,10 @@ async function updateMoney() {
   moneyUpdateBtnLoading.value = true;
   try {
     const updateMoneyDto: MoneyDto = {
-      text: moneyUpdateText.value,
+      amount: moneyUpdateValue.value,
       uuid: props.money.uuid,
+      operationDate: new Date(),
+      operationType: 'INCOME'
     };
     const res: AxiosResponse<MoneyDto> = await api.put(
       '/money/' + updateMoneyDto.uuid,
@@ -230,7 +222,7 @@ async function updateMoney() {
         iconSize: '20px',
       });
       // Restore non-editable state
-      moneyText.value = moneyUpdateText.value;
+      moneyValue.value = moneyUpdateValue.value;
       moneyInEditStateCounter.decrementMoneyInEditState();
       moneyEditable.value = false;
     }
@@ -256,7 +248,7 @@ async function updateMoney() {
 }
 
 function editMoney() {
-  moneyUpdateText.value = moneyText.value;
+  moneyUpdateValue.value = moneyValue.value;
   moneyInEditStateCounter.incrementMoneyInEditState();
   moneyEditable.value = true;
 }
