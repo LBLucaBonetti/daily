@@ -1,5 +1,8 @@
 # daily
 
+> [!WARNING]
+> This project is currently archived. No updates (security, bugs, features, dependencies) will be made. I want to focus on something else.
+
 [daily](https://trydaily.click) is an app for organizing everyday life.
 <br>
 Technically speaking, this is a "monorepo" with a Spring Boot backend and a Quasar (Vue.js)
